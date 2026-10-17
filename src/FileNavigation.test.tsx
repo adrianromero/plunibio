@@ -6,6 +6,7 @@
 import { batch, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { NavigateFileHandler } from "./AppContext";
 import FileNavigation from "./FileNavigation";
 
 const [basepath, setBasepath] = createSignal("/first");
@@ -13,9 +14,23 @@ const [filename, setFilename] = createSignal("");
 const loadFilename = vi.fn(async (nextFilename: string) => {
     setFilename(nextFilename);
 });
+let navigateBackShortcut: NavigateFileHandler | null = null;
+let navigateForwardShortcut: NavigateFileHandler | null = null;
 
 vi.mock("./AppContext", () => ({
-    useAppContext: () => ({ main: { basepath, filename, loadFilename } }),
+    useAppContext: () => ({
+        main: {
+            basepath,
+            filename,
+            loadFilename,
+            setNavigateBack: (handler: NavigateFileHandler | null) => {
+                navigateBackShortcut = handler;
+            },
+            setNavigateForward: (handler: NavigateFileHandler | null) => {
+                navigateForwardShortcut = handler;
+            },
+        },
+    }),
 }));
 vi.mock("./Localization", () => ({
     useI18N: () => ({ t: (key: string) => key }),
@@ -41,6 +56,8 @@ describe("FileNavigation", () => {
         setBasepath("/first");
         setFilename("");
         loadFilename.mockClear();
+        navigateBackShortcut = null;
+        navigateForwardShortcut = null;
     });
 
     it("uses the borderless main bar button style", () => {
@@ -68,6 +85,27 @@ describe("FileNavigation", () => {
         expect(forward?.disabled).toBe(true);
         expect(loadFilename).toHaveBeenNthCalledWith(1, "first.md");
         expect(loadFilename).toHaveBeenNthCalledWith(2, "second.md");
+    });
+
+    it("registers shortcuts only while each navigation direction is available", async () => {
+        renderNavigation();
+
+        expect(navigateBackShortcut).toBeNull();
+        expect(navigateForwardShortcut).toBeNull();
+
+        setFilename("first.md");
+        setFilename("second.md");
+        expect(navigateBackShortcut).not.toBeNull();
+        expect(navigateForwardShortcut).toBeNull();
+
+        await navigateBackShortcut?.();
+        expect(filename()).toBe("first.md");
+        expect(navigateForwardShortcut).not.toBeNull();
+
+        dispose?.();
+        dispose = undefined;
+        expect(navigateBackShortcut).toBeNull();
+        expect(navigateForwardShortcut).toBeNull();
     });
 
     it("discards forward history when a different file is opened", () => {

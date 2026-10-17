@@ -67,6 +67,10 @@ describe("createFileEditorController", () => {
                 filename,
                 setFilename,
                 loadFilename: vi.fn(() => Promise.resolve()),
+                navigateBack: () => null,
+                setNavigateBack: vi.fn(),
+                navigateForward: () => null,
+                setNavigateForward: vi.fn(),
                 onunload: () => onunload,
                 setOnunload: (handler) => {
                     onunload = handler;

@@ -5,14 +5,20 @@
 
 import ArrowLeft from "lucide-solid/icons/arrow-left";
 import ArrowRight from "lucide-solid/icons/arrow-right";
-import { batch, createEffect, createSignal, JSX } from "solid-js";
+import { batch, createEffect, createSignal, JSX, onCleanup } from "solid-js";
 import { useAppContext } from "./AppContext";
 import { useI18N } from "./Localization";
 
 export function FileNavigation(): JSX.Element {
     const { t } = useI18N();
     const {
-        main: { basepath, filename, loadFilename },
+        main: {
+            basepath,
+            filename,
+            loadFilename,
+            setNavigateBack,
+            setNavigateForward,
+        },
     } = useAppContext();
     const [filenameHistory, setFilenameHistory] = createSignal<string[]>([filename()]);
     const [historyIndex, setHistoryIndex] = createSignal(0);
@@ -71,6 +77,21 @@ export function FileNavigation(): JSX.Element {
         }
     };
 
+    const navigateBack = (): Promise<void> => navigateHistory(historyIndex() - 1);
+    const navigateForward = (): Promise<void> => navigateHistory(historyIndex() + 1);
+
+    createEffect(() => {
+        setNavigateBack(historyIndex() > 0 ? navigateBack : null);
+        setNavigateForward(
+            historyIndex() < filenameHistory().length - 1 ? navigateForward : null
+        );
+    });
+
+    onCleanup(() => {
+        setNavigateBack(null);
+        setNavigateForward(null);
+    });
+
     return (
         <>
             <button
@@ -79,7 +100,7 @@ export function FileNavigation(): JSX.Element {
                 disabled={historyIndex() <= 0}
                 aria-label={t("toolbar.back")}
                 title={t("toolbar.back")}
-                onClick={() => void navigateHistory(historyIndex() - 1)}
+                onClick={() => void navigateBack()}
             >
                 <ArrowLeft class="actionIcon" aria-hidden="true" />
             </button>
@@ -89,7 +110,7 @@ export function FileNavigation(): JSX.Element {
                 disabled={historyIndex() >= filenameHistory().length - 1}
                 aria-label={t("toolbar.forward")}
                 title={t("toolbar.forward")}
-                onClick={() => void navigateHistory(historyIndex() + 1)}
+                onClick={() => void navigateForward()}
             >
                 <ArrowRight class="actionIcon" aria-hidden="true" />
             </button>

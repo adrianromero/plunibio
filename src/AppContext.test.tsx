@@ -43,6 +43,87 @@ describe("AppProvider workspace changes", () => {
         vi.mocked(invoke).mockReset();
     });
 
+    const pressShortcut = (key: string, code: string): KeyboardEvent => {
+        const event = new KeyboardEvent("keydown", {
+            key,
+            code,
+            ctrlKey: true,
+            altKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(event);
+        return event;
+    };
+
+    const renderProvider = (): AppContextValues => {
+        let context: AppContextValues | undefined;
+
+        function Probe() {
+            context = useAppContext();
+            return null;
+        }
+
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <AppProvider initialBasepath="/workspace" initialFilename="note.md">
+                    <Probe />
+                </AppProvider>
+            ),
+            root
+        );
+
+        if (!context) throw new Error("App context was not initialized");
+        return context;
+    };
+
+    it("routes navigation and sidebar shortcuts only to registered handlers", () => {
+        const context = renderProvider();
+        const navigateBack = vi.fn(() => Promise.resolve());
+        const navigateForward = vi.fn(() => Promise.resolve());
+        const toggleSidebar = vi.fn();
+        context.main.setNavigateBack(navigateBack);
+        context.main.setNavigateForward(navigateForward);
+        context.editor.setToggleSidebar(toggleSidebar);
+
+        expect(pressShortcut(",", "Comma").defaultPrevented).toBe(true);
+        expect(pressShortcut(".", "Period").defaultPrevented).toBe(true);
+        expect(pressShortcut("b", "KeyX").defaultPrevented).toBe(true);
+        expect(navigateBack).toHaveBeenCalledOnce();
+        expect(navigateForward).toHaveBeenCalledOnce();
+        expect(toggleSidebar).toHaveBeenCalledOnce();
+
+        context.main.setNavigateBack(null);
+        context.editor.setToggleSidebar(null);
+        pressShortcut(",", "Comma");
+        pressShortcut("b", "KeyX");
+        expect(navigateBack).toHaveBeenCalledOnce();
+        expect(toggleSidebar).toHaveBeenCalledOnce();
+    });
+
+    it("blocks shortcuts while loading or while any dialog is open", () => {
+        const context = renderProvider();
+        const navigateBack = vi.fn(() => Promise.resolve());
+        context.main.setNavigateBack(navigateBack);
+
+        context.spinner.showSpinner();
+        pressShortcut(",", "Comma");
+        expect(navigateBack).not.toHaveBeenCalled();
+        context.spinner.hideSpinner();
+
+        const dialog = document.createElement("dialog");
+        dialog.setAttribute("open", "");
+        document.body.append(dialog);
+        pressShortcut(",", "Comma");
+        expect(navigateBack).not.toHaveBeenCalled();
+
+        dialog.remove();
+        pressShortcut(",", "Comma");
+        expect(navigateBack).toHaveBeenCalledOnce();
+    });
+
     it("saves pending editor changes before changing basepath and filename", async () => {
         const calls: string[] = [];
         vi.mocked(invoke).mockImplementation(async command => {

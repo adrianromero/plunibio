@@ -81,6 +81,10 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             loadFilename: async (nextFilename) => {
                 setFilename(nextFilename);
             },
+            navigateBack: () => null,
+            setNavigateBack: () => undefined,
+            navigateForward: () => null,
+            setNavigateForward: () => undefined,
             onunload,
             setOnunload,
             showAppMessage: async () => undefined,

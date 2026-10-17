@@ -8,14 +8,16 @@ import { type Accessor, type JSX, onCleanup, onMount } from "solid-js";
 export type ShortcutHandler = () => void | Promise<void>;
 export type ShortcutPhase = "capture" | "bubble";
 
-export type ShortcutDefinition = {
+type ShortcutDefinitionBase = {
     id: string;
-    key: string;
     shift?: boolean;
     alt?: boolean;
     phase?: ShortcutPhase;
     getHandler: Accessor<ShortcutHandler | null>;
 };
+
+export type ShortcutDefinition = ShortcutDefinitionBase &
+    ({ key: string; code?: never } | { key?: never; code: string });
 
 type AppShortcutsProps = {
     shortcuts: readonly ShortcutDefinition[];
@@ -27,8 +29,13 @@ function isPrimaryModifier(event: KeyboardEvent): boolean {
 }
 
 function matchesShortcut(event: KeyboardEvent, shortcut: ShortcutDefinition): boolean {
+    const matchesKey = shortcut.code
+        ? event.code === shortcut.code
+        : shortcut.key !== undefined &&
+          event.key.toLowerCase() === shortcut.key.toLowerCase();
+
     return (
-        event.key.toLowerCase() === shortcut.key.toLowerCase() &&
+        matchesKey &&
         isPrimaryModifier(event) &&
         event.shiftKey === Boolean(shortcut.shift) &&
         event.altKey === Boolean(shortcut.alt)

@@ -14,6 +14,8 @@ describe("AppShortcuts", () => {
     let reloadFile: ReturnType<typeof vi.fn<() => Promise<void>>>;
     let searchFile: ReturnType<typeof vi.fn<() => void>>;
     let customAction: ReturnType<typeof vi.fn<() => void>>;
+    let navigateBack: ReturnType<typeof vi.fn<() => void | Promise<void>>>;
+    let toggleSidebar: ReturnType<typeof vi.fn<() => void>>;
     let openWorkspace: ReturnType<typeof vi.fn<() => void>>;
     let setSaveAvailable: (available: boolean) => void;
     let setReloadAvailable: (available: boolean) => void;
@@ -26,6 +28,8 @@ describe("AppShortcuts", () => {
         reloadFile = vi.fn(() => Promise.resolve());
         searchFile = vi.fn();
         customAction = vi.fn();
+        navigateBack = vi.fn();
+        toggleSidebar = vi.fn();
         openWorkspace = vi.fn();
         const [saveAvailable, setSaveAvailableSignal] = createSignal(false);
         const [reloadAvailable, setReloadAvailableSignal] = createSignal(false);
@@ -78,6 +82,18 @@ describe("AppShortcuts", () => {
                             id: "custom",
                             key: "k",
                             getHandler: () => customAction,
+                        },
+                        {
+                            id: "navigate-back",
+                            code: "Comma",
+                            alt: true,
+                            getHandler: () => navigateBack,
+                        },
+                        {
+                            id: "toggle-sidebar",
+                            key: "b",
+                            alt: true,
+                            getHandler: () => toggleSidebar,
                         },
                     ]}
                     interactionsBlocked={interactionsBlocked}
@@ -146,6 +162,40 @@ describe("AppShortcuts", () => {
         expect(customAction).toHaveBeenCalledOnce();
     });
 
+    it("matches primary-plus-alt shortcuts by physical key with Ctrl or Meta", () => {
+        press(";", { code: "Comma", altKey: true });
+        press("B", { code: "KeyX", ctrlKey: false, metaKey: true, altKey: true });
+
+        expect(navigateBack).toHaveBeenCalledOnce();
+        expect(toggleSidebar).toHaveBeenCalledOnce();
+    });
+
+    it("does not match navigation shortcuts without Alt", () => {
+        const event = press(",", { code: "Comma" });
+
+        expect(event.defaultPrevented).toBe(false);
+        expect(navigateBack).not.toHaveBeenCalled();
+    });
+
+    it("does not start the same asynchronous navigation twice", async () => {
+        let finishNavigation: (() => void) | undefined;
+        navigateBack.mockImplementationOnce(
+            () =>
+                new Promise<void>((resolve) => {
+                    finishNavigation = resolve;
+                })
+        );
+
+        press(",", { code: "Comma", altKey: true });
+        press(",", { code: "Comma", altKey: true });
+        expect(navigateBack).toHaveBeenCalledOnce();
+
+        finishNavigation?.();
+        await Promise.resolve();
+        press(",", { code: "Comma", altKey: true });
+        expect(navigateBack).toHaveBeenCalledTimes(2);
+    });
+
     it("opens a workspace with Mod+Shift+O", () => {
         const plainOpen = press("o");
         const workspaceOpen = press("O", { shiftKey: true });
@@ -160,11 +210,20 @@ describe("AppShortcuts", () => {
         setFileModified(true);
 
         const boldEvent = press("b");
+        const blockquoteEvent = press("b", { shiftKey: true });
+        const codeMirrorNavigationEvent = press("ArrowLeft", {
+            ctrlKey: false,
+            altKey: true,
+        });
         const saveAsEvent = press("s", { shiftKey: true });
 
         expect(boldEvent.defaultPrevented).toBe(false);
+        expect(blockquoteEvent.defaultPrevented).toBe(false);
+        expect(codeMirrorNavigationEvent.defaultPrevented).toBe(false);
         expect(saveAsEvent.defaultPrevented).toBe(false);
         expect(saveFile).not.toHaveBeenCalled();
+        expect(navigateBack).not.toHaveBeenCalled();
+        expect(toggleSidebar).not.toHaveBeenCalled();
     });
 
     it("does not execute actions while interaction is blocked or a key repeats", () => {

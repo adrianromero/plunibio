@@ -38,6 +38,7 @@ import { translateAppError } from "./AppError";
 export type SaveFileHandler = () => Promise<void>;
 export type ReloadFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
+export type NavigateFileHandler = () => Promise<void>;
 export type ToggleSidebarHandler = () => void;
 export type ToggleThemeHandler = () => void;
 export type OnunloadHandler = () => Promise<void>;
@@ -50,6 +51,10 @@ export type AppContextValues = {
         filename: Accessor<string>;
         setFilename: Setter<string>;
         loadFilename: (filename: string) => Promise<void>;
+        navigateBack: Accessor<NavigateFileHandler | null>;
+        setNavigateBack: (handler: NavigateFileHandler | null) => void;
+        navigateForward: Accessor<NavigateFileHandler | null>;
+        setNavigateForward: (handler: NavigateFileHandler | null) => void;
         onunload: Accessor<OnunloadHandler | null>;
         setOnunload: (handler: OnunloadHandler | null) => void;
         showAppMessage: (msg: string, info?: MessageInfoKind) => Promise<void>;
@@ -109,6 +114,9 @@ export function AppProvider(props: {
     const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
     const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
+    const [navigateBack, setNavigateBackSignal] = createSignal<NavigateFileHandler | null>(null);
+    const [navigateForward, setNavigateForwardSignal] =
+        createSignal<NavigateFileHandler | null>(null);
     const [sidebarVisible, setSidebarVisibleSignal] = createSignal(loadSidebarVisible());
     const [showHiddenFiles, setShowHiddenFilesSignal] = createSignal(loadShowHiddenFiles());
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
@@ -142,6 +150,12 @@ export function AppProvider(props: {
     };
     const setSearchFile = (handler: SearchFileHandler | null) => {
         setSearchFileSignal(() => handler);
+    };
+    const setNavigateBack = (handler: NavigateFileHandler | null) => {
+        setNavigateBackSignal(() => handler);
+    };
+    const setNavigateForward = (handler: NavigateFileHandler | null) => {
+        setNavigateForwardSignal(() => handler);
     };
     const setToggleSidebar = (handler: ToggleSidebarHandler | null) => {
         setToggleSidebarSignal(() => handler);
@@ -213,7 +227,31 @@ export function AppProvider(props: {
             phase: "capture",
             getHandler: searchFile,
         },
+        {
+            id: "navigate-back",
+            code: "Comma",
+            alt: true,
+            getHandler: navigateBack,
+        },
+        {
+            id: "navigate-forward",
+            code: "Period",
+            alt: true,
+            getHandler: navigateForward,
+        },
+        {
+            id: "toggle-sidebar",
+            key: "b",
+            alt: true,
+            getHandler: toggleSidebar,
+        },
     ] satisfies readonly ShortcutDefinition[];
+
+    const interactionsBlocked = (): boolean =>
+        spinnerVisible() ||
+        appMessage() !== null ||
+        workspaceDialogOpen() ||
+        document.querySelector("dialog[open]") !== null;
 
     const showAppMessage: (msg: string, info?: MessageInfoKind) => Promise<void> = (msg, info) => {
         return new Promise((resolve) => {
@@ -369,6 +407,10 @@ export function AppProvider(props: {
                     filename,
                     setFilename,
                     loadFilename,
+                    navigateBack,
+                    setNavigateBack,
+                    navigateForward,
+                    setNavigateForward,
                     onunload,
                     setOnunload,
                     showAppMessage,
@@ -405,9 +447,7 @@ export function AppProvider(props: {
             {props.children}
             <AppShortcuts
                 shortcuts={shortcuts}
-                interactionsBlocked={() =>
-                    spinnerVisible() || appMessage() !== null || workspaceDialogOpen()
-                }
+                interactionsBlocked={interactionsBlocked}
             />
             <SpinnerPanel visible={spinnerVisible()} text={spinnerText()} />
 
