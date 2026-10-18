@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import Folder from "lucide-solid/icons/folder";
+import FolderDot from "lucide-solid/icons/folder-dot";
 import { createMemo, For, JSX, Show } from "solid-js";
 import { useAppContext } from "./AppContext";
 import { useI18N } from "./Localization";
@@ -35,23 +35,18 @@ export function FileBreadcrumb(): JSX.Element {
     return (
         <div class={styles.container}>
             <nav class={styles.breadcrumb} aria-label={t("toolbar.pathNavigation")}>
-                <Show
-                    when={segments().length > 0}
-                    fallback={
-                        <span class={styles.currentSegment} aria-label={basepath()}>
-                            <Folder class={styles.homeIcon} aria-hidden="true" />
-                        </span>
-                    }
+                <button
+                    type="button"
+                    class={styles.segmentLink}
+                    aria-label={basepath()}
+                    title={basepath()}
+                    disabled={segments().length === 0}
+                    onClick={() => void loadFilename("")}
                 >
-                    <button
-                        type="button"
-                        class={styles.segmentLink}
-                        aria-label={basepath()}
-                        title={basepath()}
-                        onClick={() => void loadFilename("")}
-                    >
-                        <Folder class={styles.homeIcon} aria-hidden="true" />
-                    </button>
+                    <FolderDot class={styles.homeIcon} aria-hidden="true" />
+                    {t("folder.root")}
+                </button>
+                <Show when={segments().length > 0}>
                     <span class={styles.separator} aria-hidden="true">
                         /
                     </span>
