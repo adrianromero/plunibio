@@ -34,9 +34,6 @@ export function FileBreadcrumb(): JSX.Element {
 
     return (
         <div class={styles.container}>
-            <div class={styles.basepath} title={basepath()}>
-                {basepath()}
-            </div>
             <nav class={styles.breadcrumb} aria-label={t("toolbar.pathNavigation")}>
                 <Show
                     when={segments().length > 0}

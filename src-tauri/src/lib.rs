@@ -209,6 +209,7 @@ fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath:
         })
         .invoke_handler(tauri::generate_handler![
             commands::initial_config,
+            commands::set_window_title,
             commands::set_current_filename,
             commands::set_current_basepath,
             commands::browse_directories,

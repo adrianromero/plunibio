@@ -2576,6 +2576,7 @@ name = "plunibio"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "gtk",
  "serde",
  "serde_json",
  "tauri",

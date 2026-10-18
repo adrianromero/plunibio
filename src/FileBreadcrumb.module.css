@@ -4,18 +4,7 @@
  */
 
 .container {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
-    gap: 0.2rem;
-}
-
-.basepath {
-    overflow: hidden;
-    color: var(--color-text-subtle);
-    font-size: 0.8rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .breadcrumb {

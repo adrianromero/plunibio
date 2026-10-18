@@ -8,7 +8,7 @@ import { render } from "solid-js/web";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppProvider, type AppContextValues, useAppContext } from "./AppContext";
 
-vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
+vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn(async () => undefined) }));
 vi.mock("@tauri-apps/api/window", () => ({
     getCurrentWindow: () => ({
         onCloseRequested: vi.fn(async () => vi.fn()),
@@ -154,10 +154,21 @@ describe("AppProvider workspace changes", () => {
             root
         );
 
+        await vi.waitFor(() =>
+            expect(invoke).toHaveBeenCalledWith("set_window_title", {
+                title: "Plunibio - /old-workspace",
+            })
+        );
+
         context?.main.openWorkspace();
         root.querySelector<HTMLButtonElement>('[data-testid="confirm-workspace"]')?.click();
 
         await vi.waitFor(() => expect(context?.main.basepath()).toBe("/new-workspace"));
+        await vi.waitFor(() =>
+            expect(invoke).toHaveBeenCalledWith("set_window_title", {
+                title: "Plunibio - /new-workspace",
+            })
+        );
         expect(context?.main.filename()).toBe("");
         expect(calls).toEqual(["save", "backend"]);
     });

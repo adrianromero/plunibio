@@ -7,6 +7,7 @@ import {
     Accessor,
     batch,
     createContext,
+    createEffect,
     createSignal,
     JSX,
     onCleanup,
@@ -110,6 +111,13 @@ export function AppProvider(props: {
     const { t } = useI18N();
     const [basepath, setBasepath] = createSignal(props.initialBasepath);
     const [filename, setFilename] = createSignal(props.initialFilename);
+
+    createEffect(() => {
+        const title = `Plunibio - ${basepath()}`;
+        void invoke("set_window_title", { title }).catch((error: unknown) => {
+            console.error("Unable to update the window title:", error);
+        });
+    });
 
     const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
     const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);

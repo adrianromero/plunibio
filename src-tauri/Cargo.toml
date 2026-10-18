@@ -28,3 +28,6 @@ toml = "0.9.12"
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 tokio = { version = "1.52.3", features = ["time", "fs"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18"

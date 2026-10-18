@@ -7,8 +7,11 @@ use crate::paths::{
 };
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use tauri::Manager;
 use tauri_plugin_opener::OpenerExt;
 use tracing::info;
+#[cfg(target_os = "linux")]
+use tracing::warn;
 
 pub(crate) struct AppState {
     location: Mutex<AppLocation>,
@@ -121,6 +124,45 @@ pub(crate) struct ReadFileResult {
 pub(crate) struct ReadBinaryFileResult {
     content: Vec<u8>,
     is_new: bool,
+}
+
+#[tauri::command]
+pub(crate) fn set_window_title(app: tauri::AppHandle, title: String) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window not found".to_owned())?;
+
+    window
+        .set_title(&title)
+        .map_err(|error| format!("unable to update the native window title: {error}"))?;
+
+    #[cfg(target_os = "linux")]
+    {
+        use gtk::prelude::{BinExt, Cast, GtkWindowExt, HeaderBarExt};
+        use gtk::{EventBox, HeaderBar};
+
+        if let Some(titlebar) = window
+            .gtk_window()
+            .map_err(|error| format!("unable to access the GTK window: {error}"))?
+            .titlebar()
+        {
+            let Some(event_box) = titlebar.downcast_ref::<EventBox>() else {
+                warn!("Unable to update the Wayland title bar: unexpected GTK titlebar widget");
+                return Ok(());
+            };
+            let Some(child) = event_box.child() else {
+                warn!("Unable to update the Wayland title bar: GTK titlebar has no child");
+                return Ok(());
+            };
+            let Ok(header_bar) = child.downcast::<HeaderBar>() else {
+                warn!("Unable to update the Wayland title bar: expected a GTK HeaderBar");
+                return Ok(());
+            };
+            header_bar.set_title(Some(&title));
+        }
+    }
+
+    Ok(())
 }
 
 #[tauri::command]
