@@ -11,6 +11,7 @@ import Languages from "lucide-solid/icons/languages";
 import TypeIcon from "lucide-solid/icons/type";
 import Eye from "lucide-solid/icons/eye";
 import EyeOff from "lucide-solid/icons/eye-off";
+import Info from "lucide-solid/icons/info";
 import { useAppContext } from "./AppContext";
 import FileBreadcrumb from "./FileBreadcrumb";
 import FileNavigation from "./FileNavigation";
@@ -24,7 +25,7 @@ import styles from "./Toolbar.module.css";
 export function Toolbar() {
     const { t, locale, setLocale } = useI18N();
     const {
-        main: { openWorkspace },
+        main: { openWorkspace, showAbout },
         editor: {
             saveFile,
             reloadFile,
@@ -242,6 +243,20 @@ export function Toolbar() {
                                         setTypography(nextTypography);
                                     },
                                 } satisfies ToolbarMenuChoiceItem<AppTypography>,
+                            ],
+                        },
+                        {
+                            kind: "section",
+                            id: "information",
+                            label: t("toolbar.informationSection"),
+                            items: [
+                                {
+                                    kind: "action",
+                                    id: "about",
+                                    label: t("about.title", { appName: "Plunibio" }),
+                                    icon: Info,
+                                    onSelect: showAbout,
+                                },
                             ],
                         },
                     ]}

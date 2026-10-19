@@ -31,7 +31,8 @@
         "readingTypographyDescription": "Còmoda per a textos llargs",
         "language": "Idioma",
         "unsavedChanges": "Canvis sense desar",
-        "pathNavigation": "Ruta del fitxer actual"
+        "pathNavigation": "Ruta del fitxer actual",
+        "informationSection": "Informació"
     },
     "folder": {
         "root": "arrel",
@@ -155,6 +156,12 @@
         "reloadDiscardChanges": "Voleu tornar a carregar el fitxer i descartar els canvis sense desar?",
         "navigationSaveFailed": "{{ error }} Si continueu, podríeu perdre les dades.",
         "closeSaveFailed": "{{ error }} Si sortiu, podríeu perdre les dades."
+    },
+    "about": {
+        "title": "Quant a {{ appName }}",
+        "version": "Versió {{ version }}",
+        "homepage": "Pàgina principal a GitHub",
+        "license": "Llicència MIT"
     },
     "workspace": {
         "title": "Obre un espai",

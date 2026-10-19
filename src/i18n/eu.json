@@ -31,7 +31,8 @@
         "readingTypographyDescription": "Testu luzeetarako erosoa",
         "language": "Hizkuntza",
         "unsavedChanges": "Gorde gabeko aldaketak",
-        "pathNavigation": "Uneko fitxategiaren bide-izena"
+        "pathNavigation": "Uneko fitxategiaren bide-izena",
+        "informationSection": "Informazioa"
     },
     "folder": {
         "root": "erroa",
@@ -155,6 +156,12 @@
         "reloadDiscardChanges": "Fitxategia birkargatu eta gorde gabeko aldaketak baztertu?",
         "navigationSaveFailed": "{{ error }} Jarraitzen baduzu, datuak gal ditzakezu.",
         "closeSaveFailed": "{{ error }} Irteten bazara, datuak gal ditzakezu."
+    },
+    "about": {
+        "title": "{{ appName }} aplikazioari buruz",
+        "version": "{{ version }} bertsioa",
+        "homepage": "GitHubeko orri nagusia",
+        "license": "MIT lizentzia"
     },
     "workspace": {
         "title": "Ireki lan-eremua",

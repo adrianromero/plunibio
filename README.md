@@ -1,6 +1,6 @@
 # Plunibio
 
-![0.33](./plunibio-logo.png)
+![0.52](./plunibio-logo.png)
 
 A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Crepe.
 
@@ -93,13 +93,13 @@ plunibio [FILENAME] [--base-path BASEPATH]
 
 The arguments resolve as follows:
 
-| Arguments provided                | Filename                                                   | Base path                                                                   |
-| --------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Neither                           | Last saved filename for the selected base path, or empty    | Saved base path, or the process working directory as fallback               |
-| `FILENAME` only                   | Relative file or folder path                               | Saved base path, or the process working directory as fallback               |
-| `--base-path BASEPATH` only       | Last saved filename for `BASEPATH`, or empty               | `BASEPATH`                                                                  |
-| Both, with an absolute `BASEPATH` | Relative file or folder path                               | Absolute `BASEPATH`                                                         |
-| Both, with a relative `BASEPATH`  | Relative file or folder path                               | `BASEPATH` resolved from the process working directory                      |
+| Arguments provided                | Filename                                                 | Base path                                                     |
+| --------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------- |
+| Neither                           | Last saved filename for the selected base path, or empty | Saved base path, or the process working directory as fallback |
+| `FILENAME` only                   | Relative file or folder path                             | Saved base path, or the process working directory as fallback |
+| `--base-path BASEPATH` only       | Last saved filename for `BASEPATH`, or empty             | `BASEPATH`                                                    |
+| Both, with an absolute `BASEPATH` | Relative file or folder path                             | Absolute `BASEPATH`                                           |
+| Both, with a relative `BASEPATH`  | Relative file or folder path                             | `BASEPATH` resolved from the process working directory        |
 
 On a normal shutdown, Plunibio stores the current canonical base path and its last filename in `~/.plunibio/properties.toml`, alongside the window dimensions. Changing the workspace from the application also updates the base path held in memory for the next configuration save. An explicitly supplied `--base-path` or `FILENAME` always takes precedence over its corresponding saved value. Configuration read, path restoration, window sizing, and configuration write failures are logged without displaying an error to the user.
 

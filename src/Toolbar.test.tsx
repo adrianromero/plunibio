@@ -14,12 +14,13 @@ import type { AppTypography } from "./TypographyPreferences";
 
 let editorContext: AppContextValues["editor"];
 const openWorkspace = vi.fn();
+const showAbout = vi.fn();
 let locale: Accessor<Locale>;
 let setLocale: Setter<Locale>;
 let typography: Accessor<AppTypography>;
 
 vi.mock("./AppContext", () => ({
-    useAppContext: () => ({ main: { openWorkspace }, editor: editorContext }),
+    useAppContext: () => ({ main: { openWorkspace, showAbout }, editor: editorContext }),
 }));
 
 vi.mock("./Localization", () => ({
@@ -41,6 +42,7 @@ describe("Toolbar", () => {
 
     beforeEach(() => {
         openWorkspace.mockClear();
+        showAbout.mockClear();
         const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
         const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);
         const [toggleSidebar, setToggleSidebarSignal] =
@@ -196,6 +198,21 @@ describe("Toolbar", () => {
         expect(openWorkspace).toHaveBeenCalledOnce();
     });
 
+    it("opens the About dialog from the information section", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <Toolbar />, root);
+
+        const about = root.querySelector<HTMLButtonElement>(
+            '[data-toolbar-menu-entry="about"]'
+        );
+        expect(about?.textContent).toContain("about.title");
+        expect(about?.querySelector(".lucide-info")).not.toBeNull();
+
+        about?.click();
+        expect(showAbout).toHaveBeenCalledOnce();
+    });
+
     it("selects whether hidden files are shown from the nested choice menu", () => {
         const root = document.createElement("div");
         document.body.append(root);
@@ -307,10 +324,13 @@ describe("Toolbar", () => {
         );
         expect(
             Array.from(sections ?? []).map(section => section.dataset.toolbarMenuSection)
-        ).toEqual(["general", "files", "markdown"]);
+        ).toEqual(["general", "files", "markdown", "information"]);
         expect(sections?.[0]?.firstElementChild?.textContent).toBe("toolbar.generalSection");
         expect(sections?.[1]?.firstElementChild?.textContent).toBe("toolbar.filesSection");
         expect(sections?.[2]?.firstElementChild?.textContent).toBe("toolbar.markdownSection");
+        expect(sections?.[3]?.firstElementChild?.textContent).toBe(
+            "toolbar.informationSection"
+        );
         expect(
             Array.from(
                 sections?.[0]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
@@ -326,7 +346,12 @@ describe("Toolbar", () => {
                 sections?.[2]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
             ).map(entry => entry.dataset.toolbarMenuEntry)
         ).toEqual(["typography"]);
-        expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(7);
+        expect(
+            Array.from(
+                sections?.[3]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
+            ).map(entry => entry.dataset.toolbarMenuEntry)
+        ).toEqual(["about"]);
+        expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(8);
         expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(13);
     });
 });

@@ -33,6 +33,7 @@ import {
     type AppTypography,
 } from "./TypographyPreferences";
 import OpenWorkspaceDialog from "./OpenWorkspaceDialog";
+import AboutDialog from "./AboutDialog";
 import type { InitialConfig } from "./rusttypes";
 import { translateAppError } from "./AppError";
 
@@ -49,6 +50,7 @@ export type AppContextValues = {
         basepath: Accessor<string>;
         setBasepath: Setter<string>;
         openWorkspace: () => void;
+        showAbout: () => void;
         filename: Accessor<string>;
         setFilename: Setter<string>;
         loadFilename: (filename: string) => Promise<void>;
@@ -139,6 +141,7 @@ export function AppProvider(props: {
     const [spinnerVisible, setSpinnerVisible] = createSignal(false);
     const [spinnerText, setSpinnerText] = createSignal("");
     const [workspaceDialogOpen, setWorkspaceDialogOpen] = createSignal(false);
+    const [aboutDialogOpen, setAboutDialogOpen] = createSignal(false);
 
     const [appConfirm, setAppConfirm] = createSignal<(() => void) | null>(null);
     const [appClose, setAppClose] = createSignal<(() => void) | null>(null);
@@ -259,6 +262,7 @@ export function AppProvider(props: {
         spinnerVisible() ||
         appMessage() !== null ||
         workspaceDialogOpen() ||
+        aboutDialogOpen() ||
         document.querySelector("dialog[open]") !== null;
 
     const showAppMessage: (msg: string, info?: MessageInfoKind) => Promise<void> = (msg, info) => {
@@ -300,6 +304,10 @@ export function AppProvider(props: {
 
     const openWorkspace = (): void => {
         setWorkspaceDialogOpen(true);
+    };
+
+    const showAbout = (): void => {
+        setAboutDialogOpen(true);
     };
 
     const selectWorkspace = async (nextBasepath: string): Promise<boolean> => {
@@ -412,6 +420,7 @@ export function AppProvider(props: {
                     basepath,
                     setBasepath,
                     openWorkspace,
+                    showAbout,
                     filename,
                     setFilename,
                     loadFilename,
@@ -476,6 +485,7 @@ export function AppProvider(props: {
                 onCancel={() => setWorkspaceDialogOpen(false)}
                 onConfirm={selectWorkspace}
             />
+            <AboutDialog open={aboutDialogOpen()} onClose={() => setAboutDialogOpen(false)} />
         </AppContext.Provider>
     );
 }

@@ -64,6 +64,7 @@ describe("createFileEditorController", () => {
                 basepath,
                 setBasepath,
                 openWorkspace: vi.fn(),
+                showAbout: vi.fn(),
                 filename,
                 setFilename,
                 loadFilename: vi.fn(() => Promise.resolve()),

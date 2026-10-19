@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+.aboutDialog {
+    display: none;
+    width: min(25rem, calc(100vw - 2rem));
+}
+
+.aboutDialog[open] {
+    display: block;
+}
+
+.identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.75rem 1.25rem 0;
+}
+
+.appIcon {
+    width: 4.5rem;
+    height: 4.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.title {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.35rem;
+    font-weight: 650;
+    line-height: 1.2;
+}
+
+.version,
+.copyright {
+    margin: 0;
+    color: var(--color-text-muted);
+}
+
+.version {
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.details {
+    padding: 1.25rem 1.25rem 0;
+    text-align: center;
+}
+
+.copyright {
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.9rem;
+}
+
+.links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.links a:hover {
+    color: var(--color-primary-active);
+    text-decoration: underline;
+}
+
+.links a:focus {
+    outline: none;
+}
+
+.links a:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.links svg {
+    width: 0.85rem;
+    height: 0.85rem;
+}

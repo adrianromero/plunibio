@@ -32,6 +32,11 @@ vi.mock("./OpenWorkspaceDialog", () => ({
         />
     ),
 }));
+vi.mock("./AboutDialog", () => ({
+    default: (props: { open: boolean; onClose: () => void }) => (
+        <button data-testid="close-about" disabled={!props.open} onClick={props.onClose} />
+    ),
+}));
 
 describe("AppProvider workspace changes", () => {
     let dispose: (() => void) | undefined;
@@ -101,6 +106,19 @@ describe("AppProvider workspace changes", () => {
         pressShortcut("b", "KeyX");
         expect(navigateBack).toHaveBeenCalledOnce();
         expect(toggleSidebar).toHaveBeenCalledOnce();
+    });
+
+    it("opens and closes the About dialog through the application context", () => {
+        const context = renderProvider();
+        const closeButton = document.querySelector<HTMLButtonElement>(
+            '[data-testid="close-about"]'
+        );
+
+        expect(closeButton?.disabled).toBe(true);
+        context.main.showAbout();
+        expect(closeButton?.disabled).toBe(false);
+        closeButton?.click();
+        expect(closeButton?.disabled).toBe(true);
     });
 
     it("blocks shortcuts while loading or while any dialog is open", () => {

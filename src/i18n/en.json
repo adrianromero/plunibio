@@ -31,7 +31,8 @@
         "readingTypographyDescription": "Comfortable for long texts",
         "language": "Language",
         "unsavedChanges": "Unsaved changes",
-        "pathNavigation": "Current file path"
+        "pathNavigation": "Current file path",
+        "informationSection": "Information"
     },
     "folder": {
         "root": "root",
@@ -155,6 +156,12 @@
         "reloadDiscardChanges": "Reload the file and discard your unsaved changes?",
         "navigationSaveFailed": "{{ error }} If you continue, your data might be lost.",
         "closeSaveFailed": "{{ error }} If you quit, your data might be lost."
+    },
+    "about": {
+        "title": "About {{ appName }}",
+        "version": "Version {{ version }}",
+        "homepage": "GitHub homepage",
+        "license": "MIT License"
     },
     "workspace": {
         "title": "Open workspace",

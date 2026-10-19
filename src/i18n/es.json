@@ -31,7 +31,8 @@
         "readingTypographyDescription": "Cómoda para textos largos",
         "language": "Idioma",
         "unsavedChanges": "Cambios sin guardar",
-        "pathNavigation": "Ruta del archivo actual"
+        "pathNavigation": "Ruta del archivo actual",
+        "informationSection": "Información"
     },
     "folder": {
         "root": "raíz",
@@ -155,6 +156,12 @@
         "reloadDiscardChanges": "¿Recargar el archivo y descartar los cambios sin guardar?",
         "navigationSaveFailed": "{{ error }} Si continúas, podrías perder tus datos.",
         "closeSaveFailed": "{{ error }} Si sales, podrías perder tus datos."
+    },
+    "about": {
+        "title": "Acerca de {{ appName }}",
+        "version": "Versión {{ version }}",
+        "homepage": "Página principal en GitHub",
+        "license": "Licencia MIT"
     },
     "workspace": {
         "title": "Abrir espacio",
