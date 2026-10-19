@@ -2,7 +2,7 @@
 
 ![1.00](./plunibio-readme.png)
 
-A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Crepe.a
+A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Crepe.
 
 > 🔵 Plunibio is under active development. Features and interfaces may change before the first stable release.
 
