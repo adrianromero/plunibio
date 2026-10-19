@@ -101,6 +101,14 @@
 .milkdown .milkdown-code-block .tools .language-button {
     margin-bottom: 0;
 }
+
+.milkdown .milkdown-code-block .tools .language-button,
+.milkdown .milkdown-code-block .tools .tools-button-group button,
+.milkdown .milkdown-code-block .language-picker,
+.milkdown .milkdown-code-block .language-picker .search-input {
+    font-family: var(--font-interface);
+}
+
 .milkdown .milkdown-code-block .tools-button-group > button:hover {
     background: var(--crepe-color-hover);
 }
