@@ -1,6 +1,6 @@
 # Plunibio
 
-![0.52](./plunibio-logo.png)
+![1.00](./plunibio-readme.png)
 
 A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Crepe.
 
