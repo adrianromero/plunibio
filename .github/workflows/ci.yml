@@ -1,0 +1,56 @@
+name: CI manual
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Validar proyecto
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: npm
+
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Restaurar la caché de Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Instalar dependencias de Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev
+
+      - name: Instalar dependencias del frontend
+        run: npm ci
+
+      - name: Comprobar TypeScript
+        run: npm run check
+
+      - name: Ejecutar tests
+        run: npm test
+
+      - name: Construir el frontend
+        run: npm run build
+
+      - name: Comprobar el formato de Rust
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+
+      - name: Comprobar el backend Rust
+        run: cargo check --manifest-path src-tauri/Cargo.toml --locked
