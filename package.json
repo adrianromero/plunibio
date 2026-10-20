@@ -10,6 +10,7 @@
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "notices": "node scripts/generate-third-party-notices.mjs",
+        "release:check": "node scripts/check-release-version.mjs",
         "check": "tsc --noEmit",
         "serve": "vite preview",
         "test": "vitest run",
