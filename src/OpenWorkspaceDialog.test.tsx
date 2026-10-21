@@ -99,7 +99,10 @@ describe("OpenWorkspaceDialog", () => {
         await vi.waitFor(() => {
             expect(root.querySelector("button")?.ownerDocument.body.textContent).toContain("child");
         });
-        root.querySelector<HTMLButtonElement>("button[class*='directoryEntry']")?.click();
+        const childButton = Array.from(root.querySelectorAll<HTMLButtonElement>("button")).find(
+            button => button.textContent === "child"
+        );
+        childButton?.click();
         await vi.waitFor(() => {
             expect(root.textContent).toContain("/current/child");
         });
