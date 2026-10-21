@@ -14,27 +14,15 @@ layout: default
       </div>
       <p class="hero-note"><span aria-hidden="true">●</span> {{ page.hero_note }}</p>
     </div>
-    <div class="editor-demo" aria-label="{{ page.demo_label }}">
-      <div class="window-bar"><span></span><span></span><span></span><b>notes/welcome.md</b></div>
-      <div class="editor-body">
-        <aside class="file-tree" aria-hidden="true">
-          <strong>NOTES</strong>
-          <span>⌄ daily</span>
-          <span class="file"># today.md</span>
-          <span>⌄ projects</span>
-          <span class="file active"># plunibio.md</span>
-          <span class="file"># ideas.md</span>
-        </aside>
-        <div class="document-preview">
-          <small>projects / plunibio.md</small>
-          <h2>Write it down.</h2>
-          <p>Keep your thoughts in plain Markdown files, right where they belong.</p>
-          <h3>Today</h3>
-          <p class="check"><i>✓</i> Shape the first idea</p>
-          <p class="check"><i></i> Make it yours</p>
-          <span class="cursor" aria-hidden="true"></span>
-        </div>
-      </div>
+    <div class="editor-showcase">
+      <img
+        class="editor-screenshot"
+        src="{{ '/assets/images/plunibio-editor-' | append: page.lang | append: '.webp' | relative_url }}"
+        width="1010"
+        height="668"
+        alt="{{ page.demo_label }}"
+        fetchpriority="high"
+      >
     </div>
   </div>
 </section>
