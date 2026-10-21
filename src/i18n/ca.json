@@ -31,8 +31,7 @@
         "readingTypographyDescription": "Còmoda per a textos llargs",
         "language": "Idioma",
         "unsavedChanges": "Canvis sense desar",
-        "pathNavigation": "Ruta del fitxer actual",
-        "informationSection": "Informació"
+        "pathNavigation": "Ruta del fitxer actual"
     },
     "folder": {
         "root": "arrel",

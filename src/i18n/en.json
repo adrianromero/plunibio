@@ -31,8 +31,7 @@
         "readingTypographyDescription": "Comfortable for long texts",
         "language": "Language",
         "unsavedChanges": "Unsaved changes",
-        "pathNavigation": "Current file path",
-        "informationSection": "Information"
+        "pathNavigation": "Current file path"
     },
     "folder": {
         "root": "root",

@@ -100,9 +100,7 @@ describe("Toolbar", () => {
         const reloadEntry = root.querySelector<HTMLButtonElement>(
             '[data-toolbar-menu-entry="reload"]'
         );
-        const saveEntry = root.querySelector<HTMLButtonElement>(
-            '[data-toolbar-menu-entry="save"]'
-        );
+        const saveEntry = root.querySelector<HTMLButtonElement>('[data-toolbar-menu-entry="save"]');
         expect(reloadEntry?.disabled).toBe(true);
         expect(saveEntry?.disabled).toBe(true);
         expect(reloadEntry?.textContent).toContain("CTRL+R");
@@ -203,11 +201,9 @@ describe("Toolbar", () => {
         document.body.append(root);
         dispose = render(() => <Toolbar />, root);
 
-        const about = root.querySelector<HTMLButtonElement>(
-            '[data-toolbar-menu-entry="about"]'
-        );
+        const about = root.querySelector<HTMLButtonElement>('[data-toolbar-menu-entry="about"]');
         expect(about?.textContent).toContain("about.title");
-        expect(about?.querySelector(".lucide-info")).not.toBeNull();
+        expect(about?.querySelector(".lucide-info")).toBeNull();
 
         about?.click();
         expect(showAbout).toHaveBeenCalledOnce();
@@ -319,37 +315,36 @@ describe("Toolbar", () => {
         expect(trigger?.getAttribute("aria-haspopup")).toBe("menu");
         expect(menu?.getAttribute("popover")).toBe("auto");
         expect(menu?.getAttribute("role")).toBe("menu");
-        const sections = menu?.querySelectorAll<HTMLElement>(
-            "[data-toolbar-menu-section]"
-        );
+        const sections = menu?.querySelectorAll<HTMLElement>("[data-toolbar-menu-section]");
         expect(
-            Array.from(sections ?? []).map(section => section.dataset.toolbarMenuSection)
+            Array.from(sections ?? []).map((section) => section.dataset.toolbarMenuSection)
         ).toEqual(["general", "files", "markdown", "information"]);
         expect(sections?.[0]?.firstElementChild?.textContent).toBe("toolbar.generalSection");
         expect(sections?.[1]?.firstElementChild?.textContent).toBe("toolbar.filesSection");
         expect(sections?.[2]?.firstElementChild?.textContent).toBe("toolbar.markdownSection");
-        expect(sections?.[3]?.firstElementChild?.textContent).toBe(
-            "toolbar.informationSection"
+        expect(sections?.[3]?.getAttribute("aria-labelledby")).toBeNull();
+        expect(sections?.[3]?.firstElementChild?.getAttribute("data-toolbar-menu-entry")).toBe(
+            "about"
         );
         expect(
             Array.from(
                 sections?.[0]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
-            ).map(entry => entry.dataset.toolbarMenuEntry)
+            ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["theme", "language"]);
         expect(
             Array.from(
                 sections?.[1]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
-            ).map(entry => entry.dataset.toolbarMenuEntry)
+            ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["hidden-files"]);
         expect(
             Array.from(
                 sections?.[2]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
-            ).map(entry => entry.dataset.toolbarMenuEntry)
+            ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["typography"]);
         expect(
             Array.from(
                 sections?.[3]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
-            ).map(entry => entry.dataset.toolbarMenuEntry)
+            ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["about"]);
         expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(8);
         expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(13);

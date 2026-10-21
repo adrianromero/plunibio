@@ -11,7 +11,6 @@ import Languages from "lucide-solid/icons/languages";
 import TypeIcon from "lucide-solid/icons/type";
 import Eye from "lucide-solid/icons/eye";
 import EyeOff from "lucide-solid/icons/eye-off";
-import Info from "lucide-solid/icons/info";
 import { useAppContext } from "./AppContext";
 import FileBreadcrumb from "./FileBreadcrumb";
 import FileNavigation from "./FileNavigation";
@@ -220,23 +219,17 @@ export function Toolbar() {
                                         {
                                             value: "serif",
                                             label: t("toolbar.serifTypography"),
-                                            description: t(
-                                                "toolbar.serifTypographyDescription"
-                                            ),
+                                            description: t("toolbar.serifTypographyDescription"),
                                         },
                                         {
                                             value: "modern",
                                             label: t("toolbar.modernTypography"),
-                                            description: t(
-                                                "toolbar.modernTypographyDescription"
-                                            ),
+                                            description: t("toolbar.modernTypographyDescription"),
                                         },
                                         {
                                             value: "reading",
                                             label: t("toolbar.readingTypography"),
-                                            description: t(
-                                                "toolbar.readingTypographyDescription"
-                                            ),
+                                            description: t("toolbar.readingTypographyDescription"),
                                         },
                                     ],
                                     onChange: (nextTypography): void => {
@@ -248,13 +241,11 @@ export function Toolbar() {
                         {
                             kind: "section",
                             id: "information",
-                            label: t("toolbar.informationSection"),
                             items: [
                                 {
                                     kind: "action",
                                     id: "about",
                                     label: t("about.title", { appName: "Plunibio" }),
-                                    icon: Info,
                                     onSelect: showAbout,
                                 },
                             ],

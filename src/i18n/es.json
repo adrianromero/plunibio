@@ -31,8 +31,7 @@
         "readingTypographyDescription": "Cómoda para textos largos",
         "language": "Idioma",
         "unsavedChanges": "Cambios sin guardar",
-        "pathNavigation": "Ruta del archivo actual",
-        "informationSection": "Información"
+        "pathNavigation": "Ruta del archivo actual"
     },
     "folder": {
         "root": "raíz",

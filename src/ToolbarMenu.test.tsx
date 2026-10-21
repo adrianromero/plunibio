@@ -121,6 +121,37 @@ describe("ToolbarMenu", () => {
         expect(document.activeElement).toBe(enabledItems?.[0]);
     });
 
+    it("renders a section without a label", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+
+        dispose = render(
+            () => (
+                <ToolbarMenu
+                    label="More options"
+                    blocks={[
+                        {
+                            kind: "section",
+                            id: "unlabelled",
+                            items: [
+                                { kind: "action", id: "one", label: "One", onSelect: vi.fn() },
+                            ],
+                        },
+                    ]}
+                />
+            ),
+            root
+        );
+
+        const section = root.querySelector<HTMLElement>(
+            '[data-toolbar-menu-section="unlabelled"]'
+        );
+
+        expect(section?.getAttribute("aria-labelledby")).toBeNull();
+        expect(section?.children).toHaveLength(1);
+        expect(section?.firstElementChild?.getAttribute("data-toolbar-menu-entry")).toBe("one");
+    });
+
     it("renders and changes a single-choice entry", () => {
         const root = document.createElement("div");
         document.body.append(root);

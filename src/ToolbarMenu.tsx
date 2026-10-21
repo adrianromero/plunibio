@@ -43,7 +43,7 @@ export type ToolbarMenuItem = ToolbarMenuActionItem | ToolbarMenuChoiceItem;
 export type ToolbarMenuSection = {
     kind: "section";
     id: string;
-    label: string;
+    label?: string;
     items: readonly ToolbarMenuItem[];
 };
 
@@ -87,19 +87,17 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
 
     const selectedOption = createMemo(
         () =>
-            props.item.options.find(option => option.value === props.item.value())
-            ?? props.item.options[0]
+            props.item.options.find((option) => option.value === props.item.value()) ??
+            props.item.options[0]
     );
 
     const optionElements = (): HTMLButtonElement[] =>
-        menu
-            ? Array.from(menu.querySelectorAll<HTMLButtonElement>("[data-choice-option]"))
-            : [];
+        menu ? Array.from(menu.querySelectorAll<HTMLButtonElement>("[data-choice-option]")) : [];
 
     const focusSelectedOption = (): void => {
         const options = optionElements();
         const selectedIndex = props.item.options.findIndex(
-            option => option.value === props.item.value()
+            (option) => option.value === props.item.value()
         );
         focusAt(options, Math.max(0, selectedIndex));
     };
@@ -131,7 +129,7 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
         focusSelectionOnOpen = false;
     };
 
-    const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = event => {
+    const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = (event) => {
         const options = optionElements();
         const currentIndex = options.indexOf(document.activeElement as HTMLButtonElement);
 
@@ -186,12 +184,12 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
                 onPointerDown={() => {
                     focusSelectionOnOpen = false;
                 }}
-                onClick={event => {
+                onClick={(event) => {
                     if (event.detail === 0) {
                         focusSelectionOnOpen = true;
                     }
                 }}
-                onKeyDown={event => {
+                onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                         focusSelectionOnOpen = true;
                     } else if (event.key === "ArrowRight") {
@@ -204,8 +202,12 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
                 <span class={styles.choiceLabel}>{props.item.label}</span>
                 <span class={styles.currentChoice}>
                     <Show when={props.item.currentIcon ?? selectedOption()?.icon}>
-                        {icon => (
-                            <Dynamic component={icon()} class={styles.itemIcon} aria-hidden="true" />
+                        {(icon) => (
+                            <Dynamic
+                                component={icon()}
+                                class={styles.itemIcon}
+                                aria-hidden="true"
+                            />
                         )}
                     </Show>
                     <span>{selectedOption()?.label}</span>
@@ -224,7 +226,7 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
                 onKeyDown={handleKeyDown}
             >
                 <For each={props.item.options}>
-                    {option => {
+                    {(option) => {
                         const selected = (): boolean => option.value === props.item.value();
                         return (
                             <button
@@ -241,7 +243,7 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
                                 }}
                             >
                                 <Show when={option.icon}>
-                                    {icon => (
+                                    {(icon) => (
                                         <Dynamic
                                             component={icon()}
                                             class={styles.itemIcon}
@@ -252,7 +254,7 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
                                 <span class={styles.optionText}>
                                     <span>{option.label}</span>
                                     <Show when={option.description}>
-                                        {description => (
+                                        {(description) => (
                                             <span class={styles.optionDescription}>
                                                 {description()}
                                             </span>
@@ -268,10 +270,7 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
     );
 }
 
-function ToolbarMenuEntry(props: {
-    item: ToolbarMenuItem;
-    closeParent: () => void;
-}): JSX.Element {
+function ToolbarMenuEntry(props: { item: ToolbarMenuItem; closeParent: () => void }): JSX.Element {
     const item = props.item;
     if (item.kind === "choice") {
         return <ToolbarMenuChoice item={item} closeParent={props.closeParent} />;
@@ -291,13 +290,13 @@ function ToolbarMenuEntry(props: {
             }}
         >
             <Show when={item.icon}>
-                {icon => (
+                {(icon) => (
                     <Dynamic component={icon()} class={styles.itemIcon} aria-hidden="true" />
                 )}
             </Show>
             <span>{item.label}</span>
             <Show when={item.shortcut}>
-                {shortcut => <span class={styles.shortcut}>{shortcut()}</span>}
+                {(shortcut) => <span class={styles.shortcut}>{shortcut()}</span>}
             </Show>
         </button>
     );
@@ -341,7 +340,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
         focusFirstItemOnOpen = false;
     };
 
-    const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = event => {
+    const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = (event) => {
         const items = enabledItems();
         const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
 
@@ -382,12 +381,12 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                 onPointerDown={() => {
                     focusFirstItemOnOpen = false;
                 }}
-                onClick={event => {
+                onClick={(event) => {
                     if (event.detail === 0) {
                         focusFirstItemOnOpen = true;
                     }
                 }}
-                onKeyDown={event => {
+                onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                         focusFirstItemOnOpen = true;
                     }
@@ -407,7 +406,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                 onKeyDown={handleKeyDown}
             >
                 <For each={props.blocks}>
-                    {block => {
+                    {(block) => {
                         if (block.kind !== "section") {
                             return <ToolbarMenuEntry item={block} closeParent={closeMenu} />;
                         }
@@ -417,14 +416,18 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                             <div
                                 class={styles.menuSection}
                                 role="group"
-                                aria-labelledby={labelId}
+                                aria-labelledby={block.label ? labelId : undefined}
                                 data-toolbar-menu-section={block.id}
                             >
-                                <div id={labelId} class={styles.sectionTitle}>
-                                    {block.label}
-                                </div>
+                                <Show when={block.label}>
+                                    {(label) => (
+                                        <div id={labelId} class={styles.sectionTitle}>
+                                            {label()}
+                                        </div>
+                                    )}
+                                </Show>
                                 <For each={block.items}>
-                                    {item => (
+                                    {(item) => (
                                         <ToolbarMenuEntry item={item} closeParent={closeMenu} />
                                     )}
                                 </For>
