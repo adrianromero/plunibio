@@ -12,8 +12,8 @@ import dialogStyles from "./Dialog.module.css";
 import styles from "./AboutDialog.module.css";
 import { useI18N } from "./Localization";
 
-const HOMEPAGE_URL = "https://github.com/adrianromero/plunibio";
-const LICENSE_URL = `${HOMEPAGE_URL}/blob/main/LICENSE`;
+const HOMEPAGE_URL = "https://adrianromero.github.io/plunibio";
+const LICENSE_URL = "https://github.com/adrianromero/plunibio/blob/main/LICENSE";
 
 type AboutDialogProps = {
     open: boolean;
@@ -83,10 +83,10 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
                 <p class={styles.copyright}>Copyright © 2026 Adrián Romero Corchado</p>
                 <div class={styles.links}>
                     <a
-                        href={HOMEPAGE_URL}
+                        href={t("about.homepageLink", { root: HOMEPAGE_URL })}
                         onClick={(event) => {
                             event.preventDefault();
-                            openExternalUrl(HOMEPAGE_URL);
+                            openExternalUrl(t("about.homepageLink", { root: HOMEPAGE_URL }));
                         }}
                     >
                         {t("about.homepage")}

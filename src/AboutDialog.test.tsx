@@ -21,8 +21,11 @@ vi.mock("@tauri-apps/plugin-opener", () => ({
 
 vi.mock("./Localization", () => ({
     useI18N: () => ({
-        t: (key: string, params?: Record<string, string>) =>
-            key === "about.version" ? `Version ${params?.version}` : key,
+        t: (key: string, params?: Record<string, string>) => {
+            if (key === "about.version") return `Version ${params?.version}`;
+            if (key === "about.homepageLink") return `${params?.root}/en`;
+            return key;
+        },
     }),
 }));
 
@@ -70,12 +73,15 @@ describe("AboutDialog", () => {
         expect(root.textContent).toContain("about.license");
 
         const links = root.querySelectorAll<HTMLAnchorElement>("a");
+        expect(links[0]?.getAttribute("href")).toBe(
+            "https://adrianromero.github.io/plunibio/en"
+        );
         links[0]?.click();
         links[1]?.click();
 
         expect(openUrl).toHaveBeenNthCalledWith(
             1,
-            "https://github.com/adrianromero/plunibio"
+            "https://adrianromero.github.io/plunibio/en"
         );
         expect(openUrl).toHaveBeenNthCalledWith(
             2,

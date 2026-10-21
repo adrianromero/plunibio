@@ -159,7 +159,8 @@
     "about": {
         "title": "{{ appName }} aplikazioari buruz",
         "version": "{{ version }} bertsioa",
-        "homepage": "GitHubeko orri nagusia",
+        "homepage": "Hasiera-orria",
+        "homepageLink": "{{ root }}/es",
         "license": "MIT lizentzia"
     },
     "workspace": {

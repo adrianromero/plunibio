@@ -159,7 +159,8 @@
     "about": {
         "title": "Acerca de {{ appName }}",
         "version": "Versión {{ version }}",
-        "homepage": "Página principal en GitHub",
+        "homepage": "Página principal",
+        "homepageLink": "{{ root }}/es",
         "license": "Licencia MIT"
     },
     "workspace": {
