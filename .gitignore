@@ -2,3 +2,7 @@ node_modules
 dist
 storybook-static
 private
+website/_site
+website/.jekyll-cache
+website/.jekyll-metadata
+website/.sass-cache

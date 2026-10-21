@@ -1,0 +1,14 @@
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <div>
+      <a class="brand footer-brand" href="{{ '/' | append: page.lang | append: '/' | relative_url }}">
+        <span class="brand-mark" aria-hidden="true">P</span><span>Plunibio</span>
+      </a>
+      <p>{{ include.t.footer_tagline }}</p>
+    </div>
+    <div class="footer-links">
+      <a href="{{ site.github_url }}">{{ include.t.source }}</a>
+      <a href="{{ site.license_url }}">{{ include.t.license }}</a>
+    </div>
+  </div>
+</footer>

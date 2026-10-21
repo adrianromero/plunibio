@@ -1,0 +1,28 @@
+en:
+  skip: Skip to content
+  home: Plunibio home
+  primary_nav: Primary navigation
+  features: Features
+  docs: Docs
+  about: About
+  github: View on GitHub
+  language: Language
+  english: English
+  spanish: Español
+  footer_tagline: A lightweight desktop Markdown editor.
+  license: Released under the MIT License.
+  source: Source code
+es:
+  skip: Saltar al contenido
+  home: Inicio de Plunibio
+  primary_nav: Navegación principal
+  features: Funcionalidades
+  docs: Documentación
+  about: Acerca de
+  github: Ver en GitHub
+  language: Idioma
+  english: English
+  spanish: Español
+  footer_tagline: Un editor de Markdown de escritorio ligero.
+  license: Publicado bajo la licencia MIT.
+  source: Código fuente

@@ -1,0 +1,20 @@
+<a class="skip-link" href="#main-content">{{ include.t.skip }}</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="{{ '/' | append: page.lang | append: '/' | relative_url }}" aria-label="{{ include.t.home }}">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>Plunibio</span>
+    </a>
+    <nav class="main-nav" aria-label="{{ include.t.primary_nav }}">
+      <a {% if page.section == 'features' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/features/' | relative_url }}">{{ include.t.features }}</a>
+      <a {% if page.section == 'docs' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/docs/' | relative_url }}">{{ include.t.docs }}</a>
+      <a {% if page.section == 'about' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/about/' | relative_url }}">{{ include.t.about }}</a>
+    </nav>
+    <div class="header-actions">
+      {% include language-switcher.html t=include.t %}
+      <a class="github-link" href="{{ site.github_url }}" rel="noopener noreferrer">
+        {% include icon.html name="github" %}<span>{{ include.t.github }}</span>
+      </a>
+    </div>
+  </div>
+</header>

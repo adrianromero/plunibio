@@ -1,0 +1,20 @@
+title: Plunibio
+description: A lightweight desktop Markdown editor.
+url: "https://adrianromero.github.io"
+baseurl: "/plunibio"
+repository: adrianromero/plunibio
+github_url: "https://github.com/adrianromero/plunibio"
+license_url: "https://github.com/adrianromero/plunibio/blob/main/LICENSE"
+markdown: kramdown
+permalink: pretty
+timezone: Europe/Madrid
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
