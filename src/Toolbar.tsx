@@ -19,9 +19,14 @@ import { useI18N } from "./Localization";
 import type { Locale } from "./Localization";
 import type { AppTheme } from "./ThemePreferences";
 import type { AppTypography } from "./TypographyPreferences";
+import type { ContextualToolbarSection } from "./viewers/ContentForPath";
 import styles from "./Toolbar.module.css";
 
-export function Toolbar() {
+type ToolbarProps = {
+    contextualSections: readonly ContextualToolbarSection[];
+};
+
+export function Toolbar(props: ToolbarProps) {
     const { t, locale, setLocale } = useI18N();
     const {
         main: { openWorkspace, showAbout },
@@ -169,75 +174,89 @@ export function Toolbar() {
                                 } satisfies ToolbarMenuChoiceItem<Locale>,
                             ],
                         },
-                        {
-                            kind: "section",
-                            id: "files",
-                            label: t("toolbar.filesSection"),
-                            items: [
-                                {
-                                    kind: "choice",
-                                    id: "hidden-files",
-                                    label: t("folder.hiddenFiles"),
-                                    value: hiddenFilesVisibility,
-                                    options: [
+                        ...(props.contextualSections.includes("files")
+                            ? [
+                                  {
+                                      kind: "section",
+                                      id: "files",
+                                      label: t("toolbar.filesSection"),
+                                      items: [
                                         {
-                                            value: "show",
-                                            label: t("folder.show"),
-                                            icon: Eye,
-                                        },
+                                            kind: "choice",
+                                            id: "hidden-files",
+                                            label: t("folder.hiddenFiles"),
+                                            value: hiddenFilesVisibility,
+                                            options: [
+                                                {
+                                                    value: "show",
+                                                    label: t("folder.show"),
+                                                    icon: Eye,
+                                                },
+                                                {
+                                                    value: "hide",
+                                                    label: t("folder.hide"),
+                                                    icon: EyeOff,
+                                                },
+                                            ],
+                                            onChange: (visibility): void => {
+                                                setShowHiddenFiles(visibility === "show");
+                                            },
+                                        } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
+                                      ],
+                                  } as const,
+                              ]
+                            : []),
+                        ...(props.contextualSections.includes("markdown")
+                            ? [
+                                  {
+                                      kind: "section",
+                                      id: "markdown",
+                                      label: t("toolbar.markdownSection"),
+                                      items: [
                                         {
-                                            value: "hide",
-                                            label: t("folder.hide"),
-                                            icon: EyeOff,
-                                        },
-                                    ],
-                                    onChange: (visibility): void => {
-                                        setShowHiddenFiles(visibility === "show");
-                                    },
-                                } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
-                            ],
-                        },
-                        {
-                            kind: "section",
-                            id: "markdown",
-                            label: t("toolbar.markdownSection"),
-                            items: [
-                                {
-                                    kind: "choice",
-                                    id: "typography",
-                                    label: t("toolbar.typography"),
-                                    currentIcon: TypeIcon,
-                                    value: typography,
-                                    options: [
-                                        {
-                                            value: "sans-serif",
-                                            label: t("toolbar.sansSerifTypography"),
-                                            description: t(
-                                                "toolbar.sansSerifTypographyDescription"
-                                            ),
-                                        },
-                                        {
-                                            value: "serif",
-                                            label: t("toolbar.serifTypography"),
-                                            description: t("toolbar.serifTypographyDescription"),
-                                        },
-                                        {
-                                            value: "modern",
-                                            label: t("toolbar.modernTypography"),
-                                            description: t("toolbar.modernTypographyDescription"),
-                                        },
-                                        {
-                                            value: "reading",
-                                            label: t("toolbar.readingTypography"),
-                                            description: t("toolbar.readingTypographyDescription"),
-                                        },
-                                    ],
-                                    onChange: (nextTypography): void => {
-                                        setTypography(nextTypography);
-                                    },
-                                } satisfies ToolbarMenuChoiceItem<AppTypography>,
-                            ],
-                        },
+                                            kind: "choice",
+                                            id: "typography",
+                                            label: t("toolbar.typography"),
+                                            currentIcon: TypeIcon,
+                                            value: typography,
+                                            options: [
+                                                {
+                                                    value: "sans-serif",
+                                                    label: t("toolbar.sansSerifTypography"),
+                                                    description: t(
+                                                        "toolbar.sansSerifTypographyDescription"
+                                                    ),
+                                                },
+                                                {
+                                                    value: "serif",
+                                                    label: t("toolbar.serifTypography"),
+                                                    description: t(
+                                                        "toolbar.serifTypographyDescription"
+                                                    ),
+                                                },
+                                                {
+                                                    value: "modern",
+                                                    label: t("toolbar.modernTypography"),
+                                                    description: t(
+                                                        "toolbar.modernTypographyDescription"
+                                                    ),
+                                                },
+                                                {
+                                                    value: "reading",
+                                                    label: t("toolbar.readingTypography"),
+                                                    description: t(
+                                                        "toolbar.readingTypographyDescription"
+                                                    ),
+                                                },
+                                            ],
+                                            onChange: (nextTypography): void => {
+                                                setTypography(nextTypography);
+                                            },
+                                        } satisfies ToolbarMenuChoiceItem<AppTypography>,
+                                      ],
+                                  } as const,
+                              ]
+                            : []),
                         {
                             kind: "section",
                             id: "information",

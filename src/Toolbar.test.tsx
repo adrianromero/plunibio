@@ -11,6 +11,7 @@ import Toolbar from "./Toolbar";
 import type { Locale } from "./Localization";
 import type { AppTheme } from "./ThemePreferences";
 import type { AppTypography } from "./TypographyPreferences";
+import type { ContextualToolbarSection } from "./viewers/ContentForPath";
 
 let editorContext: AppContextValues["editor"];
 const openWorkspace = vi.fn();
@@ -18,6 +19,8 @@ const showAbout = vi.fn();
 let locale: Accessor<Locale>;
 let setLocale: Setter<Locale>;
 let typography: Accessor<AppTypography>;
+let contextualSections: Accessor<readonly ContextualToolbarSection[]>;
+let setContextualSections: Setter<readonly ContextualToolbarSection[]>;
 
 vi.mock("./AppContext", () => ({
     useAppContext: () => ({ main: { openWorkspace, showAbout }, editor: editorContext }),
@@ -54,6 +57,9 @@ describe("Toolbar", () => {
         const [theme, setThemeSignal] = createSignal<AppTheme>("light");
         const [typographySignal, setTypographySignal] = createSignal<AppTypography>("sans-serif");
         typography = typographySignal;
+        [contextualSections, setContextualSections] = createSignal<
+            readonly ContextualToolbarSection[]
+        >(["files", "markdown"]);
         [locale, setLocale] = createSignal<Locale>("en");
         setSaveFile = (handler) => setSaveFileSignal(() => handler);
         setReloadFile = (handler) => setReloadFileSignal(() => handler);
@@ -95,7 +101,7 @@ describe("Toolbar", () => {
     it("always shows Reload and Save in the menu with their availability", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const reloadEntry = root.querySelector<HTMLButtonElement>(
             '[data-toolbar-menu-entry="reload"]'
@@ -129,7 +135,7 @@ describe("Toolbar", () => {
     it("shows the registered sidebar toggle without an action separator", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         expect(root.querySelector('[aria-label="toolbar.hideSidebar"]')).toBeNull();
 
@@ -154,7 +160,7 @@ describe("Toolbar", () => {
     it("selects the application theme from the nested choice menu", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         expect(root.querySelector('[aria-label="toolbar.useDarkTheme"]')).toBeNull();
 
@@ -181,7 +187,7 @@ describe("Toolbar", () => {
     it("opens a workspace from the first menu entry", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const entries = root.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]");
         expect(entries[0]?.dataset.toolbarMenuEntry).toBe("open-workspace");
@@ -199,7 +205,7 @@ describe("Toolbar", () => {
     it("opens the About dialog from the information section", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const about = root.querySelector<HTMLButtonElement>('[data-toolbar-menu-entry="about"]');
         expect(about?.textContent).toContain("about.title");
@@ -212,7 +218,7 @@ describe("Toolbar", () => {
     it("selects whether hidden files are shown from the nested choice menu", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const entry = root.querySelector<HTMLButtonElement>(
             '[data-toolbar-menu-entry="hidden-files"]'
@@ -238,7 +244,7 @@ describe("Toolbar", () => {
     it("selects the application language from the nested choice menu", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const languageEntry = root.querySelector<HTMLButtonElement>(
             '[data-toolbar-menu-entry="language"]'
@@ -273,7 +279,7 @@ describe("Toolbar", () => {
     it("selects the Markdown typography from the nested choice menu", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const typographyEntry = root.querySelector<HTMLButtonElement>(
             '[data-toolbar-menu-entry="typography"]'
@@ -301,7 +307,7 @@ describe("Toolbar", () => {
     it("renders the native popover menu with its grouped choices", () => {
         const root = document.createElement("div");
         document.body.append(root);
-        dispose = render(() => <Toolbar />, root);
+        dispose = render(() => <Toolbar contextualSections={contextualSections()} />, root);
 
         const trigger = root.querySelector<HTMLButtonElement>(
             '[aria-label="toolbar.moreOptions"][popovertarget]'
@@ -348,5 +354,32 @@ describe("Toolbar", () => {
         ).toEqual(["about"]);
         expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(8);
         expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(13);
+    });
+
+    it("reactively shows only the contextual section selected for the current path", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        setContextualSections(["markdown"]);
+        dispose = render(
+            () => <Toolbar contextualSections={contextualSections()} />,
+            root
+        );
+
+        const sectionIds = (): string[] =>
+            Array.from(
+                root.querySelectorAll<HTMLElement>("[data-toolbar-menu-section]")
+            ).map((section) => section.dataset.toolbarMenuSection ?? "");
+
+        expect(sectionIds()).toEqual(["general", "markdown", "information"]);
+        expect(root.querySelector('[data-toolbar-menu-entry="typography"]')).not.toBeNull();
+        expect(root.querySelector('[data-toolbar-menu-entry="hidden-files"]')).toBeNull();
+
+        setContextualSections(["files"]);
+        expect(sectionIds()).toEqual(["general", "files", "information"]);
+        expect(root.querySelector('[data-toolbar-menu-entry="typography"]')).toBeNull();
+        expect(root.querySelector('[data-toolbar-menu-entry="hidden-files"]')).not.toBeNull();
+
+        setContextualSections([]);
+        expect(sectionIds()).toEqual(["general", "information"]);
     });
 });

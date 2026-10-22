@@ -3,59 +3,47 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createResource, JSX, Match, Show, Switch } from "solid-js";
-import { invoke } from "@tauri-apps/api/core";
-import EditorFolder from "./viewers/EditorFolder";
+import { JSX, Match, Show, Switch } from "solid-js";
 import { useAppContext } from "./AppContext";
 import ErrorView from "./viewers/ErrorView";
 import { useI18N } from "./Localization";
-import { translateAppError } from "./AppError";
-import type { PathKind } from "./rusttypes";
 import { Dynamic } from "solid-js/web";
-import { componentForFilename } from "./viewers/ComponentForFile";
+import type { ContentSelection } from "./viewers/ContentForPath";
 
-type PathResult = { kind: PathKind; error?: never } | { kind: "error"; error: string };
+type RootContentProps = {
+    selection: ContentSelection | undefined;
+    loading: boolean;
+};
 
-export function RootContent(): JSX.Element {
+export function RootContent(props: RootContentProps): JSX.Element {
     const { t } = useI18N();
     const {
-        main: { basepath, filename },
-        spinner: { showSpinner, hideSpinner, setSpinnerParams },
+        main: { filename },
     } = useAppContext();
-
-    const [pathResult] = createResource(
-        () => ({ basepath: basepath(), filename: filename() }),
-        async (path): Promise<PathResult> => {
-            setSpinnerParams("");
-            showSpinner();
-            try {
-                const kind = await invoke<PathKind>("path_kind", path);
-                return { kind };
-            } catch (error: unknown) {
-                console.error("Unable to inspect path:", error);
-                return { kind: "error", error: translateAppError(error, t) };
-            } finally {
-                hideSpinner();
-            }
-        }
-    );
+    const content = () => (props.selection?.kind === "content" ? props.selection : undefined);
 
     return (
-        <Show when={!pathResult.loading}>
+        <Show when={!props.loading}>
             <Switch>
-                <Match when={pathResult()?.kind === "file"}>
-                    <Dynamic {...componentForFilename(filename())} />
+                <Match when={content()}>
+                    {(selection) => (
+                        <Dynamic
+                            component={selection().component}
+                            {...selection().props}
+                        />
+                    )}
                 </Match>
-                <Match when={pathResult()?.kind === "directory"}>
-                    <EditorFolder />
-                </Match>
-                <Match when={pathResult()?.kind === "other"}>
+                <Match when={props.selection?.kind === "unsupported"}>
                     <ErrorView info="status">
                         {t("errors.unsupportedPathType", { filename: filename() })}
                     </ErrorView>
                 </Match>
-                <Match when={pathResult()?.kind === "error"}>
-                    <ErrorView>{pathResult()?.error ?? t("errors.unknown")}</ErrorView>
+                <Match when={props.selection?.kind === "error"}>
+                    <ErrorView>
+                        {props.selection?.kind === "error"
+                            ? props.selection.error
+                            : t("errors.unknown")}
+                    </ErrorView>
                 </Match>
             </Switch>
         </Show>

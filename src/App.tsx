@@ -3,16 +3,58 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { createMemo, createResource, type JSX } from "solid-js";
+import { invoke } from "@tauri-apps/api/core";
 import RootContent from "./RootContent";
 import Toolbar from "./Toolbar";
 import styles from "./App.module.css";
-import { AppProvider } from "./AppContext";
-import I18NProvider from "./Localization";
+import { AppProvider, useAppContext } from "./AppContext";
+import I18NProvider, { useI18N } from "./Localization";
+import { translateAppError } from "./AppError";
+import type { PathKind } from "./rusttypes";
+import {
+    contentForPath,
+    type PathResult,
+} from "./viewers/ContentForPath";
 
 type AppProps = {
     initialBasepath: string;
     initialFilename: string;
 };
+
+function AppContent(): JSX.Element {
+    const { t } = useI18N();
+    const {
+        main: { basepath, filename },
+        spinner: { showSpinner, hideSpinner, setSpinnerParams },
+    } = useAppContext();
+    const [pathResult] = createResource(
+        () => ({ basepath: basepath(), filename: filename() }),
+        async (path): Promise<PathResult> => {
+            setSpinnerParams("");
+            showSpinner();
+            try {
+                const kind = await invoke<PathKind>("path_kind", path);
+                return { kind };
+            } catch (error: unknown) {
+                console.error("Unable to inspect path:", error);
+                return { kind: "error", error: translateAppError(error, t) };
+            } finally {
+                hideSpinner();
+            }
+        }
+    );
+    const selection = createMemo(() =>
+        pathResult.loading ? undefined : contentForPath(filename(), pathResult())
+    );
+
+    return (
+        <main class={styles.appMain}>
+            <Toolbar contextualSections={selection()?.toolbarSections ?? []} />
+            <RootContent selection={selection()} loading={pathResult.loading} />
+        </main>
+    );
+}
 
 function App(props: AppProps) {
     return (
@@ -21,10 +63,7 @@ function App(props: AppProps) {
                 initialBasepath={props.initialBasepath}
                 initialFilename={props.initialFilename}
             >
-                <main class={styles.appMain}>
-                    <Toolbar />
-                    <RootContent />
-                </main>
+                <AppContent />
             </AppProvider>
         </I18NProvider>
     );
