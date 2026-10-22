@@ -11,6 +11,7 @@ import appIcon from "../src-tauri/icons/128x128.png";
 import dialogStyles from "./Dialog.module.css";
 import styles from "./AboutDialog.module.css";
 import { useI18N } from "./Localization";
+import { dismissDialogOnBackdropClick } from "./DialogDismiss";
 
 const HOMEPAGE_URL = "https://adrianromero.github.io/plunibio";
 const LICENSE_URL = "https://github.com/adrianromero/plunibio/blob/main/LICENSE";
@@ -28,6 +29,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
     let closeButtonRef!: HTMLButtonElement;
     let previouslyFocusedElement: HTMLElement | null = null;
     let metadataRequested = false;
+    const close = (): void => props.onClose();
 
     const openExternalUrl = (url: string): void => {
         void openUrl(url).catch((error: unknown) => {
@@ -69,8 +71,9 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
             tabIndex={-1}
             onCancel={(event) => {
                 event.preventDefault();
-                props.onClose();
+                close();
             }}
+            onClick={(event) => dismissDialogOnBackdropClick(event, close)}
         >
             <div class={styles.identity}>
                 <img class={styles.appIcon} src={appIcon} alt="" aria-hidden="true" />
@@ -109,7 +112,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
                     ref={closeButtonRef}
                     class="stdButton"
                     type="button"
-                    onClick={props.onClose}
+                    onClick={close}
                 >
                     {t("dialog.close")}
                 </button>

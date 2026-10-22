@@ -15,6 +15,7 @@ import styles from "./OpenWorkspaceDialog.module.css";
 import folderStyles from "./viewers/EditorFolder.module.css";
 import { useI18N } from "./Localization";
 import type { DirectoryBrowserEntry, DirectoryBrowserLocation } from "./rusttypes";
+import { dismissDialogOnBackdropClick } from "./DialogDismiss";
 
 type OpenWorkspaceDialogProps = {
     open: boolean;
@@ -34,6 +35,10 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
     const [error, setError] = createSignal<string | null>(null);
     let loadSequence = 0;
     let wasOpen = false;
+
+    const cancel = (): void => {
+        if (!confirming()) props.onCancel();
+    };
 
     const loadDirectory = async (path: string): Promise<void> => {
         const sequence = ++loadSequence;
@@ -104,8 +109,9 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
             tabIndex={-1}
             onCancel={(event) => {
                 event.preventDefault();
-                if (!confirming()) props.onCancel();
+                cancel();
             }}
+            onClick={(event) => dismissDialogOnBackdropClick(event, cancel)}
         >
             <div class={`${dialogStyles.iconRow} ${styles.iconRow}`}>
                 <FolderOpen class={dialogStyles.icon} aria-hidden="true" />
@@ -190,7 +196,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                     class="stdButton"
                     type="button"
                     disabled={confirming()}
-                    onClick={props.onCancel}
+                    onClick={cancel}
                 >
                     {t("dialog.cancel")}
                 </button>

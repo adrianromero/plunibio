@@ -8,6 +8,7 @@ import styles from "./Dialog.module.css";
 import { Dynamic } from "solid-js/web";
 import { messagesinfo, type MessageInfo, type MessageInfoKind } from "./messagesinfo";
 import { useI18N } from "./Localization";
+import { dismissDialogOnBackdropClick } from "./DialogDismiss";
 
 type DialogProps = {
     open: boolean;
@@ -26,6 +27,7 @@ export function Dialog(props: DialogProps): JSX.Element {
     const titleId = createUniqueId();
     const kind = (): MessageInfoKind => props.info ?? (props.confirmLabel ? "question" : "error");
     const info = (): MessageInfo => messagesinfo[kind()];
+    const cancel = (): void => props.onCancel();
 
     createEffect(() => {
         if (props.open && !dialogRef.open) {
@@ -43,8 +45,9 @@ export function Dialog(props: DialogProps): JSX.Element {
             tabIndex={-1}
             onCancel={(e) => {
                 e.preventDefault();
-                props.onCancel?.();
+                cancel();
             }}
+            onClick={(event) => dismissDialogOnBackdropClick(event, cancel)}
             onClose={() => {
                 props.onClose?.();
             }}
@@ -69,7 +72,7 @@ export function Dialog(props: DialogProps): JSX.Element {
                     </button>
                 ) : null}
                 {props.cancelLabel ? (
-                    <button class="stdButton" type="button" onClick={() => void props.onCancel()}>
+                    <button class="stdButton" type="button" onClick={cancel}>
                         {props.cancelLabel}
                     </button>
                 ) : null}
