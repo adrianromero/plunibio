@@ -166,6 +166,12 @@ export function EditorMarkdown(): JSX.Element {
                 root: editorRef,
                 defaultValue: document.markdown,
                 featureConfigs: {
+                    [Crepe.Feature.LinkTooltip]: {
+                        inputPlaceholder: t("markdownToolbar.linkPlaceholder"),
+                    },
+                    [Crepe.Feature.Placeholder]: {
+                        text: t("markdownToolbar.editorPlaceholder"),
+                    },
                     [Crepe.Feature.CodeMirror]: {
                         // Crepe defaults to oneDark. Token classes keep its embedded
                         // editors synchronized with the application theme instead.
