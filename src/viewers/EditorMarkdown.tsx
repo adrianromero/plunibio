@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createEffect, createSignal, onCleanup, onMount, Show, JSX } from "solid-js";
+import { createEffect, createSignal, onCleanup, Show, JSX } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { Crepe } from "@milkdown/crepe";
 import { editorViewCtx, EditorStatus } from "@milkdown/kit/core";
@@ -27,6 +27,10 @@ import styles from "./EditorMarkdown.module.css";
 import EditorMarkdownSidebar from "./EditorMarkdownSidebar";
 import { createMarkdownImageProxy, type MarkdownImageProxy } from "./MarkdownImageProxy";
 import MarkdownImageActions from "./MarkdownImageActions";
+import MarkdownLinkActions from "./MarkdownLinkActions";
+import MarkdownFloatingActionsHost, {
+    createMarkdownFloatingActionsController,
+} from "./MarkdownFloatingActionsHost";
 import { configureMarkdownSerialization } from "./MarkdownSerialization";
 import { configureCodeLanguages } from "./CodeLanguages";
 import { joinMarkdownFrontmatter, splitMarkdownFrontmatter } from "./MarkdownFrontmatter";
@@ -42,6 +46,8 @@ export function EditorMarkdown(): JSX.Element {
     let imageProxy: MarkdownImageProxy | null = null;
     let currentSearchController: ProseMirrorSearchController | null = null;
     let focusSearch: (() => void) | null = null;
+    let createLink: (() => void) | null = null;
+    const floatingActions = createMarkdownFloatingActionsController();
     const [editorReady, setEditorReady] = createSignal(false);
     const [imageActionsCrepe, setImageActionsCrepe] = createSignal<Crepe | null>(null);
     const [frontmatterVisible, setFrontmatterVisible] = createSignal(false);
@@ -76,32 +82,7 @@ export function EditorMarkdown(): JSX.Element {
         return true;
     };
 
-    const handleLinkPreviewClick = async (event: MouseEvent): Promise<void> => {
-        const target = event.target;
-        if (!(target instanceof Element)) {
-            return;
-        }
-
-        const link = target.closest<HTMLAnchorElement>(
-            ".milkdown-link-preview a.link-display[href]"
-        );
-        if (!link || !editorRef.contains(link)) {
-            return;
-        }
-
-        const href = link.getAttribute("href");
-        if (!href) {
-            return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        const preview = link.closest<HTMLElement>(".milkdown-link-preview");
-        if (preview) {
-            preview.dataset.show = "false";
-        }
-
+    const navigateToLink = async (href: string): Promise<void> => {
         if (href.startsWith("#")) {
             if (!navigateToAnchor(href)) {
                 console.error("Heading anchor not found:", href);
@@ -297,12 +278,7 @@ export function EditorMarkdown(): JSX.Element {
         setSearchFile(state().status === "ready" ? openSearch : null);
     });
 
-    onMount(() => {
-        editorRef.addEventListener("click", handleLinkPreviewClick, { capture: true });
-    });
-
     onCleanup(() => {
-        editorRef.removeEventListener("click", handleLinkPreviewClick, { capture: true });
         setSearchFile(null);
     });
 
@@ -323,7 +299,24 @@ export function EditorMarkdown(): JSX.Element {
                     <div ref={frontmatterRef} class={styles.frontmatterEditor} />
                 </div>
                 <div ref={editorRef} class={`contentView milkdowntheme ${styles.editorMarkdown}`} />
-                <MarkdownImageActions editorRoot={() => editorRef} crepe={imageActionsCrepe} />
+                <MarkdownLinkActions
+                    editorRoot={() => editorRef}
+                    crepe={imageActionsCrepe}
+                    controller={floatingActions}
+                    onNavigate={navigateToLink}
+                    registerCreateLink={(handler) => {
+                        createLink = handler;
+                    }}
+                />
+                <MarkdownImageActions
+                    editorRoot={() => editorRef}
+                    crepe={imageActionsCrepe}
+                    controller={floatingActions}
+                />
+                <MarkdownFloatingActionsHost
+                    editorRoot={() => editorRef}
+                    controller={floatingActions}
+                />
             </div>
             <EditorMarkdownSidebar
                 disabled={editorDisabled()}
@@ -336,6 +329,7 @@ export function EditorMarkdown(): JSX.Element {
                 registerSearchFocus={(focus) => {
                     focusSearch = focus;
                 }}
+                onCreateLink={() => createLink?.()}
             />
         </section>
     );

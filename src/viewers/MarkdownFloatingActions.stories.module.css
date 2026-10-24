@@ -1,0 +1,7 @@
+.stage {
+    min-width: min(36rem, calc(100vw - 4rem));
+    padding: 4rem 2rem;
+    background: var(--color-view-background);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-medium);
+}

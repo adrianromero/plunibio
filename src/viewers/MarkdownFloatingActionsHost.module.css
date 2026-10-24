@@ -1,0 +1,15 @@
+.layer {
+    position: relative;
+    z-index: 5;
+    height: 0;
+    pointer-events: none;
+}
+
+.positioner {
+    position: absolute;
+    pointer-events: auto;
+}
+
+.positioner[hidden] {
+    display: none;
+}

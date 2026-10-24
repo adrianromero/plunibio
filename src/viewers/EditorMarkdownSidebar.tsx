@@ -89,6 +89,7 @@ type EditorMarkdownSidebarProps = {
     selectedTab: string;
     onSelectedTabChange: (key: string) => void;
     registerSearchFocus?: (focus: (() => void) | null) => void;
+    onCreateLink?: () => void;
 };
 
 type ListKind = "bullet" | "ordered" | "task";
@@ -305,7 +306,7 @@ function toggleInlineCode(ctx: Ctx): void {
     );
 }
 
-function toggleLink(ctx: Ctx): void {
+function toggleLink(ctx: Ctx, onCreateLink?: () => void): void {
     const view = ctx.get(editorViewCtx);
     const markType = linkSchema.type(ctx);
 
@@ -314,7 +315,13 @@ function toggleLink(ctx: Ctx): void {
         return;
     }
 
-    ctx.get(commandsCtx).call(toggleLinkCommand.key);
+    const { from, to } = view.state.selection;
+    if (view.state.doc.rangeHasMark(from, to, markType) || !onCreateLink) {
+        ctx.get(commandsCtx).call(toggleLinkCommand.key);
+        return;
+    }
+
+    onCreateLink();
 }
 
 function getListContext(ctx: Ctx): ListContext | null {
@@ -736,7 +743,7 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                                 icon={Link2}
                                 label={t("markdownToolbar.link")}
                                 onRun={(ctx) => {
-                                    toggleLink(ctx);
+                                    toggleLink(ctx, props.onCreateLink);
                                     updateSelectedState(ctx);
                                 }}
                             />

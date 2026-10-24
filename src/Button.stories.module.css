@@ -83,16 +83,6 @@
     list-style: none;
 }
 
-.floatingStage {
-    position: relative;
-    width: 3rem;
-    height: 2.5rem;
-}
-
-.floatingStage .floatingButtonGroup {
-    position: static;
-}
-
 .variant .externalStage {
     min-height: auto;
     justify-content: flex-start;

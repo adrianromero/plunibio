@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import ExternalLink from "lucide-solid/icons/external-link";
 import File from "lucide-solid/icons/file";
 import Folder from "lucide-solid/icons/folder";
-import LinkIcon from "lucide-solid/icons/link";
 import RefreshCw from "lucide-solid/icons/refresh-cw";
 import Save from "lucide-solid/icons/save";
 import type { JSX } from "solid-js";
@@ -10,7 +9,6 @@ import breadcrumbStyles from "./FileBreadcrumb.module.css";
 import styles from "./Button.stories.module.css";
 import externalFileStyles from "./viewers/EditorExternalFile.module.css";
 import folderStyles from "./viewers/EditorFolder.module.css";
-import floatingStyles from "./viewers/MarkdownImageActions.module.css";
 
 const meta = {
     title: "Components/Buttons",
@@ -60,30 +58,6 @@ function Variant(props: {
             {props.children}
             {props.note && <p class={styles.note}>{props.note}</p>}
         </article>
-    );
-}
-
-function FloatingImageButton(props: {
-    label: string;
-    selected?: boolean;
-    disabled?: boolean;
-}): JSX.Element {
-    return (
-        <div class={styles.floatingStage}>
-            <div
-                class={`${floatingStyles.buttonGroup} ${styles.floatingButtonGroup}`}
-            >
-                <button
-                    class={floatingStyles.actionButton}
-                    aria-label={props.label}
-                    aria-pressed={props.selected}
-                    disabled={props.disabled}
-                >
-                    <LinkIcon />
-                    Abrir
-                </button>
-            </div>
-        </div>
     );
 }
 
@@ -305,22 +279,6 @@ export const ComponentScoped: Story = {
                                     </button>
                                 </li>
                             </ul>
-                        }
-                    />
-                </Variant>
-
-                <Variant
-                    name="Acción flotante de imagen"
-                    source="MarkdownImageActions.module.css · .actionButton"
-                    note="El componente define su propia estructura y todos sus estados; no depende del DOM ni de los estilos internos de Crepe."
-                >
-                    <ButtonStates
-                        normal={<FloatingImageButton label="Abrir imagen" />}
-                        selected={
-                            <FloatingImageButton label="Abrir imagen seleccionada" selected />
-                        }
-                        disabled={
-                            <FloatingImageButton label="Abrir imagen deshabilitada" disabled />
                         }
                     />
                 </Variant>

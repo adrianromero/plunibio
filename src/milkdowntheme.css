@@ -88,6 +88,10 @@
 .milkdown .milkdown-link-edit {
     font-family: var(--font-interface);
 }
+.milkdown .milkdown-link-preview {
+    display: none;
+    pointer-events: none;
+}
 .milkdown .milkdown-link-preview > .link-preview,
 .milkdown .milkdown-link-edit > .link-edit {
     box-sizing: border-box;
