@@ -71,6 +71,15 @@ describe("createMarkdownImageProxy", () => {
         expect(invokeMock).not.toHaveBeenCalled();
     });
 
+    it("returns the visible fallback for an ephemeral Blob URL", () => {
+        const proxy = createMarkdownImageProxy("/documents", "/documents/note.md");
+
+        const result = proxy.proxyDomURL("blob:http://localhost/expired");
+
+        expect(result).toMatch(/^data:image\/svg\+xml;charset=utf-8,/);
+        expect(invokeMock).not.toHaveBeenCalled();
+    });
+
     it("creates an object URL for an existing local image", async () => {
         invokeMock.mockResolvedValue([137, 80, 78, 71]);
         const createObjectURL = vi

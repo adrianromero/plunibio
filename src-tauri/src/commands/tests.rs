@@ -296,6 +296,7 @@ fn linked_binary_file_is_read_relative_to_the_markdown_document() {
         std::fs::create_dir_all(base.join("docs")).unwrap();
         std::fs::create_dir_all(base.join("images")).unwrap();
         std::fs::write(base.join("images/logo.png"), [0_u8, 128, 255]).unwrap();
+        std::fs::write(base.join("docs/BUG webkit rendering.md"), b"linked content").unwrap();
         let basepath = base.to_string_lossy().into_owned();
 
         let content = super::read_linked_binary_file(
@@ -307,6 +308,15 @@ fn linked_binary_file_is_read_relative_to_the_markdown_document() {
         .unwrap();
         assert_eq!(content, vec![0, 128, 255]);
 
+        let content = super::read_linked_binary_file(
+            basepath.clone(),
+            "docs/readme.md".to_owned(),
+            "./BUG%20webkit%20rendering.md".to_owned(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(content, b"linked content");
+
         assert!(super::read_linked_binary_file(
             basepath,
             "docs/readme.md".to_owned(),
@@ -316,6 +326,196 @@ fn linked_binary_file_is_read_relative_to_the_markdown_document() {
         .is_err());
 
         std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn linked_images_are_saved_beside_markdown_without_overwriting() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-pasted-image-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        std::fs::write(base.join("docs/photo.png"), [1_u8, 2, 3]).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let saved_name = super::save_linked_image(
+            basepath,
+            "docs/readme.md".to_owned(),
+            "photo.png".to_owned(),
+            vec![4, 5, 6],
+        )
+        .await
+        .unwrap();
+
+        assert_eq!(saved_name, "photo-2.png");
+        assert_eq!(
+            std::fs::read(base.join("docs/photo.png")).unwrap(),
+            [1, 2, 3]
+        );
+        assert_eq!(
+            std::fs::read(base.join("docs/photo-2.png")).unwrap(),
+            [4, 5, 6]
+        );
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn linked_image_name_cannot_select_another_directory() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-invalid-image-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        assert!(super::save_linked_image(
+            basepath,
+            "docs/readme.md".to_owned(),
+            "../photo.png".to_owned(),
+            vec![1, 2, 3],
+        )
+        .await
+        .is_err());
+        assert!(!base.join("photo.png").exists());
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn linked_image_name_must_have_a_supported_extension() {
+    tauri::async_runtime::block_on(async {
+        let result = super::save_linked_image(
+            std::env::temp_dir().to_string_lossy().into_owned(),
+            "readme.md".to_owned(),
+            "notes.txt".to_owned(),
+            vec![1, 2, 3],
+        )
+        .await;
+
+        assert!(result.is_err());
+    });
+}
+
+#[test]
+fn clipboard_rgba_image_is_encoded_as_png() {
+    let content = super::encode_rgba_png(1, 1, &[255, 0, 0, 255]).unwrap();
+    let image = image::load_from_memory_with_format(&content, image::ImageFormat::Png).unwrap();
+
+    assert_eq!(image.width(), 1);
+    assert_eq!(image.height(), 1);
+    assert_eq!(image.to_rgba8().into_raw(), [255, 0, 0, 255]);
+}
+
+#[test]
+fn image_inside_base_is_linked_without_copying() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-linked-paste-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        std::fs::create_dir_all(base.join("images")).unwrap();
+        let source = base.join("images/my photo.png");
+        std::fs::write(&source, [1_u8, 2, 3]).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+        let uri = url::Url::from_file_path(&source).unwrap().to_string();
+
+        let href = super::import_linked_image_uri(basepath, "docs/readme.md".to_owned(), uri)
+            .await
+            .unwrap();
+
+        assert_eq!(href, "../images/my photo.png");
+        assert_eq!(std::fs::read(&source).unwrap(), [1, 2, 3]);
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn image_outside_base_is_copied_beside_markdown() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-import-paste-{unique}"));
+        let source = std::env::temp_dir().join(format!("plunibio-source-{unique}.png"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        std::fs::write(&source, [4_u8, 5, 6]).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+        let uri = url::Url::from_file_path(&source).unwrap().to_string();
+
+        let href = super::import_linked_image_uri(basepath, "docs/readme.md".to_owned(), uri)
+            .await
+            .unwrap();
+
+        assert_eq!(href, format!("./plunibio-source-{unique}.png"));
+        assert_eq!(
+            std::fs::read(base.join(format!("docs/plunibio-source-{unique}.png"))).unwrap(),
+            [4, 5, 6]
+        );
+        std::fs::remove_dir_all(base).unwrap();
+        std::fs::remove_file(source).unwrap();
+    });
+}
+
+#[test]
+fn file_inside_base_is_linked_relative_to_markdown() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-linked-file-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        std::fs::create_dir_all(base.join("references")).unwrap();
+        let source = base.join("references/specification.pdf");
+        std::fs::write(&source, [1_u8, 2, 3]).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+        let uri = url::Url::from_file_path(&source).unwrap().to_string();
+
+        let href = super::resolve_linked_file_uri(basepath, "docs/readme.md".to_owned(), uri)
+            .await
+            .unwrap();
+
+        assert_eq!(href, "../references/specification.pdf");
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn file_outside_base_keeps_its_absolute_uri_without_copying() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-external-file-link-{unique}"));
+        let source = std::env::temp_dir().join(format!("plunibio-external-{unique}.pdf"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        std::fs::write(&source, [4_u8, 5, 6]).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+        let uri = url::Url::from_file_path(&source).unwrap().to_string();
+
+        let href =
+            super::resolve_linked_file_uri(basepath, "docs/readme.md".to_owned(), uri.clone())
+                .await
+                .unwrap();
+
+        assert_eq!(href, uri);
+        assert!(!base
+            .join(format!("docs/plunibio-external-{unique}.pdf"))
+            .exists());
+        std::fs::remove_dir_all(base).unwrap();
+        std::fs::remove_file(source).unwrap();
     });
 }
 

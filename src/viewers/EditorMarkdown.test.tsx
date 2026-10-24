@@ -5,12 +5,15 @@
 
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { invoke } from "@tauri-apps/api/core";
 import I18NProvider from "../Localization";
 import { StoryAppProvider } from "../stories/StoryAppProvider";
 import EditorMarkdown from "./EditorMarkdown";
 
 let markdownContent =
     "![0.33](./plunibio-logo.png)\n\n# Plunibio\n\n[Open](./old.md) and [Other](./other.md)\n";
+let nativeClipboardText = "";
+let resolvedLinkedFileHref = "../files/document.pdf";
 
 vi.mock("@tauri-apps/api/core", () => ({
     invoke: vi.fn((command: string) => {
@@ -25,9 +28,40 @@ vi.mock("@tauri-apps/api/core", () => ({
             return new Promise<number[]>(() => undefined);
         }
 
+        if (command === "save_linked_image") {
+            return Promise.resolve("pasted.png");
+        }
+
+        if (command === "import_linked_image_uri") {
+            return Promise.resolve("./adrianavatar.png");
+        }
+
+        if (command === "resolve_linked_file_uri") {
+            return Promise.resolve(resolvedLinkedFileHref);
+        }
+
+        if (command === "plugin:clipboard-manager|read_text") {
+            return Promise.resolve(nativeClipboardText);
+        }
+
+        if (command === "plugin:clipboard-manager|read_image") {
+            return Promise.resolve(42);
+        }
+
+        if (command === "save_linked_image_resource") {
+            return Promise.resolve("pasted-image.png");
+        }
+
         return Promise.resolve(undefined);
     }),
 }));
+
+vi.mock("@tauri-apps/plugin-clipboard-manager", () => ({
+    readText: vi.fn(() => Promise.resolve(nativeClipboardText)),
+    readImage: vi.fn(() => Promise.reject(new Error("No native image configured"))),
+}));
+
+const invokeMock = vi.mocked(invoke);
 
 describe("EditorMarkdown", () => {
     let dispose: (() => void) | undefined;
@@ -36,6 +70,8 @@ describe("EditorMarkdown", () => {
     beforeEach(() => {
         markdownContent =
             "![0.33](./plunibio-logo.png)\n\n# Plunibio\n\n[Open](./old.md) and [Other](./other.md)\n";
+        nativeClipboardText = "";
+        resolvedLinkedFileHref = "../files/document.pdf";
     });
 
     const activateButton = (button: HTMLButtonElement): void => {
@@ -68,6 +104,330 @@ describe("EditorMarkdown", () => {
         await vi.waitFor(() => {
             expect(root?.querySelector(".ProseMirror")).not.toBeNull();
             expect(root?.querySelector("h1")?.textContent).toBe("Plunibio");
+        });
+    });
+
+    it("imports an image exposed by the clipboard as a local file URI", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        const paste = new ClipboardEvent("paste", {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: {
+                files: {
+                    length: 0,
+                    item: (): File | null => null,
+                },
+                items: { length: 0 },
+                getData: (type: string): string =>
+                    type === "text/uri-list" || type === "text/plain"
+                        ? "file:///home/adrian/Im%C3%A1genes/adrianavatar.png"
+                        : "",
+            } as unknown as DataTransfer,
+        });
+
+        editor.dispatchEvent(paste);
+
+        await vi.waitFor(() => {
+            expect(invokeMock).toHaveBeenCalledWith("import_linked_image_uri", {
+                basepath: "/home/adrian/documents",
+                filename: "notes/README.md",
+                uri: "file:///home/adrian/Im%C3%A1genes/adrianavatar.png",
+            });
+            expect(root?.querySelector(".milkdown-image-inline")).not.toBeNull();
+        });
+    });
+
+    it("keeps the URL when pasting a web image", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        editor.dispatchEvent(
+            new ClipboardEvent("paste", {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    getData: (type: string): string =>
+                        type === "text/html"
+                            ? '<img src="https://example.com/photo.png" alt="Web photo">'
+                            : "",
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            const image = root?.querySelector<HTMLImageElement>(
+                '.milkdown-image-inline img[src="https://example.com/photo.png"]'
+            );
+            expect(image).not.toBeNull();
+            expect(image?.alt).toBe("Web photo");
+        });
+        expect(invokeMock).not.toHaveBeenCalledWith(
+            "save_linked_image",
+            expect.anything()
+        );
+    });
+
+    it("creates an image block when pasting into an empty top-level line", async () => {
+        markdownContent = "";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        editor.dispatchEvent(
+            new ClipboardEvent("paste", {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    getData: (type: string): string =>
+                        type === "text/html"
+                            ? '<img src="https://example.com/photo.png" alt="Photo">'
+                            : "",
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            expect(root?.querySelector(".milkdown-image-block")).not.toBeNull();
+            expect(root?.querySelector(".milkdown-image-inline")).toBeNull();
+        });
+    });
+
+    it("creates an image when pasting a plain web image URL", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        const source = "https://example.com/catalog/photo.jpg";
+        editor.dispatchEvent(
+            new ClipboardEvent("paste", {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    getData: (type: string): string =>
+                        type === "text/plain" ? source : "",
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            expect(
+                root?.querySelector(`.milkdown-image-inline img[src="${source}"]`)
+            ).not.toBeNull();
+        });
+    });
+
+    it("creates a relative link when pasting a non-image file from the base path", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        editor.dispatchEvent(
+            new ClipboardEvent("paste", {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    getData: (type: string): string => {
+                        if (type === "text/html") {
+                            return '<a href="file:///home/adrian/documents/files/document.pdf">/home/adrian/documents/files/document.pdf</a>';
+                        }
+                        return type === "text/plain"
+                            ? "/home/adrian/documents/files/document.pdf"
+                            : "";
+                    },
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            const link = root?.querySelector<HTMLAnchorElement>(
+                '.ProseMirror a[href="../files/document.pdf"]'
+            );
+            expect(link?.textContent).toBe("../files/document.pdf");
+        });
+        expect(invokeMock).toHaveBeenCalledWith("resolve_linked_file_uri", {
+            basepath: "/home/adrian/documents",
+            filename: "notes/README.md",
+            uri: "file:///home/adrian/documents/files/document.pdf",
+        });
+    });
+
+    it("resolves a pasted blob image through the native clipboard", async () => {
+        markdownContent = "Start";
+        nativeClipboardText =
+            "file:///home/adrian/Im%C3%A1genes/adrianavatar.png";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        editor.dispatchEvent(
+            new ClipboardEvent("paste", {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    types: ["text/html", "image/png"],
+                    getData: (type: string): string =>
+                        type === "text/html"
+                            ? '<img src="blob:http://localhost:1420/image-id">'
+                            : "",
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            expect(invokeMock).toHaveBeenCalledWith("import_linked_image_uri", {
+                basepath: "/home/adrian/documents",
+                filename: "notes/README.md",
+                uri: "file:///home/adrian/Im%C3%A1genes/adrianavatar.png",
+            });
+            expect(root?.querySelector(".milkdown-image-inline")).not.toBeNull();
+        });
+        expect(root.querySelector('img[src^="blob:"]')).toBeNull();
+    });
+
+    it("imports a dropped local image as an image block", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        editor.dispatchEvent(
+            new DragEvent("drop", {
+                bubbles: true,
+                cancelable: true,
+                dataTransfer: {
+                    files: { length: 0, item: (): File | null => null },
+                    items: { length: 0 },
+                    getData: (type: string): string =>
+                        type === "text/uri-list"
+                            ? "file:///home/adrian/Im%C3%A1genes/adrianavatar.png"
+                            : "",
+                } as unknown as DataTransfer,
+            })
+        );
+
+        await vi.waitFor(() => {
+            expect(invokeMock).toHaveBeenCalledWith("import_linked_image_uri", {
+                basepath: "/home/adrian/documents",
+                filename: "notes/README.md",
+                uri: "file:///home/adrian/Im%C3%A1genes/adrianavatar.png",
+            });
+            expect(root?.querySelector(".milkdown-image-block")).not.toBeNull();
         });
     });
 

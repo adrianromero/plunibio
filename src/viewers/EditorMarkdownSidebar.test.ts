@@ -25,6 +25,7 @@ import {
     observeEditorState,
     toggleList,
 } from "./EditorMarkdownSidebar";
+import { insertResolvedMarkdownImage } from "./MarkdownImageInsertion";
 
 describe("acciones de EditorMarkdownSidebar", () => {
     it("notifica el cambio del estado de tecleo al pulsar Ctrl+B", async () => {
@@ -138,6 +139,36 @@ describe("acciones de EditorMarkdownSidebar", () => {
 
         expect(result).toContain("| ![]()");
         expect(result).not.toContain("![1.00]()");
+    });
+
+    it("inserta una imagen pegada como bloque en un párrafo vacío", async () => {
+        const result = await runCrepeMarkdownAction("Antes\n\n[[]]\n\nDespués", (ctx) =>
+            insertResolvedMarkdownImage(
+                ctx.get(editorViewCtx),
+                "./photo.png",
+                "photo.png"
+            )
+        );
+
+        expect(result).toContain("![1.00](./photo.png)");
+    });
+
+    it("inserta una imagen pegada en línea dentro de una celda vacía", async () => {
+        const markdown = `
+| Columna |
+| ------- |
+| [[]]    |
+`.trim();
+        const result = await runCrepeMarkdownAction(markdown, (ctx) =>
+            insertResolvedMarkdownImage(
+                ctx.get(editorViewCtx),
+                "./photo.png",
+                "photo.png"
+            )
+        );
+
+        expect(result).toContain("| ![photo.png](./photo.png)");
+        expect(result).not.toContain("![1.00](./photo.png)");
     });
 
     it("activa la lista de viñetas de todos los elementos seleccionados", async () => {

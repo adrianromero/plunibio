@@ -25,8 +25,28 @@ class IntersectionObserverStub implements IntersectionObserver {
     unobserve(): void {}
 }
 
+class ClipboardEventStub extends Event implements ClipboardEvent {
+    readonly clipboardData: DataTransfer | null;
+
+    constructor(type: string, eventInitDict: ClipboardEventInit = {}) {
+        super(type, eventInitDict);
+        this.clipboardData = eventInitDict.clipboardData ?? null;
+    }
+}
+
+class DragEventStub extends MouseEvent implements DragEvent {
+    readonly dataTransfer: DataTransfer | null;
+
+    constructor(type: string, eventInitDict: DragEventInit = {}) {
+        super(type, eventInitDict);
+        this.dataTransfer = eventInitDict.dataTransfer ?? null;
+    }
+}
+
 vi.stubGlobal("ResizeObserver", ResizeObserverStub);
 vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
+vi.stubGlobal("ClipboardEvent", ClipboardEventStub);
+vi.stubGlobal("DragEvent", DragEventStub);
 vi.stubGlobal("matchMedia", () => ({
     matches: false,
     media: "",
@@ -41,6 +61,13 @@ vi.stubGlobal("matchMedia", () => ({
 Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
     configurable: true,
     value: (): void => {},
+});
+
+Object.defineProperty(Document.prototype, "elementFromPoint", {
+    configurable: true,
+    value: function (this: Document): Element | null {
+        return this.querySelector(".ProseMirror") ?? this.body;
+    },
 });
 
 Object.defineProperties(Range.prototype, {

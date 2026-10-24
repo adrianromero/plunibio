@@ -143,6 +143,7 @@
         "sepia": "Sepia",
         "invert": "Alderantzikatu koloreak",
         "resetFilters": "Berrezarri iragazkiak",
+        "unsupportedFormat": "Fitxategi hau ez da onartutako irudi bat. Erabili AVIF, BMP, GIF, ICO, JPEG, PNG, SVG edo WebP.",
         "unsupportedSaveFormat": "Irudi-formatu hau ikus daiteke, baina ezin da gorde editatu ondoren. PNG, JPEG eta WebP formatuak gorde daitezke.",
         "preset": {
             "normal": "Arrunta",

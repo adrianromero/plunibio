@@ -79,6 +79,7 @@ import SidebarTab from "../commons/SidebarTab";
 import SidebarTabSection from "../commons/SidebarTabSection";
 import SearchPanel from "../commons/SearchPanel";
 import type { SearchController } from "../search/SearchController";
+import { canReplaceEmptyParagraphWithImageBlock } from "./MarkdownImageInsertion";
 
 type EditorMarkdownSidebarProps = {
     getEditor: () => Editor | null;
@@ -530,23 +531,11 @@ function toggleBlockquote(ctx: Ctx): void {
 
 export function insertImage(ctx: Ctx): void {
     const view = ctx.get(editorViewCtx);
-    const { selection } = view.state;
-    const { $from } = selection;
     const imageBlock = imageBlockSchema.type(ctx);
-    const containerDepth = $from.depth - 1;
-    const paragraphIndex = containerDepth >= 0 ? $from.index(containerDepth) : -1;
-    const isEmptyParagraph =
-        selection.empty &&
-        $from.parent.type === paragraphSchema.type(ctx) &&
-        $from.parent.content.size === 0;
-    const canReplaceParagraphWithBlock =
-        isEmptyParagraph &&
-        containerDepth >= 0 &&
-        $from.node(containerDepth).canReplaceWith(paragraphIndex, paragraphIndex + 1, imageBlock);
     const commands = ctx.get(commandsCtx);
 
     if (
-        canReplaceParagraphWithBlock &&
+        canReplaceEmptyParagraphWithImageBlock(view) &&
         commands.call(addBlockTypeCommand.key, {
             nodeType: imageBlock,
         })

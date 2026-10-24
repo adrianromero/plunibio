@@ -28,6 +28,7 @@ fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath:
     tauri::Builder::default()
         .manage(AppState::new(basepath, filename))
         .manage(managed_properties)
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
         .setup(move |app| {
             let (properties_path, application_properties) = match app.path().home_dir() {
@@ -220,6 +221,10 @@ fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath:
             commands::read_file,
             commands::read_binary_file,
             commands::read_linked_binary_file,
+            commands::resolve_linked_file_uri,
+            commands::import_linked_image_uri,
+            commands::save_linked_image,
+            commands::save_linked_image_resource,
             commands::write_binary_file,
             commands::open_file,
             commands::write_file

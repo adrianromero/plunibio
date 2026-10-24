@@ -143,6 +143,7 @@
         "sepia": "Sèpia",
         "invert": "Inverteix els colors",
         "resetFilters": "Restableix els filtres",
+        "unsupportedFormat": "Aquest fitxer no és una imatge compatible. Utilitzeu AVIF, BMP, GIF, ICO, JPEG, PNG, SVG o WebP.",
         "unsupportedSaveFormat": "Aquest format d'imatge es pot visualitzar, però no es pot desar després d'editar-lo. Es poden desar PNG, JPEG i WebP.",
         "preset": {
             "normal": "Normal",

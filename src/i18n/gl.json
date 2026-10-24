@@ -143,6 +143,7 @@
         "sepia": "Sepia",
         "invert": "Inverter as cores",
         "resetFilters": "Restablecer os filtros",
+        "unsupportedFormat": "Este ficheiro non é unha imaxe compatible. Usa AVIF, BMP, GIF, ICO, JPEG, PNG, SVG ou WebP.",
         "unsupportedSaveFormat": "Este formato de imaxe pódese visualizar, pero non gardar despois de editalo. Pódense gardar PNG, JPEG e WebP.",
         "preset": {
             "normal": "Normal",

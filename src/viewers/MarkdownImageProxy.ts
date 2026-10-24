@@ -90,6 +90,10 @@ export function createMarkdownImageProxy(
     let disposed = false;
 
     const proxyDomURL = (source: string): Promise<string> | string => {
+        if (/^blob:/i.test(source)) {
+            return missingImageDataUrl;
+        }
+
         const localSource = localImageSource(source);
         if (!localSource) {
             return source;

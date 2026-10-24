@@ -4,11 +4,16 @@
 use crate::app_error::{AppError, AppErrorCode};
 use crate::paths::{
     canonical_basepath, normalize_link_filename, resolve_existing_path, resolve_write_path,
+    validate_relative_filename,
 };
-use std::path::{Path, PathBuf};
+use std::io::Cursor;
+use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use tauri::image::JsImage;
 use tauri::Manager;
+use tauri::Webview;
 use tauri_plugin_opener::OpenerExt;
+use tokio::io::AsyncWriteExt;
 use tracing::info;
 #[cfg(target_os = "linux")]
 use tracing::warn;
@@ -556,6 +561,325 @@ pub(crate) async fn read_linked_binary_file(
             AppErrorCode::ReadFileFailed,
         )
     })
+}
+
+fn linked_file_name(preferred_name: &str, attempt: u32) -> Result<String, AppError> {
+    if preferred_name.contains(['/', '\\', '\0']) {
+        return Err(AppError::invalid_path(
+            preferred_name,
+            "linked file name must not contain path separators",
+        ));
+    }
+
+    let preferred_path = Path::new(preferred_name);
+    let mut components = preferred_path.components();
+    if !matches!(components.next(), Some(Component::Normal(_))) || components.next().is_some() {
+        return Err(AppError::invalid_path(
+            preferred_name,
+            "linked file name must be a single file name",
+        ));
+    }
+
+    if attempt == 1 {
+        return Ok(preferred_name.to_owned());
+    }
+
+    let stem = preferred_path
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .ok_or_else(|| AppError::invalid_path(preferred_name, "linked file name is invalid"))?;
+    let extension = preferred_path.extension().and_then(|value| value.to_str());
+    Ok(match extension {
+        Some(extension) if !extension.is_empty() => {
+            format!("{stem}-{attempt}.{extension}")
+        }
+        _ => format!("{stem}-{attempt}"),
+    })
+}
+
+fn supported_image_name(filename: &str) -> bool {
+    Path::new(filename)
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| {
+            matches!(
+                extension.to_ascii_lowercase().as_str(),
+                "avif" | "bmp" | "gif" | "ico" | "jpeg" | "jpg" | "png" | "svg" | "webp"
+            )
+        })
+}
+
+fn relative_markdown_link(from_directory: &Path, target: &Path) -> Result<String, AppError> {
+    let from_components: Vec<_> = from_directory.components().collect();
+    let target_components: Vec<_> = target.components().collect();
+    let common_length = from_components
+        .iter()
+        .zip(&target_components)
+        .take_while(|(left, right)| left == right)
+        .count();
+
+    let mut relative = PathBuf::new();
+    for _ in common_length..from_components.len() {
+        relative.push("..");
+    }
+    for component in &target_components[common_length..] {
+        relative.push(component.as_os_str());
+    }
+
+    if relative.as_os_str().is_empty() {
+        return Err(AppError::invalid_path(
+            &target.to_string_lossy(),
+            "linked file path is empty",
+        ));
+    }
+    let link = relative.to_string_lossy().replace('\\', "/");
+    Ok(if link.starts_with("../") {
+        link
+    } else {
+        format!("./{link}")
+    })
+}
+
+#[tauri::command]
+pub(crate) async fn resolve_linked_file_uri(
+    basepath: String,
+    filename: String,
+    uri: String,
+) -> Result<String, AppError> {
+    let source_url = url::Url::parse(&uri)
+        .map_err(|_| AppError::invalid_path(&uri, "linked file URI is invalid"))?;
+    if source_url.scheme() != "file" {
+        return Err(AppError::unsupported_link(&uri));
+    }
+    let source_filename = source_url
+        .to_file_path()
+        .map_err(|_| AppError::invalid_path(&uri, "linked file URI is not a local file"))?;
+    let source_path = tokio::fs::canonicalize(&source_filename)
+        .await
+        .map_err(|error| {
+            AppError::io(
+                "resolve_linked_file",
+                &source_filename.to_string_lossy(),
+                error,
+                AppErrorCode::ReadFileFailed,
+            )
+        })?;
+    let metadata = tokio::fs::metadata(&source_path).await.map_err(|error| {
+        AppError::io(
+            "inspect_linked_file",
+            &source_path.to_string_lossy(),
+            error,
+            AppErrorCode::InspectPathFailed,
+        )
+    })?;
+    if !metadata.is_file() {
+        return Err(AppError::invalid_path(
+            &source_path.to_string_lossy(),
+            "linked path is not a file",
+        ));
+    }
+
+    let markdown_filename = validate_relative_filename(&filename)?;
+    let markdown_directory = markdown_filename.parent().unwrap_or_else(|| Path::new(""));
+    let canonical_base = canonical_basepath(&basepath, &filename).await?;
+    if let Ok(target) = source_path.strip_prefix(&canonical_base) {
+        return relative_markdown_link(markdown_directory, target);
+    }
+
+    url::Url::from_file_path(&source_path)
+        .map(|url| url.to_string())
+        .map_err(|_| {
+            AppError::invalid_path(
+                &source_path.to_string_lossy(),
+                "linked file path cannot be represented as a URI",
+            )
+        })
+}
+
+#[tauri::command]
+pub(crate) async fn save_linked_image(
+    basepath: String,
+    filename: String,
+    preferred_name: String,
+    content: Vec<u8>,
+) -> Result<String, AppError> {
+    if !supported_image_name(&preferred_name) {
+        return Err(AppError::invalid_path(
+            &preferred_name,
+            "linked file is not a supported image",
+        ));
+    }
+    let markdown_filename = validate_relative_filename(&filename)?;
+    let markdown_directory = markdown_filename.parent().unwrap_or_else(|| Path::new(""));
+
+    for attempt in 1.. {
+        let saved_name = linked_file_name(&preferred_name, attempt)?;
+        let linked_filename = markdown_directory
+            .join(&saved_name)
+            .to_string_lossy()
+            .into_owned();
+        let path = resolve_write_path(&basepath, &linked_filename).await?;
+
+        let mut file = match tokio::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .await
+        {
+            Ok(file) => file,
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => {
+                return Err(AppError::io(
+                    "create_linked_image",
+                    &linked_filename,
+                    error,
+                    AppErrorCode::WriteFileFailed,
+                ));
+            }
+        };
+
+        let write_result = async {
+            file.write_all(&content).await?;
+            file.flush().await
+        }
+        .await;
+        if let Err(error) = write_result {
+            drop(file);
+            let _ = tokio::fs::remove_file(&path).await;
+            return Err(AppError::io(
+                "write_linked_image",
+                &linked_filename,
+                error,
+                AppErrorCode::WriteFileFailed,
+            ));
+        }
+
+        info!(
+            source = %filename,
+            target = %linked_filename,
+            "Saved linked image"
+        );
+        return Ok(saved_name);
+    }
+
+    unreachable!("the linked image suffix space is unbounded")
+}
+
+fn encode_rgba_png(width: u32, height: u32, rgba: &[u8]) -> Result<Vec<u8>, AppError> {
+    let image = image::RgbaImage::from_raw(width, height, rgba.to_vec()).ok_or_else(|| {
+        AppError::internal(
+            AppErrorCode::WriteFileFailed,
+            "encode_linked_image",
+            "pasted-image.png",
+            "clipboard image dimensions do not match its RGBA data",
+        )
+    })?;
+    let mut content = Cursor::new(Vec::new());
+    image::DynamicImage::ImageRgba8(image)
+        .write_to(&mut content, image::ImageFormat::Png)
+        .map_err(|error| {
+            AppError::internal(
+                AppErrorCode::WriteFileFailed,
+                "encode_linked_image",
+                "pasted-image.png",
+                &error.to_string(),
+            )
+        })?;
+    Ok(content.into_inner())
+}
+
+#[tauri::command]
+pub(crate) async fn save_linked_image_resource(
+    webview: Webview,
+    basepath: String,
+    filename: String,
+    preferred_name: String,
+    image: JsImage,
+) -> Result<String, AppError> {
+    let (width, height, rgba) = {
+        let resources = webview.resources_table();
+        let image = image.into_img(&resources).map_err(|error| {
+            AppError::internal(
+                AppErrorCode::ReadFileFailed,
+                "read_clipboard_image",
+                &preferred_name,
+                &error.to_string(),
+            )
+        })?;
+        (image.width(), image.height(), image.rgba().to_vec())
+    };
+    let content = encode_rgba_png(width, height, &rgba)?;
+    save_linked_image(basepath, filename, preferred_name, content).await
+}
+
+#[tauri::command]
+pub(crate) async fn import_linked_image_uri(
+    basepath: String,
+    filename: String,
+    uri: String,
+) -> Result<String, AppError> {
+    let source_url = url::Url::parse(&uri)
+        .map_err(|_| AppError::invalid_path(&uri, "linked image URI is invalid"))?;
+    if source_url.scheme() != "file" {
+        return Err(AppError::unsupported_link(&uri));
+    }
+    let source_filename = source_url
+        .to_file_path()
+        .map_err(|_| AppError::invalid_path(&uri, "linked image URI is not a local file"))?;
+    let source_path = tokio::fs::canonicalize(&source_filename)
+        .await
+        .map_err(|error| {
+            AppError::io(
+                "resolve_linked_image",
+                &source_filename.to_string_lossy(),
+                error,
+                AppErrorCode::ReadFileFailed,
+            )
+        })?;
+    let preferred_name = source_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| AppError::invalid_path(&uri, "linked image has no valid file name"))?;
+    if !supported_image_name(preferred_name) {
+        return Err(AppError::invalid_path(
+            preferred_name,
+            "linked file is not a supported image",
+        ));
+    }
+
+    let metadata = tokio::fs::metadata(&source_path).await.map_err(|error| {
+        AppError::io(
+            "inspect_linked_image",
+            &source_path.to_string_lossy(),
+            error,
+            AppErrorCode::InspectPathFailed,
+        )
+    })?;
+    if !metadata.is_file() {
+        return Err(AppError::invalid_path(
+            &source_path.to_string_lossy(),
+            "linked image is not a file",
+        ));
+    }
+
+    let markdown_filename = validate_relative_filename(&filename)?;
+    let markdown_directory = markdown_filename.parent().unwrap_or_else(|| Path::new(""));
+    let canonical_base = canonical_basepath(&basepath, &filename).await?;
+    if let Ok(target) = source_path.strip_prefix(&canonical_base) {
+        return relative_markdown_link(markdown_directory, target);
+    }
+
+    let content = tokio::fs::read(&source_path).await.map_err(|error| {
+        AppError::io(
+            "read_linked_image",
+            &source_path.to_string_lossy(),
+            error,
+            AppErrorCode::ReadFileFailed,
+        )
+    })?;
+    let saved_name =
+        save_linked_image(basepath, filename, preferred_name.to_owned(), content).await?;
+    Ok(format!("./{saved_name}"))
 }
 
 #[tauri::command]

@@ -18,6 +18,17 @@ fn link_can_move_to_a_parent_inside_the_base_path() {
 }
 
 #[test]
+fn percent_encoded_link_is_decoded_before_resolving_the_file() {
+    let result =
+        normalize_link_filename("private/readme.md", "./BUG%20webkit%20rendering.md").unwrap();
+
+    assert_eq!(
+        result,
+        std::path::Path::new("private/BUG webkit rendering.md")
+    );
+}
+
+#[test]
 fn link_cannot_escape_the_base_path() {
     let result = normalize_link_filename("samples/index.md", "../../other.md");
 

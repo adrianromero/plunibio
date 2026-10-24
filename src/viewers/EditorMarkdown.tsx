@@ -6,7 +6,7 @@
 import { createEffect, createSignal, onCleanup, Show, JSX } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { Crepe } from "@milkdown/crepe";
-import { editorViewCtx, EditorStatus } from "@milkdown/kit/core";
+import { editorViewCtx, editorViewOptionsCtx, EditorStatus } from "@milkdown/kit/core";
 import { yaml } from "@codemirror/lang-yaml";
 import { basicSetup } from "codemirror";
 import { EditorView as CodeMirrorEditorView } from "@codemirror/view";
@@ -37,6 +37,16 @@ import { joinMarkdownFrontmatter, splitMarkdownFrontmatter } from "./MarkdownFro
 import { ProseMirrorSearchController } from "../search/ProseMirrorSearchController";
 import type { SearchController } from "../search/SearchController";
 import { codeMirrorSyntaxTheme } from "./CodeMirrorTheme";
+import { insertResolvedMarkdownImage } from "./MarkdownImageInsertion";
+import {
+    droppedMarkdownImage,
+    pastedMarkdownImage,
+    pastedMarkdownLink,
+    resolveDroppedMarkdownImage,
+    resolvePastedMarkdownImage,
+    resolvePastedMarkdownLink,
+    UnsupportedMarkdownImageError,
+} from "./MarkdownImageTransfer";
 
 export function EditorMarkdown(): JSX.Element {
     let editorRef!: HTMLDivElement;
@@ -142,7 +152,17 @@ export function EditorMarkdown(): JSX.Element {
                 ],
                 parent: frontmatterRef,
             });
-            const nextImageProxy = createMarkdownImageProxy(basepath(), currentFilename);
+            const currentBasepath = basepath();
+            const nextImageProxy = createMarkdownImageProxy(currentBasepath, currentFilename);
+            const reportImageTransferError = async (err: unknown): Promise<void> => {
+                console.error("Unable to import Markdown image:", err);
+                await showAppMessage(
+                    err instanceof UnsupportedMarkdownImageError
+                        ? t("image.unsupportedFormat")
+                        : translateAppError(err, t),
+                    "error"
+                );
+            };
             const nextCrepe = new Crepe({
                 root: editorRef,
                 defaultValue: document.markdown,
@@ -186,6 +206,143 @@ export function EditorMarkdown(): JSX.Element {
             imageProxy = nextImageProxy;
             crepeInstance = nextCrepe;
 
+            nextCrepe.editor.config((ctx) => {
+                ctx.update(editorViewOptionsCtx, (value) => ({
+                    ...value,
+                    handlePaste: (view, event, slice) => {
+                        const clipboardData = event.clipboardData;
+                        if (!clipboardData) {
+                            return value.handlePaste?.(view, event, slice) ?? false;
+                        }
+
+                        let parsedContentContainsImage = false;
+                        let parsedLinkHref: string | null = null;
+                        let parsedLinkLabel = "";
+                        let parsedLinkIsExclusive = true;
+                        slice.content.descendants((node) => {
+                            if (node.type.name === "image" || node.type.name === "image-block") {
+                                parsedContentContainsImage = true;
+                            }
+                            if (!node.isText || !node.text?.trim()) return true;
+
+                            const linkMark = node.marks.find((mark) => mark.type.name === "link");
+                            const href = linkMark ? String(linkMark.attrs.href ?? "") : "";
+                            if (!href || (parsedLinkHref !== null && parsedLinkHref !== href)) {
+                                parsedLinkIsExclusive = false;
+                                return true;
+                            }
+                            parsedLinkHref = href;
+                            parsedLinkLabel += node.text;
+                            return true;
+                        });
+                        const parsedLink =
+                            parsedLinkIsExclusive && parsedLinkHref
+                                ? {
+                                      href: parsedLinkHref,
+                                      label: parsedLinkLabel.trim() || parsedLinkHref,
+                                  }
+                                : null;
+                        const imageTransfer = pastedMarkdownImage(
+                            clipboardData,
+                            parsedContentContainsImage,
+                            parsedLink
+                        );
+                        if (imageTransfer) {
+                            void (async () => {
+                                const { source, alt } = await resolvePastedMarkdownImage(
+                                    imageTransfer,
+                                    currentBasepath,
+                                    currentFilename
+                                );
+                                if (!view.dom.isConnected) return;
+                                insertResolvedMarkdownImage(view, source, alt);
+                            })().catch(async (err: unknown) => {
+                                await reportImageTransferError(err);
+                            });
+                            return true;
+                        }
+
+                        const linkTransfer = pastedMarkdownLink(clipboardData, parsedLink);
+                        if (!linkTransfer) {
+                            return value.handlePaste?.(view, event, slice) ?? false;
+                        }
+                        void resolvePastedMarkdownLink(
+                            linkTransfer,
+                            currentBasepath,
+                            currentFilename
+                        )
+                            .then(({ href, label }) => {
+                                if (!view.dom.isConnected) return;
+                                const link = view.state.schema.marks.link;
+                                if (!link) return;
+                                const { from, to } = view.state.selection;
+                                const transaction = view.state.tr;
+                                const mark = link.create({ href });
+                                if (from === to) {
+                                    transaction.insertText(label, from);
+                                    transaction.addMark(from, from + label.length, mark);
+                                } else {
+                                    transaction.addMark(from, to, mark);
+                                }
+                                view.dispatch(transaction.scrollIntoView());
+                            })
+                            .catch(async (err: unknown) => {
+                                console.error("Unable to import Markdown link:", err);
+                                await showAppMessage(translateAppError(err, t), "error");
+                            });
+                        return true;
+                    },
+                    handleDrop: (view, event, slice, moved) => {
+                        if (moved) {
+                            return value.handleDrop?.(view, event, slice, moved) ?? false;
+                        }
+                        const transferData = event.dataTransfer;
+                        if (!transferData) {
+                            return value.handleDrop?.(view, event, slice, moved) ?? false;
+                        }
+
+                        const transfer = droppedMarkdownImage(transferData);
+                        if (!transfer) {
+                            return value.handleDrop?.(view, event, slice, moved) ?? false;
+                        }
+
+                        const dropPosition =
+                            view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos ??
+                            view.state.selection.from;
+                        void resolveDroppedMarkdownImage(
+                            transfer,
+                            currentBasepath,
+                            currentFilename
+                        )
+                            .then(({ source }) => {
+                                if (!view.dom.isConnected) return;
+                                const imageBlock = view.state.schema.nodes["image-block"];
+                                if (!imageBlock) return;
+                                const position = Math.min(
+                                    dropPosition,
+                                    view.state.doc.content.size
+                                );
+                                view.dispatch(
+                                    view.state.tr
+                                        .replaceWith(
+                                            position,
+                                            position,
+                                            imageBlock.create({
+                                                src: source,
+                                                caption: "",
+                                                ratio: 1,
+                                            })
+                                        )
+                                        .scrollIntoView()
+                                );
+                            })
+                            .catch(async (err: unknown) => {
+                                await reportImageTransferError(err);
+                            });
+                        return true;
+                    },
+                }));
+            });
             nextCrepe.editor.config(
                 configureCodeLanguages(t("markdownToolbar.codePreviewMermaidError"))
             );

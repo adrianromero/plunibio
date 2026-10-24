@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::app_error::{AppError, AppErrorCode};
+use percent_encoding::percent_decode_str;
 use std::path::{Component, Path, PathBuf};
 
 pub(crate) fn validate_relative_filename(filename: &str) -> Result<&Path, AppError> {
@@ -39,10 +40,16 @@ fn has_uri_scheme(href: &str) -> bool {
 
 pub(crate) fn normalize_link_filename(filename: &str, href: &str) -> Result<PathBuf, AppError> {
     let current = validate_relative_filename(filename)?;
-    let link = Path::new(href);
     if has_uri_scheme(href) || href.starts_with("//") {
         return Err(AppError::unsupported_link(href));
     }
+    let decoded_href = percent_decode_str(href)
+        .decode_utf8()
+        .map_err(|_| AppError::invalid_path(href, "link target is not valid UTF-8"))?;
+    if has_uri_scheme(&decoded_href) || decoded_href.starts_with("//") {
+        return Err(AppError::unsupported_link(href));
+    }
+    let link = Path::new(decoded_href.as_ref());
     if href.is_empty() || link.is_absolute() {
         return Err(AppError::invalid_path(
             href,
