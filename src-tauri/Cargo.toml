@@ -1,6 +1,6 @@
 [package]
 name = "plunibio"
-version = "0.1.0-alpha"
+version = "0.1.1"
 description = "A lightweight desktop Markdown editor built with Tauri and SolidJS"
 authors = ["Adrián Romero"]
 license = "MIT"

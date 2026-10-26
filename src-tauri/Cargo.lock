@@ -2718,7 +2718,7 @@ dependencies = [
 
 [[package]]
 name = "plunibio"
-version = "0.1.0-alpha"
+version = "0.1.1"
 dependencies = [
  "clap",
  "gtk",
