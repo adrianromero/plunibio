@@ -5,6 +5,8 @@
 
 import { createEffect, createSignal, onCleanup, Show, JSX } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Crepe } from "@milkdown/crepe";
 import { editorViewCtx, editorViewOptionsCtx, EditorStatus } from "@milkdown/kit/core";
 import { yaml } from "@codemirror/lang-yaml";
@@ -17,6 +19,8 @@ import "@milkdown/crepe/theme/frame.css";
 import ErrorView from "./ErrorView";
 import { translateAppError } from "../AppError";
 import { Ctx } from "@milkdown/kit/ctx";
+import type { Slice } from "@milkdown/kit/prose/model";
+import type { EditorView as MilkdownEditorView } from "@milkdown/kit/prose/view";
 import {
     createFileEditorController,
     textFileStorage,
@@ -37,16 +41,53 @@ import { joinMarkdownFrontmatter, splitMarkdownFrontmatter } from "./MarkdownFro
 import { ProseMirrorSearchController } from "../search/ProseMirrorSearchController";
 import type { SearchController } from "../search/SearchController";
 import { codeMirrorSyntaxTheme } from "./CodeMirrorTheme";
-import { insertResolvedMarkdownImage } from "./MarkdownImageInsertion";
 import {
-    droppedMarkdownImage,
-    pastedMarkdownImage,
-    pastedMarkdownLink,
-    resolveDroppedMarkdownImage,
-    resolvePastedMarkdownImage,
-    resolvePastedMarkdownLink,
+    insertResolvedMarkdownImage,
+    insertResolvedMarkdownLink,
+} from "./MarkdownTransferInsertion";
+import {
+    isLocalFileMarkdownTransfer,
+    markdownTransfer,
+    markdownTransferFromPath,
+    resolveMarkdownTransfer,
+    type MarkdownTransfer,
+    type MarkdownTransferOptions,
     UnsupportedMarkdownImageError,
-} from "./MarkdownImageTransfer";
+} from "./MarkdownTransfer";
+
+function parsedTransferOptions(slice: Slice): MarkdownTransferOptions {
+    let parsedContentContainsImage = false;
+    let parsedLinkHref: string | null = null;
+    let parsedLinkLabel = "";
+    let parsedLinkIsExclusive = true;
+    slice.content.descendants((node) => {
+        if (node.type.name === "image" || node.type.name === "image-block") {
+            parsedContentContainsImage = true;
+        }
+        if (!node.isText || !node.text?.trim()) return true;
+
+        const linkMark = node.marks.find((mark) => mark.type.name === "link");
+        const href = linkMark ? String(linkMark.attrs.href ?? "") : "";
+        if (!href || (parsedLinkHref !== null && parsedLinkHref !== href)) {
+            parsedLinkIsExclusive = false;
+            return true;
+        }
+        parsedLinkHref = href;
+        parsedLinkLabel += node.text;
+        return true;
+    });
+
+    return {
+        parsedContentContainsImage,
+        parsedLink:
+            parsedLinkIsExclusive && parsedLinkHref
+                ? {
+                      href: parsedLinkHref,
+                      label: parsedLinkLabel.trim() || parsedLinkHref,
+                  }
+                : null,
+    };
+}
 
 export function EditorMarkdown(): JSX.Element {
     let editorRef!: HTMLDivElement;
@@ -54,6 +95,7 @@ export function EditorMarkdown(): JSX.Element {
     let crepeInstance: Crepe | null = null;
     let frontmatterEditor: CodeMirrorEditorView | null = null;
     let imageProxy: MarkdownImageProxy | null = null;
+    let nativeDropUnlisten: (() => void) | null = null;
     let currentSearchController: ProseMirrorSearchController | null = null;
     let focusSearch: (() => void) | null = null;
     let createLink: (() => void) | null = null;
@@ -163,6 +205,45 @@ export function EditorMarkdown(): JSX.Element {
                     "error"
                 );
             };
+            const resolveAndInsertTransfer = async (
+                view: MilkdownEditorView,
+                transfer: MarkdownTransfer,
+                position?: number
+            ): Promise<void> => {
+                const resolved = await resolveMarkdownTransfer(
+                    transfer,
+                    currentBasepath,
+                    currentFilename
+                );
+                if (!view.dom.isConnected) return;
+                if (resolved.kind === "image") {
+                    insertResolvedMarkdownImage(
+                        view,
+                        resolved.source,
+                        resolved.alt,
+                        position
+                    );
+                } else {
+                    insertResolvedMarkdownLink(
+                        view,
+                        resolved.href,
+                        resolved.label,
+                        position
+                    );
+                }
+            };
+            const reportTransferError = async (
+                err: unknown,
+                transfer: MarkdownTransfer
+            ): Promise<void> => {
+                if (transfer.kind === "image") {
+                    await reportImageTransferError(err);
+                    return;
+                }
+                console.error("Unable to import Markdown link:", err);
+                await showAppMessage(translateAppError(err, t), "error");
+            };
+            let internalEditorDrag = false;
             const nextCrepe = new Crepe({
                 root: editorRef,
                 defaultValue: document.markdown,
@@ -209,136 +290,68 @@ export function EditorMarkdown(): JSX.Element {
             nextCrepe.editor.config((ctx) => {
                 ctx.update(editorViewOptionsCtx, (value) => ({
                     ...value,
+                    handleDOMEvents: {
+                        ...value.handleDOMEvents,
+                        dragstart: (view, event) => {
+                            internalEditorDrag = true;
+                            return value.handleDOMEvents?.dragstart?.(view, event) ?? false;
+                        },
+                        dragend: (view, event) => {
+                            internalEditorDrag = false;
+                            return value.handleDOMEvents?.dragend?.(view, event) ?? false;
+                        },
+                        drop: (view, event) => {
+                            const wasInternalDrag = internalEditorDrag;
+                            internalEditorDrag = false;
+                            if (!(event instanceof DragEvent) || wasInternalDrag) {
+                                return value.handleDOMEvents?.drop?.(view, event) ?? false;
+                            }
+
+                            const transferData = event.dataTransfer;
+                            if (!transferData) {
+                                return value.handleDOMEvents?.drop?.(view, event) ?? false;
+                            }
+                            const transfer = markdownTransfer(transferData);
+                            if (!transfer) {
+                                return value.handleDOMEvents?.drop?.(view, event) ?? false;
+                            }
+                            if (isLocalFileMarkdownTransfer(transfer)) {
+                                event.preventDefault();
+                                return true;
+                            }
+
+                            const dropPosition =
+                                view.posAtCoords({
+                                    left: event.clientX,
+                                    top: event.clientY,
+                                })?.pos ?? view.state.selection.from;
+                            event.preventDefault();
+                            void resolveAndInsertTransfer(view, transfer, dropPosition).catch(
+                                async (err: unknown) => {
+                                    await reportTransferError(err, transfer);
+                                }
+                            );
+                            return true;
+                        },
+                    },
                     handlePaste: (view, event, slice) => {
                         const clipboardData = event.clipboardData;
                         if (!clipboardData) {
                             return value.handlePaste?.(view, event, slice) ?? false;
                         }
 
-                        let parsedContentContainsImage = false;
-                        let parsedLinkHref: string | null = null;
-                        let parsedLinkLabel = "";
-                        let parsedLinkIsExclusive = true;
-                        slice.content.descendants((node) => {
-                            if (node.type.name === "image" || node.type.name === "image-block") {
-                                parsedContentContainsImage = true;
-                            }
-                            if (!node.isText || !node.text?.trim()) return true;
-
-                            const linkMark = node.marks.find((mark) => mark.type.name === "link");
-                            const href = linkMark ? String(linkMark.attrs.href ?? "") : "";
-                            if (!href || (parsedLinkHref !== null && parsedLinkHref !== href)) {
-                                parsedLinkIsExclusive = false;
-                                return true;
-                            }
-                            parsedLinkHref = href;
-                            parsedLinkLabel += node.text;
-                            return true;
+                        const transfer = markdownTransfer(clipboardData, {
+                            ...parsedTransferOptions(slice),
+                            allowNativeClipboardImage: true,
                         });
-                        const parsedLink =
-                            parsedLinkIsExclusive && parsedLinkHref
-                                ? {
-                                      href: parsedLinkHref,
-                                      label: parsedLinkLabel.trim() || parsedLinkHref,
-                                  }
-                                : null;
-                        const imageTransfer = pastedMarkdownImage(
-                            clipboardData,
-                            parsedContentContainsImage,
-                            parsedLink
-                        );
-                        if (imageTransfer) {
-                            void (async () => {
-                                const { source, alt } = await resolvePastedMarkdownImage(
-                                    imageTransfer,
-                                    currentBasepath,
-                                    currentFilename
-                                );
-                                if (!view.dom.isConnected) return;
-                                insertResolvedMarkdownImage(view, source, alt);
-                            })().catch(async (err: unknown) => {
-                                await reportImageTransferError(err);
-                            });
-                            return true;
-                        }
-
-                        const linkTransfer = pastedMarkdownLink(clipboardData, parsedLink);
-                        if (!linkTransfer) {
+                        if (!transfer) {
                             return value.handlePaste?.(view, event, slice) ?? false;
                         }
-                        void resolvePastedMarkdownLink(
-                            linkTransfer,
-                            currentBasepath,
-                            currentFilename
-                        )
-                            .then(({ href, label }) => {
-                                if (!view.dom.isConnected) return;
-                                const link = view.state.schema.marks.link;
-                                if (!link) return;
-                                const { from, to } = view.state.selection;
-                                const transaction = view.state.tr;
-                                const mark = link.create({ href });
-                                if (from === to) {
-                                    transaction.insertText(label, from);
-                                    transaction.addMark(from, from + label.length, mark);
-                                } else {
-                                    transaction.addMark(from, to, mark);
-                                }
-                                view.dispatch(transaction.scrollIntoView());
-                            })
-                            .catch(async (err: unknown) => {
-                                console.error("Unable to import Markdown link:", err);
-                                await showAppMessage(translateAppError(err, t), "error");
-                            });
-                        return true;
-                    },
-                    handleDrop: (view, event, slice, moved) => {
-                        if (moved) {
-                            return value.handleDrop?.(view, event, slice, moved) ?? false;
-                        }
-                        const transferData = event.dataTransfer;
-                        if (!transferData) {
-                            return value.handleDrop?.(view, event, slice, moved) ?? false;
-                        }
-
-                        const transfer = droppedMarkdownImage(transferData);
-                        if (!transfer) {
-                            return value.handleDrop?.(view, event, slice, moved) ?? false;
-                        }
-
-                        const dropPosition =
-                            view.posAtCoords({ left: event.clientX, top: event.clientY })?.pos ??
-                            view.state.selection.from;
-                        void resolveDroppedMarkdownImage(
-                            transfer,
-                            currentBasepath,
-                            currentFilename
-                        )
-                            .then(({ source }) => {
-                                if (!view.dom.isConnected) return;
-                                const imageBlock = view.state.schema.nodes["image-block"];
-                                if (!imageBlock) return;
-                                const position = Math.min(
-                                    dropPosition,
-                                    view.state.doc.content.size
-                                );
-                                view.dispatch(
-                                    view.state.tr
-                                        .replaceWith(
-                                            position,
-                                            position,
-                                            imageBlock.create({
-                                                src: source,
-                                                caption: "",
-                                                ratio: 1,
-                                            })
-                                        )
-                                        .scrollIntoView()
-                                );
-                            })
-                            .catch(async (err: unknown) => {
-                                await reportImageTransferError(err);
-                            });
+                        void resolveAndInsertTransfer(view, transfer).catch(
+                            async (err: unknown) => {
+                                await reportTransferError(err, transfer);
+                            }
+                        );
                         return true;
                     },
                 }));
@@ -372,7 +385,57 @@ export function EditorMarkdown(): JSX.Element {
             // create() has populated that context; an image-first document can
             // otherwise emit a selection update during editor initialization.
             setImageActionsCrepe(nextCrepe);
-            nextCrepe.editor.action((ctx) => ctx.get(editorViewCtx).focus());
+            let editorView!: MilkdownEditorView;
+            nextCrepe.editor.action((ctx) => {
+                editorView = ctx.get(editorViewCtx);
+                editorView.focus();
+            });
+            const unlisten = await getCurrentWebview().onDragDropEvent((event) => {
+                const payload = event.payload;
+                if (payload.type !== "drop" || crepeInstance !== nextCrepe) return;
+
+                void (async () => {
+                    const scaleFactor = await getCurrentWindow().scaleFactor();
+                    const position = payload.position.toLogical(scaleFactor);
+                    const editorRect = editorView.dom.getBoundingClientRect();
+                    if (
+                        editorRect.width > 0 &&
+                        editorRect.height > 0 &&
+                        (position.x < editorRect.left ||
+                            position.x > editorRect.right ||
+                            position.y < editorRect.top ||
+                            position.y > editorRect.bottom)
+                    ) {
+                        return;
+                    }
+
+                    let insertionPosition =
+                        editorView.posAtCoords({ left: position.x, top: position.y })?.pos ??
+                        editorView.state.selection.from;
+                    for (const path of payload.paths) {
+                        const transfer = markdownTransferFromPath(path);
+                        if (!transfer) continue;
+                        try {
+                            await resolveAndInsertTransfer(
+                                editorView,
+                                transfer,
+                                insertionPosition
+                            );
+                            insertionPosition = editorView.state.selection.to;
+                        } catch (err: unknown) {
+                            await reportTransferError(err, transfer);
+                        }
+                    }
+                })().catch(async (err: unknown) => {
+                    console.error("Unable to process native file drop:", err);
+                    await showAppMessage(translateAppError(err, t), "error");
+                });
+            });
+            if (crepeInstance === nextCrepe) {
+                nativeDropUnlisten = unlisten;
+            } else {
+                unlisten();
+            }
             nextCrepe.editor.action((ctx) => {
                 currentSearchController = new ProseMirrorSearchController(ctx.get(editorViewCtx));
                 setSearchController(currentSearchController);
@@ -391,6 +454,9 @@ export function EditorMarkdown(): JSX.Element {
             frontmatterRef.replaceChildren();
             const currentCrepe = crepeInstance;
             crepeInstance = null;
+            const currentNativeDropUnlisten = nativeDropUnlisten;
+            nativeDropUnlisten = null;
+            currentNativeDropUnlisten?.();
             const currentImageProxy = imageProxy;
             imageProxy = null;
             currentImageProxy?.dispose();

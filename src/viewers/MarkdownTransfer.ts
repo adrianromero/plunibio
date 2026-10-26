@@ -23,31 +23,32 @@ type DirectMarkdownImage =
     | { kind: "web"; source: string; alt: string }
     | { kind: "file-uri"; uri: string; alt: string };
 
-export type PastedMarkdownImage =
+type MarkdownImageTransfer =
     | DirectMarkdownImage
-    | { kind: "native"; fallbackFile: File | null; alt: string };
+    | { kind: "native"; fallbackFile: File | null; alt: string }
+    | { kind: "file"; file: File; alt: string };
 
-export type DroppedMarkdownImage =
-    | DirectMarkdownImage
-    | { kind: "file"; file: File };
-
-export interface ResolvedMarkdownImage {
-    source: string;
-    alt: string;
-}
-
-export type PastedMarkdownLink =
+type MarkdownLinkTransfer =
     | { kind: "web"; href: string; label: string }
     | { kind: "file-uri"; uri: string; label: string };
 
-export interface ResolvedMarkdownLink {
-    href: string;
-    label: string;
-}
+export type MarkdownTransfer =
+    | { kind: "image"; image: MarkdownImageTransfer }
+    | { kind: "link"; link: MarkdownLinkTransfer };
+
+export type ResolvedMarkdownTransfer =
+    | { kind: "image"; source: string; alt: string }
+    | { kind: "link"; href: string; label: string };
 
 export interface ParsedMarkdownLink {
     href: string;
     label: string;
+}
+
+export interface MarkdownTransferOptions {
+    allowNativeClipboardImage?: boolean;
+    parsedContentContainsImage?: boolean;
+    parsedLink?: ParsedMarkdownLink | null;
 }
 
 export class UnsupportedMarkdownImageError extends Error {
@@ -195,13 +196,6 @@ export function fileUriFromText(value: string): string | null {
     );
 }
 
-function fileUriFromTransfer(transferData: DataTransfer): string | null {
-    return (
-        fileUriFromText(transferData.getData("text/uri-list")) ??
-        fileUriFromText(transferData.getData("text/plain"))
-    );
-}
-
 function imageFileFromTransfer(transferData: DataTransfer): File | null {
     for (let index = 0; index < transferData.files.length; index += 1) {
         const file = transferData.files.item(index);
@@ -235,54 +229,79 @@ function transferContainsImage(transferData: DataTransfer): boolean {
     );
 }
 
-export function pastedMarkdownImage(
+export function markdownTransfer(
     transferData: DataTransfer,
-    parsedContentContainsImage = false,
-    parsedLink: ParsedMarkdownLink | null = null
-): PastedMarkdownImage | null {
+    options: MarkdownTransferOptions = {}
+): MarkdownTransfer | null {
     const webImage = webImageFromHtml(transferData.getData("text/html"));
-    if (webImage) return webImage;
+    if (webImage) return { kind: "image", image: webImage };
 
-    const link = linkFromTransfer(transferData, parsedLink);
+    const link = linkFromTransfer(transferData, options.parsedLink);
     if (link?.href.match(/^file:/i) && isSupportedImageReference(link.href)) {
-        return { kind: "file-uri", uri: link.href, alt: imageNameFromUrl(link.href) };
+        return {
+            kind: "image",
+            image: { kind: "file-uri", uri: link.href, alt: imageNameFromUrl(link.href) },
+        };
     }
     if (link?.href.match(/^https?:/i) && isSupportedImageReference(link.href)) {
-        return { kind: "web", source: link.href, alt: imageNameFromUrl(link.href) };
+        return {
+            kind: "image",
+            image: { kind: "web", source: link.href, alt: imageNameFromUrl(link.href) },
+        };
+    }
+    if (link) {
+        return {
+            kind: "link",
+            link: link.href.match(/^file:/i)
+                ? { kind: "file-uri", uri: link.href, label: link.label }
+                : { kind: "web", href: link.href, label: link.label },
+        };
     }
 
     const fallbackFile = imageFileFromTransfer(transferData);
-    if (!fallbackFile && !parsedContentContainsImage && !transferContainsImage(transferData)) {
-        return null;
+    if (
+        options.allowNativeClipboardImage &&
+        (fallbackFile ||
+            options.parsedContentContainsImage ||
+            transferContainsImage(transferData))
+    ) {
+        return {
+            kind: "image",
+            image: {
+                kind: "native",
+                fallbackFile,
+                alt: fallbackFile?.name || "image",
+            },
+        };
+    }
+    if (fallbackFile) {
+        return {
+            kind: "image",
+            image: { kind: "file", file: fallbackFile, alt: fallbackFile.name },
+        };
+    }
+    return null;
+}
+
+export function markdownTransferFromPath(path: string): MarkdownTransfer | null {
+    const uri = absolutePathToFileUri(path);
+    if (!uri) return null;
+    if (isSupportedImageReference(uri)) {
+        return {
+            kind: "image",
+            image: { kind: "file-uri", uri, alt: imageNameFromUrl(uri) },
+        };
     }
     return {
-        kind: "native",
-        fallbackFile,
-        alt: fallbackFile?.name || "image",
+        kind: "link",
+        link: { kind: "file-uri", uri, label: path },
     };
 }
 
-export function pastedMarkdownLink(
-    transferData: DataTransfer,
-    parsedLink: ParsedMarkdownLink | null = null
-): PastedMarkdownLink | null {
-    const link = linkFromTransfer(transferData, parsedLink);
-    if (!link || isSupportedImageReference(link.href)) return null;
-    return link.href.match(/^file:/i)
-        ? { kind: "file-uri", uri: link.href, label: link.label }
-        : { kind: "web", href: link.href, label: link.label };
-}
-
-export function droppedMarkdownImage(transferData: DataTransfer): DroppedMarkdownImage | null {
-    const fileUri = fileUriFromTransfer(transferData);
-    if (fileUri) {
-        return { kind: "file-uri", uri: fileUri, alt: imageNameFromUrl(fileUri) };
-    }
-
-    const webImage = webImageFromHtml(transferData.getData("text/html"));
-    if (webImage) return webImage;
-    const file = imageFileFromTransfer(transferData);
-    return file ? { kind: "file", file } : null;
+export function isLocalFileMarkdownTransfer(transfer: MarkdownTransfer): boolean {
+    return transfer.kind === "image"
+        ? transfer.image.kind === "file-uri" || transfer.image.kind === "file"
+        : transfer.link.kind === "file-uri";
 }
 
 async function importLinkedImageUri(
@@ -314,31 +333,34 @@ async function saveLinkedImageFile(
     return encodeMarkdownHref(`./${savedName}`);
 }
 
-async function resolveDirectImage(
-    image: DirectMarkdownImage,
+async function resolveMarkdownImage(
+    image: MarkdownImageTransfer,
     basepath: string,
     markdownFilename: string
-): Promise<ResolvedMarkdownImage> {
-    if (image.kind === "web") return { source: image.source, alt: image.alt };
-    return {
-        source: await importLinkedImageUri(image.uri, basepath, markdownFilename),
-        alt: image.alt,
-    };
-}
-
-export async function resolvePastedMarkdownImage(
-    image: PastedMarkdownImage,
-    basepath: string,
-    markdownFilename: string
-): Promise<ResolvedMarkdownImage> {
-    if (image.kind !== "native") {
-        return await resolveDirectImage(image, basepath, markdownFilename);
+): Promise<ResolvedMarkdownTransfer> {
+    if (image.kind === "web") {
+        return { kind: "image", source: image.source, alt: image.alt };
+    }
+    if (image.kind === "file-uri") {
+        return {
+            kind: "image",
+            source: await importLinkedImageUri(image.uri, basepath, markdownFilename),
+            alt: image.alt,
+        };
+    }
+    if (image.kind === "file") {
+        return {
+            kind: "image",
+            source: await saveLinkedImageFile(image.file, basepath, markdownFilename),
+            alt: image.alt,
+        };
     }
 
     try {
         const nativeUri = fileUriFromText(await readText());
         if (nativeUri) {
             return {
+                kind: "image",
                 source: await importLinkedImageUri(nativeUri, basepath, markdownFilename),
                 alt: imageNameFromUrl(nativeUri),
             };
@@ -357,6 +379,7 @@ export async function resolvePastedMarkdownImage(
                 image: transformImage(clipboardImage),
             });
             return {
+                kind: "image",
                 source: encodeMarkdownHref(`./${savedName}`),
                 alt: image.alt,
             };
@@ -366,6 +389,7 @@ export async function resolvePastedMarkdownImage(
     } catch (error: unknown) {
         if (!image.fallbackFile) throw error;
         return {
+            kind: "image",
             source: await saveLinkedImageFile(image.fallbackFile, basepath, markdownFilename),
             alt: image.alt,
         };
@@ -382,12 +406,14 @@ function localPathFromFileUri(uri: string): string {
     }
 }
 
-export async function resolvePastedMarkdownLink(
-    link: PastedMarkdownLink,
+async function resolveMarkdownLink(
+    link: MarkdownLinkTransfer,
     basepath: string,
     markdownFilename: string
-): Promise<ResolvedMarkdownLink> {
-    if (link.kind === "web") return { href: link.href, label: link.label };
+): Promise<ResolvedMarkdownTransfer> {
+    if (link.kind === "web") {
+        return { kind: "link", href: link.href, label: link.label };
+    }
 
     const href = await invoke<string>("resolve_linked_file_uri", {
         basepath,
@@ -395,21 +421,17 @@ export async function resolvePastedMarkdownLink(
         uri: link.uri,
     });
     if (href.startsWith("./") || href.startsWith("../")) {
-        return { href: encodeMarkdownHref(href), label: href };
+        return { kind: "link", href: encodeMarkdownHref(href), label: href };
     }
-    return { href, label: localPathFromFileUri(href) };
+    return { kind: "link", href, label: localPathFromFileUri(href) };
 }
 
-export async function resolveDroppedMarkdownImage(
-    image: DroppedMarkdownImage,
+export async function resolveMarkdownTransfer(
+    transfer: MarkdownTransfer,
     basepath: string,
     markdownFilename: string
-): Promise<ResolvedMarkdownImage> {
-    if (image.kind !== "file") {
-        return await resolveDirectImage(image, basepath, markdownFilename);
-    }
-    return {
-        source: await saveLinkedImageFile(image.file, basepath, markdownFilename),
-        alt: image.file.name,
-    };
+): Promise<ResolvedMarkdownTransfer> {
+    return transfer.kind === "image"
+        ? await resolveMarkdownImage(transfer.image, basepath, markdownFilename)
+        : await resolveMarkdownLink(transfer.link, basepath, markdownFilename);
 }

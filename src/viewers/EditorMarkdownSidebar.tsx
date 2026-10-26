@@ -79,7 +79,7 @@ import SidebarTab from "../commons/SidebarTab";
 import SidebarTabSection from "../commons/SidebarTabSection";
 import SearchPanel from "../commons/SearchPanel";
 import type { SearchController } from "../search/SearchController";
-import { canReplaceEmptyParagraphWithImageBlock } from "./MarkdownImageInsertion";
+import { canReplaceEmptyParagraphWithImageBlock } from "./MarkdownTransferInsertion";
 
 type EditorMarkdownSidebarProps = {
     getEditor: () => Editor | null;

@@ -25,7 +25,7 @@ import {
     observeEditorState,
     toggleList,
 } from "./EditorMarkdownSidebar";
-import { insertResolvedMarkdownImage } from "./MarkdownImageInsertion";
+import { insertResolvedMarkdownImage } from "./MarkdownTransferInsertion";
 
 describe("acciones de EditorMarkdownSidebar", () => {
     it("notifica el cambio del estado de tecleo al pulsar Ctrl+B", async () => {

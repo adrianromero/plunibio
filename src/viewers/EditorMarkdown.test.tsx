@@ -6,6 +6,8 @@
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { invoke } from "@tauri-apps/api/core";
+import type { DragDropEvent } from "@tauri-apps/api/webview";
+import type { EventCallback } from "@tauri-apps/api/event";
 import I18NProvider from "../Localization";
 import { StoryAppProvider } from "../stories/StoryAppProvider";
 import EditorMarkdown from "./EditorMarkdown";
@@ -14,6 +16,8 @@ let markdownContent =
     "![0.33](./plunibio-logo.png)\n\n# Plunibio\n\n[Open](./old.md) and [Other](./other.md)\n";
 let nativeClipboardText = "";
 let resolvedLinkedFileHref = "../files/document.pdf";
+let nativeDragDropHandler: EventCallback<DragDropEvent> | null = null;
+const nativeDropUnlistenMock = vi.fn();
 
 vi.mock("@tauri-apps/api/core", () => ({
     invoke: vi.fn((command: string) => {
@@ -61,6 +65,21 @@ vi.mock("@tauri-apps/plugin-clipboard-manager", () => ({
     readImage: vi.fn(() => Promise.reject(new Error("No native image configured"))),
 }));
 
+vi.mock("@tauri-apps/api/webview", () => ({
+    getCurrentWebview: () => ({
+        onDragDropEvent: (handler: EventCallback<DragDropEvent>) => {
+            nativeDragDropHandler = handler;
+            return Promise.resolve(nativeDropUnlistenMock);
+        },
+    }),
+}));
+
+vi.mock("@tauri-apps/api/window", () => ({
+    getCurrentWindow: () => ({
+        scaleFactor: () => Promise.resolve(1),
+    }),
+}));
+
 const invokeMock = vi.mocked(invoke);
 
 describe("EditorMarkdown", () => {
@@ -72,11 +91,31 @@ describe("EditorMarkdown", () => {
             "![0.33](./plunibio-logo.png)\n\n# Plunibio\n\n[Open](./old.md) and [Other](./other.md)\n";
         nativeClipboardText = "";
         resolvedLinkedFileHref = "../files/document.pdf";
+        nativeDragDropHandler = null;
+        nativeDropUnlistenMock.mockReset();
     });
 
     const activateButton = (button: HTMLButtonElement): void => {
         button.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
         button.click();
+    };
+
+    const dropNativeFiles = async (paths: string[]): Promise<void> => {
+        const handler = await vi.waitFor(() => {
+            expect(nativeDragDropHandler).not.toBeNull();
+            return nativeDragDropHandler!;
+        });
+        handler({
+            event: "tauri://drag-drop",
+            id: 1,
+            payload: {
+                type: "drop",
+                paths,
+                position: {
+                    toLogical: () => ({ x: 0, y: 0 }),
+                },
+            } as unknown as DragDropEvent,
+        });
     };
 
     afterEach(() => {
@@ -386,7 +425,7 @@ describe("EditorMarkdown", () => {
         expect(root.querySelector('img[src^="blob:"]')).toBeNull();
     });
 
-    it("imports a dropped local image as an image block", async () => {
+    it("imports a dropped local image inline when the target paragraph has text", async () => {
         markdownContent = "Start";
         root = document.createElement("div");
         document.body.append(root);
@@ -406,20 +445,26 @@ describe("EditorMarkdown", () => {
             expect(element).not.toBeNull();
             return element!;
         });
-        editor.dispatchEvent(
-            new DragEvent("drop", {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer: {
-                    files: { length: 0, item: (): File | null => null },
-                    items: { length: 0 },
-                    getData: (type: string): string =>
-                        type === "text/uri-list"
-                            ? "file:///home/adrian/Im%C3%A1genes/adrianavatar.png"
-                            : "",
-                } as unknown as DataTransfer,
-            })
+        const browserDrop = new DragEvent("drop", {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: {
+                files: { length: 0, item: (): File | null => null },
+                items: { length: 0 },
+                getData: (type: string): string =>
+                    type === "text/uri-list"
+                        ? "file:///home/adrian/Im%C3%A1genes/adrianavatar.png"
+                        : "",
+            } as unknown as DataTransfer,
+        });
+        editor.dispatchEvent(browserDrop);
+        expect(browserDrop.defaultPrevented).toBe(true);
+        expect(invokeMock).not.toHaveBeenCalledWith(
+            "import_linked_image_uri",
+            expect.anything()
         );
+
+        await dropNativeFiles(["/home/adrian/Imágenes/adrianavatar.png"]);
 
         await vi.waitFor(() => {
             expect(invokeMock).toHaveBeenCalledWith("import_linked_image_uri", {
@@ -427,7 +472,116 @@ describe("EditorMarkdown", () => {
                 filename: "notes/README.md",
                 uri: "file:///home/adrian/Im%C3%A1genes/adrianavatar.png",
             });
+            expect(root?.querySelector(".milkdown-image-inline")).not.toBeNull();
+            expect(root?.querySelector(".milkdown-image-block")).toBeNull();
+            expect(editor.textContent).not.toContain("file://");
+        });
+    });
+
+    it("keeps an image URL dropped from the browser", async () => {
+        markdownContent = "Start";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        const source = "https://example.com/photo.jpg?w=740&q=80";
+        const dropEvent = new DragEvent("drop", {
+            bubbles: true,
+            cancelable: true,
+            dataTransfer: {
+                files: { length: 0, item: (): File | null => null },
+                items: { length: 0 },
+                getData: (type: string): string =>
+                    type === "text/uri-list" ? source : "",
+            } as unknown as DataTransfer,
+        });
+        editor.dispatchEvent(dropEvent);
+
+        expect(dropEvent.defaultPrevented).toBe(true);
+        await vi.waitFor(() => {
+            const image = root?.querySelector<HTMLImageElement>(
+                ".milkdown-image-inline img"
+            );
+            expect(image).not.toBeNull();
+            expect(image?.getAttribute("src")).toBe(source);
+        });
+    });
+
+    it("imports a dropped image as a block on an empty top-level line", async () => {
+        markdownContent = "";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+        });
+        await dropNativeFiles(["/home/adrian/Imágenes/adrianavatar.png"]);
+
+        await vi.waitFor(() => {
             expect(root?.querySelector(".milkdown-image-block")).not.toBeNull();
+            expect(root?.querySelector(".milkdown-image-inline")).toBeNull();
+        });
+    });
+
+    it("creates a relative link when dropping a non-image file from the base path", async () => {
+        markdownContent = "Start";
+        resolvedLinkedFileHref = "./Development plan.md";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="notes/README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const editor = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(".ProseMirror");
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        await dropNativeFiles(["/home/adrian/documents/notes/Development plan.md"]);
+
+        await vi.waitFor(() => {
+            const link = root?.querySelector<HTMLAnchorElement>(
+                '.ProseMirror a[href="./Development%20plan.md"]'
+            );
+            expect(link?.textContent).toBe("./Development plan.md");
+            expect(editor.textContent).not.toContain("file://");
+        });
+        expect(invokeMock).toHaveBeenCalledWith("resolve_linked_file_uri", {
+            basepath: "/home/adrian/documents",
+            filename: "notes/README.md",
+            uri: "file:///home/adrian/documents/notes/Development%20plan.md",
         });
     });
 

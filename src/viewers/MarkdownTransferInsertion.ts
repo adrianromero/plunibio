@@ -4,9 +4,19 @@
  */
 
 import type { EditorView } from "@milkdown/kit/prose/view";
+import { TextSelection, type Selection } from "@milkdown/kit/prose/state";
 
-export function canReplaceEmptyParagraphWithImageBlock(view: EditorView): boolean {
-    const { selection } = view.state;
+function insertionSelection(view: EditorView, position?: number): Selection {
+    if (position === undefined) return view.state.selection;
+    const boundedPosition = Math.max(0, Math.min(position, view.state.doc.content.size));
+    return TextSelection.near(view.state.doc.resolve(boundedPosition));
+}
+
+export function canReplaceEmptyParagraphWithImageBlock(
+    view: EditorView,
+    position?: number
+): boolean {
+    const selection = insertionSelection(view, position);
     const { $from } = selection;
     const imageBlock = view.state.schema.nodes["image-block"];
     const paragraph = view.state.schema.nodes.paragraph;
@@ -31,11 +41,13 @@ export function canReplaceEmptyParagraphWithImageBlock(view: EditorView): boolea
 export function insertResolvedMarkdownImage(
     view: EditorView,
     source: string,
-    alt: string
+    alt: string,
+    position?: number
 ): void {
+    const selection = insertionSelection(view, position);
     const imageBlock = view.state.schema.nodes["image-block"];
-    if (imageBlock && canReplaceEmptyParagraphWithImageBlock(view)) {
-        const { $from } = view.state.selection;
+    if (imageBlock && canReplaceEmptyParagraphWithImageBlock(view, position)) {
+        const { $from } = selection;
         const paragraphStart = $from.before($from.depth);
         view.dispatch(
             view.state.tr
@@ -53,7 +65,30 @@ export function insertResolvedMarkdownImage(
     if (!image) return;
     view.dispatch(
         view.state.tr
+            .setSelection(selection)
             .replaceSelectionWith(image.create({ src: source, alt, title: "" }))
             .scrollIntoView()
     );
+}
+
+export function insertResolvedMarkdownLink(
+    view: EditorView,
+    href: string,
+    label: string,
+    position?: number
+): void {
+    const link = view.state.schema.marks.link;
+    if (!link) return;
+
+    const selection = insertionSelection(view, position);
+    const { from, to } = selection;
+    const transaction = view.state.tr.setSelection(selection);
+    const mark = link.create({ href });
+    if (from === to) {
+        transaction.insertText(label, from);
+        transaction.addMark(from, from + label.length, mark);
+    } else {
+        transaction.addMark(from, to, mark);
+    }
+    view.dispatch(transaction.scrollIntoView());
 }
