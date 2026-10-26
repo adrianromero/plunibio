@@ -149,9 +149,11 @@ src-tauri/capabilities/ Tauri security capabilities
 Useful validation commands:
 
 ```bash
+npm run check
+npm test
 npm run build
-cargo check --manifest-path src-tauri/Cargo.toml
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+cargo check --manifest-path src-tauri/Cargo.toml --locked
 ```
 
 Regenerate all application icons from `plunibio-logo.png` with:
@@ -159,6 +161,55 @@ Regenerate all application icons from `plunibio-logo.png` with:
 ```bash
 npm run tauri icon plunibio-logo.png
 ```
+
+## Continuous integration
+
+The validation workflow does not run automatically on pushes or pull requests. Run it on demand from the repository's **Actions** tab:
+
+1. Select **CI manual**.
+2. Choose **Run workflow**.
+3. Select the branch to validate and confirm the run.
+
+The workflow installs the locked dependencies, checks TypeScript, runs the test suite, builds the frontend, checks Rust formatting, and checks the Rust backend. Its definition is available in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
+
+## Releasing
+
+Desktop releases are built only when a tag whose name starts with `v` is pushed. The version after the `v` must match the version declared in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`.
+
+To prepare a release:
+
+1. Update the version in all three files.
+2. Run the local checks, including the release-version check:
+
+   ```bash
+   npm run release:check -- v0.2.0
+   npm run check
+   npm test
+   npm run build
+   cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+   cargo check --manifest-path src-tauri/Cargo.toml --locked
+   ```
+
+3. Optionally run **CI manual** against the release branch from the Actions tab.
+4. Commit the version changes, create the matching tag, and push it:
+
+   ```bash
+   git tag -a v0.2.0 -m "Plunibio v0.2.0"
+   git push origin v0.2.0
+   ```
+
+The release workflow builds the following packages:
+
+| Platform | Architecture | Packages |
+| --- | --- | --- |
+| Linux | x86_64 | Debian package (`.deb`) and AppImage (`.AppImage`) |
+| macOS | Apple Silicon | Application bundle (`.app`) and disk image (`.dmg`) |
+| macOS | Intel | Application bundle (`.app`) and disk image (`.dmg`) |
+| Windows | x86_64 | NSIS installer (`-setup.exe`) and Windows Installer (`.msi`) |
+
+GitHub creates the release as a draft with generated release notes. Tags containing a prerelease suffix, such as `v0.2.0-alpha.1`, create a prerelease. Download and test the generated packages before publishing the draft release. Since a macOS `.app` is a directory, it is archived when uploaded as a release asset.
+
+The macOS packages currently use an ad-hoc signature and the Windows packages are unsigned. Operating-system security warnings may therefore appear until production code signing and macOS notarization are configured. The release workflow is defined in [`.github/workflows/release.yml`](./.github/workflows/release.yml).
 
 ## Contributing
 

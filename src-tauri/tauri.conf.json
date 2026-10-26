@@ -25,6 +25,11 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "category": "Productivity",
+    "shortDescription": "A lightweight desktop Markdown editor.",
+    "longDescription": "A lightweight desktop Markdown editor built with Tauri, SolidJS, and Milkdown Crepe.",
+    "homepage": "https://github.com/adrianromero/plunibio",
+    "publisher": "Adrián Romero",
     "copyright": "Copyright (c) 2026 Adrián Romero",
     "license": "MIT",
     "licenseFile": "../LICENSE",
