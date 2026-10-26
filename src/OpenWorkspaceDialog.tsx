@@ -16,6 +16,7 @@ import folderStyles from "./viewers/EditorFolder.module.css";
 import { useI18N } from "./Localization";
 import type { DirectoryBrowserEntry, DirectoryBrowserLocation } from "./rusttypes";
 import { dismissDialogOnBackdropClick } from "./DialogDismiss";
+import { formatPathForDisplay } from "./PathPresentation";
 
 type OpenWorkspaceDialogProps = {
     open: boolean;
@@ -100,6 +101,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
     };
 
     const displayedEntries = () => roots() ?? location()?.directories ?? [];
+    const displayedPath = () => formatPathForDisplay(location()?.path ?? props.initialPath);
 
     return (
         <dialog
@@ -144,8 +146,11 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                     >
                         <ArrowUp aria-hidden="true" />
                     </button>
-                    <div class={styles.currentPath} title={location()?.path ?? ""}>
-                        {roots() ? t("workspace.roots") : (location()?.path ?? props.initialPath)}
+                    <div
+                        class={styles.currentPath}
+                        title={roots() ? t("workspace.roots") : displayedPath()}
+                    >
+                        {roots() ? t("workspace.roots") : displayedPath()}
                     </div>
                 </div>
                 <div class={styles.directoryList} aria-busy={loading()}>

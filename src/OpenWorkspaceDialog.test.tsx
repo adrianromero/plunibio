@@ -145,4 +145,39 @@ describe("OpenWorkspaceDialog", () => {
         );
         expect(openButton?.disabled).toBe(true);
     });
+
+    it("shows a friendly Windows path while confirming the canonical path", async () => {
+        const canonicalPath = "\\\\?\\C:\\Users\\ana\\Documents";
+        const onConfirm = vi.fn(async () => true);
+        invokeMock.mockImplementation(async (command) => {
+            if (command === "filesystem_roots") return [];
+            return { path: canonicalPath, parent: "\\\\?\\C:\\Users\\ana", directories: [] };
+        });
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <OpenWorkspaceDialog
+                    open={true}
+                    initialPath={canonicalPath}
+                    showHidden={false}
+                    onCancel={vi.fn()}
+                    onConfirm={onConfirm}
+                />
+            ),
+            root
+        );
+
+        await vi.waitFor(() => {
+            expect(root.textContent).toContain("C:\\Users\\ana\\Documents");
+        });
+        expect(root.textContent).not.toContain("\\\\?\\");
+
+        const openButton = Array.from(root.querySelectorAll<HTMLButtonElement>("button")).find(
+            button => button.textContent === "workspace.open"
+        );
+        openButton?.click();
+
+        await vi.waitFor(() => expect(onConfirm).toHaveBeenCalledWith(canonicalPath));
+    });
 });

@@ -121,6 +121,28 @@ describe("AppProvider workspace changes", () => {
         expect(closeButton?.disabled).toBe(true);
     });
 
+    it("uses a friendly Windows path in the window title", async () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <AppProvider
+                    initialBasepath={"\\\\?\\C:\\Users\\ana\\Documents"}
+                    initialFilename=""
+                >
+                    <div />
+                </AppProvider>
+            ),
+            root
+        );
+
+        await vi.waitFor(() =>
+            expect(invoke).toHaveBeenCalledWith("set_window_title", {
+                title: "Plunibio - C:\\Users\\ana\\Documents",
+            })
+        );
+    });
+
     it("blocks shortcuts while loading or while any dialog is open", () => {
         const context = renderProvider();
         const navigateBack = vi.fn(() => Promise.resolve());

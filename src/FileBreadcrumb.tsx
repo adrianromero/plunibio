@@ -8,6 +8,7 @@ import { createMemo, For, JSX, Show } from "solid-js";
 import { useAppContext } from "./AppContext";
 import { useI18N } from "./Localization";
 import styles from "./FileBreadcrumb.module.css";
+import { formatPathForDisplay } from "./PathPresentation";
 
 type BreadcrumbSegment = {
     name: string;
@@ -38,8 +39,8 @@ export function FileBreadcrumb(): JSX.Element {
                 <button
                     type="button"
                     class={styles.segmentLink}
-                    aria-label={basepath()}
-                    title={basepath()}
+                    aria-label={formatPathForDisplay(basepath())}
+                    title={formatPathForDisplay(basepath())}
                     disabled={segments().length === 0}
                     onClick={() => void loadFilename("")}
                 >

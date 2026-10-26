@@ -36,6 +36,7 @@ import OpenWorkspaceDialog from "./OpenWorkspaceDialog";
 import AboutDialog from "./AboutDialog";
 import type { InitialConfig } from "./rusttypes";
 import { translateAppError } from "./AppError";
+import { formatPathForDisplay } from "./PathPresentation";
 
 export type SaveFileHandler = () => Promise<void>;
 export type ReloadFileHandler = () => Promise<void>;
@@ -115,7 +116,7 @@ export function AppProvider(props: {
     const [filename, setFilename] = createSignal(props.initialFilename);
 
     createEffect(() => {
-        const title = `Plunibio - ${basepath()}`;
+        const title = `Plunibio - ${formatPathForDisplay(basepath())}`;
         void invoke("set_window_title", { title }).catch((error: unknown) => {
             console.error("Unable to update the window title:", error);
         });
