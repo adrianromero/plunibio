@@ -34,7 +34,7 @@
         "pathNavigation": "Ruta del fitxer actual"
     },
     "folder": {
-        "root": "arrel",
+        "root": "Inici",
         "loading": "S'està carregant {{ path }}...",
         "empty": "Aquesta carpeta és buida",
         "hiddenFiles": "Fitxers ocults",

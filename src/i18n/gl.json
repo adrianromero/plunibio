@@ -34,7 +34,7 @@
         "pathNavigation": "Ruta do ficheiro actual"
     },
     "folder": {
-        "root": "raíz",
+        "root": "Inicio",
         "loading": "Cargando {{ path }}...",
         "empty": "Este cartafol está baleiro",
         "hiddenFiles": "Ficheiros ocultos",

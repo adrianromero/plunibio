@@ -34,7 +34,7 @@
         "pathNavigation": "Current file path"
     },
     "folder": {
-        "root": "root",
+        "root": "Home",
         "loading": "Loading {{ path }}...",
         "empty": "This folder is empty",
         "hiddenFiles": "Hidden files",

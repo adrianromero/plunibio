@@ -34,7 +34,7 @@
         "pathNavigation": "Uneko fitxategiaren bide-izena"
     },
     "folder": {
-        "root": "erroa",
+        "root": "Hasiera",
         "loading": "{{ path }} kargatzen...",
         "empty": "Karpeta hau hutsik dago",
         "hiddenFiles": "Ezkutuko fitxategiak",
