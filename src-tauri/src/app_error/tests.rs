@@ -21,3 +21,15 @@ fn app_error_omits_an_empty_relative_path() {
     assert_eq!(value["code"], "read_directory_failed");
     assert!(value.get("path").is_none());
 }
+
+#[test]
+fn outside_workspace_error_includes_the_resolved_target() {
+    let target = std::path::Path::new("/outside/videos");
+    let base = std::path::Path::new("/workspace");
+    let error = AppError::path_outside_workspace("My Videos", target, base);
+    let value = serde_json::to_value(error).unwrap();
+
+    assert_eq!(value["code"], "path_outside_workspace");
+    assert_eq!(value["path"], "My Videos");
+    assert_eq!(value["target"], "/outside/videos");
+}

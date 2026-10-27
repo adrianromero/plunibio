@@ -128,10 +128,7 @@ pub(crate) async fn resolve_existing_path(
         })?;
 
     if !path.starts_with(&base) {
-        return Err(AppError::invalid_path(
-            filename,
-            "filename escapes the base path",
-        ));
+        return Err(AppError::path_outside_workspace(filename, &path, &base));
     }
 
     Ok((base, path))
@@ -175,10 +172,7 @@ pub(crate) async fn resolve_write_path(
     };
 
     if !path.starts_with(&base) {
-        return Err(AppError::invalid_path(
-            filename,
-            "filename escapes the base path",
-        ));
+        return Err(AppError::path_outside_workspace(filename, &path, &base));
     }
 
     Ok(path)

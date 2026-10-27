@@ -36,6 +36,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
     const [error, setError] = createSignal<string | null>(null);
     let loadSequence = 0;
     let wasOpen = false;
+    let previousShowHidden = props.showHidden;
 
     const cancel = (): void => {
         if (!confirming()) props.onCancel();
@@ -78,10 +79,18 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
     };
 
     createEffect(() => {
+        const showHidden = props.showHidden;
         if (props.open && !wasOpen) {
             void loadDirectory(props.initialPath);
+        } else if (
+            props.open &&
+            showHidden !== previousShowHidden &&
+            roots() === null
+        ) {
+            void loadDirectory(location()?.path ?? props.initialPath);
         }
         wasOpen = props.open;
+        previousShowHidden = showHidden;
         if (props.open && !dialogRef.open) {
             dialogRef.showModal();
         } else if (!props.open && dialogRef.open) {

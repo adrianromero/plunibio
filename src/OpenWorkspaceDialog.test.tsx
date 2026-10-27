@@ -5,6 +5,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { render } from "solid-js/web";
+import { createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import OpenWorkspaceDialog from "./OpenWorkspaceDialog";
 
@@ -144,6 +145,40 @@ describe("OpenWorkspaceDialog", () => {
             button => button.textContent === "workspace.open"
         );
         expect(openButton?.disabled).toBe(true);
+    });
+
+    it("reloads the current directory when hidden-file visibility changes", async () => {
+        const [showHidden, setShowHidden] = createSignal(false);
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <OpenWorkspaceDialog
+                    open={true}
+                    initialPath="/current"
+                    showHidden={showHidden()}
+                    onCancel={vi.fn()}
+                    onConfirm={vi.fn(async () => true)}
+                />
+            ),
+            root
+        );
+
+        await vi.waitFor(() =>
+            expect(invokeMock).toHaveBeenCalledWith("browse_directories", {
+                path: "/current",
+                showHidden: false,
+            })
+        );
+
+        setShowHidden(true);
+
+        await vi.waitFor(() =>
+            expect(invokeMock).toHaveBeenCalledWith("browse_directories", {
+                path: "/current",
+                showHidden: true,
+            })
+        );
     });
 
     it("shows a friendly Windows path while confirming the canonical path", async () => {

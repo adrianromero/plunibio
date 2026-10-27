@@ -195,6 +195,7 @@
     "backendErrors": {
         "unsupported_link": "No se puede abrir el enlace {{ path }} porque no es una ruta de archivo relativa.",
         "invalid_path": "La ruta seleccionada {{ path }} no es válida.",
+        "path_outside_workspace": "La ruta {{ path }} apunta fuera del espacio actual: {{ target }}.",
         "path_not_found": "No se encuentra {{ path }}. Puede que se haya movido o eliminado.",
         "permission_denied": "No tienes permiso para acceder a {{ path }}.",
         "inspect_path_failed": "No se ha podido examinar la ruta {{ path }}.",

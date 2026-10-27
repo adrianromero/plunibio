@@ -4,10 +4,12 @@
  */
 
 import { hasTranslationKey, type Translator } from "./Localization";
+import { formatPathForDisplay } from "./PathPresentation";
 
 type AppErrorPayload = {
     code: string;
     path?: string;
+    target?: string;
 };
 
 function parsePayload(error: unknown): AppErrorPayload | null {
@@ -28,7 +30,8 @@ function parsePayload(error: unknown): AppErrorPayload | null {
     const payload = candidate as Record<string, unknown>;
     if (
         typeof payload.code !== "string" ||
-        (payload.path !== undefined && typeof payload.path !== "string")
+        (payload.path !== undefined && typeof payload.path !== "string") ||
+        (payload.target !== undefined && typeof payload.target !== "string")
     ) {
         return null;
     }
@@ -36,6 +39,7 @@ function parsePayload(error: unknown): AppErrorPayload | null {
     return {
         code: payload.code,
         ...(typeof payload.path === "string" ? { path: payload.path } : {}),
+        ...(typeof payload.target === "string" ? { target: payload.target } : {}),
     };
 }
 
@@ -47,9 +51,10 @@ export function translateAppError(error: unknown, t: Translator, fallback?: stri
     }
 
     const path = payload.path ?? "[ . ]";
+    const target = payload.target ? formatPathForDisplay(payload.target) : "[ . ]";
     const translationKey = `backendErrors.${payload.code}`;
     if (!hasTranslationKey(translationKey)) {
         return fallbackMessage;
     }
-    return t(translationKey, { path });
+    return t(translationKey, { path, target });
 }

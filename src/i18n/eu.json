@@ -195,6 +195,7 @@
     "backendErrors": {
         "unsupported_link": "Ezin da {{ path }} esteka ireki, ez delako fitxategi-bide erlatiboa.",
         "invalid_path": "Hautatutako {{ path }} bidea ez da baliozkoa.",
+        "path_outside_workspace": "{{ path }} bideak uneko lan-eremutik kanpora zuzentzen du: {{ target }}.",
         "path_not_found": "Ezin izan da {{ path }} aurkitu. Baliteke lekuz aldatu edo ezabatu izana.",
         "permission_denied": "Ez duzu {{ path }} atzitzeko baimenik.",
         "inspect_path_failed": "Ezin izan da {{ path }} bidea aztertu.",

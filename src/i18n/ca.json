@@ -195,6 +195,7 @@
     "backendErrors": {
         "unsupported_link": "No es pot obrir l'enllaç {{ path }} perquè no és una ruta de fitxer relativa.",
         "invalid_path": "La ruta seleccionada {{ path }} no és vàlida.",
+        "path_outside_workspace": "La ruta {{ path }} apunta fora de l'espai actual: {{ target }}.",
         "path_not_found": "No s'ha trobat {{ path }}. Pot ser que s'hagi mogut o suprimit.",
         "permission_denied": "No teniu permís per accedir a {{ path }}.",
         "inspect_path_failed": "No s'ha pogut examinar la ruta {{ path }}.",

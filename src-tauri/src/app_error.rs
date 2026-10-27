@@ -1,12 +1,14 @@
 // Copyright (c) 2026 Adrián Romero
 // SPDX-License-Identifier: MIT
 
+use std::path::Path;
 use tracing::error;
 
 #[derive(Clone, Copy, Debug, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum AppErrorCode {
     InvalidPath,
+    PathOutsideWorkspace,
     UnsupportedLink,
     PathNotFound,
     PermissionDenied,
@@ -23,6 +25,8 @@ pub(crate) struct AppError {
     code: AppErrorCode,
     #[serde(skip_serializing_if = "Option::is_none")]
     path: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    target: Option<String>,
 }
 
 impl AppError {
@@ -30,6 +34,7 @@ impl AppError {
         Self {
             code,
             path: (!filename.is_empty()).then(|| filename.to_owned()),
+            target: None,
         }
     }
 
@@ -41,6 +46,20 @@ impl AppError {
     pub(crate) fn unsupported_link(href: &str) -> Self {
         error!(href, "Unsupported link");
         Self::new(AppErrorCode::UnsupportedLink, href)
+    }
+
+    pub(crate) fn path_outside_workspace(filename: &str, target: &Path, base: &Path) -> Self {
+        error!(
+            path = filename,
+            target = %target.display(),
+            base = %base.display(),
+            "Path resolves outside the workspace"
+        );
+        Self {
+            code: AppErrorCode::PathOutsideWorkspace,
+            path: (!filename.is_empty()).then(|| filename.to_owned()),
+            target: Some(target.to_string_lossy().into_owned()),
+        }
     }
 
     pub(crate) fn io(

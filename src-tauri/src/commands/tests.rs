@@ -188,6 +188,63 @@ fn list_directory_respects_show_hidden_flag() {
 }
 
 #[test]
+fn windows_hidden_and_system_attributes_are_treated_as_hidden() {
+    assert!(!super::windows_attributes_are_hidden(0));
+    assert!(super::windows_attributes_are_hidden(0x2));
+    assert!(super::windows_attributes_are_hidden(0x4));
+    assert!(super::windows_attributes_are_hidden(0x2 | 0x4));
+}
+
+#[cfg(unix)]
+#[test]
+fn list_directory_shows_links_resolving_outside_the_base_path() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-list-links-base-{unique}"));
+        let outside = std::env::temp_dir().join(format!("plunibio-list-links-outside-{unique}"));
+        std::fs::create_dir_all(base.join("inside")).unwrap();
+        std::fs::create_dir(&outside).unwrap();
+        std::os::unix::fs::symlink(base.join("inside"), base.join("inside-alias")).unwrap();
+        std::os::unix::fs::symlink(&outside, base.join("outside-alias")).unwrap();
+
+        let entries =
+            super::list_directory(base.to_string_lossy().into_owned(), String::new(), true)
+                .await
+                .unwrap();
+        let names = entries
+            .iter()
+            .map(|entry| entry.name.as_str())
+            .collect::<Vec<_>>();
+
+        assert_eq!(names, vec!["inside", "inside-alias", "outside-alias"]);
+
+        let canonical_outside = std::fs::canonicalize(&outside).unwrap();
+        for error in [
+            crate::paths::resolve_existing_path(&base.to_string_lossy(), "outside-alias")
+                .await
+                .unwrap_err(),
+            crate::paths::resolve_write_path(&base.to_string_lossy(), "outside-alias")
+                .await
+                .unwrap_err(),
+        ] {
+            let value = serde_json::to_value(error).unwrap();
+            assert_eq!(value["code"], "path_outside_workspace");
+            assert_eq!(value["path"], "outside-alias");
+            assert_eq!(
+                value["target"],
+                canonical_outside.to_string_lossy().as_ref()
+            );
+        }
+
+        std::fs::remove_dir_all(base).unwrap();
+        std::fs::remove_dir_all(outside).unwrap();
+    });
+}
+
+#[test]
 fn directory_browser_lists_only_directories_and_reports_the_parent() {
     tauri::async_runtime::block_on(async {
         let unique = SystemTime::now()
@@ -199,6 +256,13 @@ fn directory_browser_lists_only_directories_and_reports_the_parent() {
         std::fs::create_dir(base.join("visible")).unwrap();
         std::fs::create_dir(base.join(".hidden")).unwrap();
         std::fs::write(base.join("file.md"), "Not a directory").unwrap();
+        #[cfg(unix)]
+        let outside = {
+            let outside = std::env::temp_dir().join(format!("plunibio-browse-outside-{unique}"));
+            std::fs::create_dir(&outside).unwrap();
+            std::os::unix::fs::symlink(&outside, base.join("outside-link")).unwrap();
+            outside
+        };
 
         let result = super::browse_directories(base.to_string_lossy().into_owned(), false)
             .await
@@ -220,7 +284,11 @@ fn directory_browser_lists_only_directories_and_reports_the_parent() {
                 .iter()
                 .map(|entry| entry.name.as_str())
                 .collect::<Vec<_>>(),
-            vec!["visible"]
+            if cfg!(unix) {
+                vec!["outside-link", "visible"]
+            } else {
+                vec!["visible"]
+            }
         );
 
         let all = super::browse_directories(base.to_string_lossy().into_owned(), true)
@@ -231,9 +299,15 @@ fn directory_browser_lists_only_directories_and_reports_the_parent() {
                 .iter()
                 .map(|entry| entry.name.as_str())
                 .collect::<Vec<_>>(),
-            vec![".hidden", "visible"]
+            if cfg!(unix) {
+                vec![".hidden", "outside-link", "visible"]
+            } else {
+                vec![".hidden", "visible"]
+            }
         );
         std::fs::remove_dir_all(base).unwrap();
+        #[cfg(unix)]
+        std::fs::remove_dir_all(outside).unwrap();
     });
 }
 

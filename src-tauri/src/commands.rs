@@ -14,9 +14,7 @@ use tauri::Manager;
 use tauri::Webview;
 use tauri_plugin_opener::OpenerExt;
 use tokio::io::AsyncWriteExt;
-use tracing::info;
-#[cfg(target_os = "linux")]
-use tracing::warn;
+use tracing::{info, warn};
 
 pub(crate) struct AppState {
     location: Mutex<AppLocation>,
@@ -115,6 +113,42 @@ pub(crate) struct DirectoryBrowserLocation {
     path: String,
     parent: Option<String>,
     directories: Vec<DirectoryBrowserEntry>,
+}
+
+#[cfg(any(windows, test))]
+fn windows_attributes_are_hidden(attributes: u32) -> bool {
+    const FILE_ATTRIBUTE_HIDDEN: u32 = 0x2;
+    const FILE_ATTRIBUTE_SYSTEM: u32 = 0x4;
+
+    attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM) != 0
+}
+
+async fn should_hide_entry(name: &str, path: &Path, show_hidden: bool) -> bool {
+    if show_hidden {
+        return false;
+    }
+    if name.starts_with('.') {
+        return true;
+    }
+
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+
+        return match tokio::fs::symlink_metadata(path).await {
+            Ok(metadata) => windows_attributes_are_hidden(metadata.file_attributes()),
+            Err(error) => {
+                warn!(path = %path.display(), error = %error, "Unable to inspect directory entry visibility");
+                true
+            }
+        };
+    }
+
+    #[cfg(not(windows))]
+    {
+        let _ = path;
+        false
+    }
 }
 
 #[derive(serde::Serialize)]
@@ -228,10 +262,10 @@ pub(crate) async fn browse_directories(
         )
     })? {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if !show_hidden && name.starts_with('.') {
+        let entry_path = entry.path();
+        if should_hide_entry(&name, &entry_path, show_hidden).await {
             continue;
         }
-        let entry_path = entry.path();
         let metadata = match tokio::fs::metadata(&entry_path).await {
             Ok(metadata) => metadata,
             Err(_) => continue,
@@ -438,19 +472,18 @@ pub(crate) async fn list_directory(
         )
     })? {
         let entry_name = entry.file_name().to_string_lossy().into_owned();
-        if !show_hidden && entry_name.starts_with('.') {
+        let entry_path = entry.path();
+        if should_hide_entry(&entry_name, &entry_path, show_hidden).await {
             continue;
         }
 
-        let entry_path = entry.path();
-        let metadata = tokio::fs::metadata(&entry_path).await.map_err(|error| {
-            AppError::io(
-                "inspect_directory_entry",
-                &filename,
-                error,
-                AppErrorCode::ReadDirectoryFailed,
-            )
-        })?;
+        let metadata = match tokio::fs::metadata(&entry_path).await {
+            Ok(metadata) => metadata,
+            Err(error) => {
+                warn!(path = %entry_path.display(), error = %error, "Unable to inspect directory entry");
+                continue;
+            }
+        };
         let kind = if metadata.is_dir() {
             PathKind::Directory
         } else if metadata.is_file() {
