@@ -82,11 +82,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
         const showHidden = props.showHidden;
         if (props.open && !wasOpen) {
             void loadDirectory(props.initialPath);
-        } else if (
-            props.open &&
-            showHidden !== previousShowHidden &&
-            roots() === null
-        ) {
+        } else if (props.open && showHidden !== previousShowHidden && roots() === null) {
             void loadDirectory(location()?.path ?? props.initialPath);
         }
         wasOpen = props.open;
@@ -147,7 +143,9 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                         type="button"
                         aria-label={t("workspace.parent")}
                         title={t("workspace.parent")}
-                        disabled={!location()?.parent || loading() || confirming()}
+                        disabled={
+                            !location()?.parent || roots() !== null || loading() || confirming()
+                        }
                         onClick={() => {
                             const parent = location()?.parent;
                             if (parent) void loadDirectory(parent);
@@ -206,12 +204,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                 >
                     {confirming() ? t("workspace.opening") : t("workspace.open")}
                 </button>
-                <button
-                    class="stdButton"
-                    type="button"
-                    disabled={confirming()}
-                    onClick={cancel}
-                >
+                <button class="stdButton" type="button" disabled={confirming()} onClick={cancel}>
                     {t("dialog.cancel")}
                 </button>
             </div>

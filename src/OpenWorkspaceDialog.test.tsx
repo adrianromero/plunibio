@@ -147,6 +147,40 @@ describe("OpenWorkspaceDialog", () => {
         expect(openButton?.disabled).toBe(true);
     });
 
+    it("disables parent navigation while showing filesystem roots", async () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <OpenWorkspaceDialog
+                    open={true}
+                    initialPath="/current"
+                    showHidden={false}
+                    onCancel={vi.fn()}
+                    onConfirm={vi.fn(async () => true)}
+                />
+            ),
+            root
+        );
+
+        const parentButton = root.querySelector<HTMLButtonElement>(
+            '[aria-label="workspace.parent"]'
+        );
+        await vi.waitFor(() => expect(parentButton?.disabled).toBe(false));
+
+        root.querySelector<HTMLButtonElement>('[aria-label="workspace.roots"]')?.click();
+        await vi.waitFor(() => {
+            expect(root.textContent).toContain("workspace.roots");
+            expect(parentButton?.disabled).toBe(true);
+        });
+
+        parentButton?.click();
+        expect(invokeMock).not.toHaveBeenCalledWith("browse_directories", {
+            path: "/",
+            showHidden: false,
+        });
+    });
+
     it("reloads the current directory when hidden-file visibility changes", async () => {
         const [showHidden, setShowHidden] = createSignal(false);
         const root = document.createElement("div");
