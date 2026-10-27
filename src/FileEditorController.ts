@@ -4,7 +4,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
-import { createEffect, createSignal, onCleanup, type Accessor } from "solid-js";
+import { createEffect, createSignal, on, onCleanup, type Accessor } from "solid-js";
 import { translateAppError } from "./AppError";
 import { useAppContext } from "./AppContext";
 import { useI18N } from "./Localization";
@@ -220,22 +220,21 @@ export function createFileEditorController<Content = string>(
         }
     };
 
-    createEffect(() => {
-        const currentBasepath = basepath();
-        const currentFilename = filename();
+    createEffect(
+        on([basepath, filename], ([currentBasepath, currentFilename]) => {
+            const loadId = beginLoading();
 
-        const loadId = beginLoading();
-
-        void replaceContentFromDisk(currentBasepath, currentFilename, loadId)
-            .then((applied) => {
-                if (applied) enterReadyState(loadId);
-            })
-            .catch((err: unknown) => {
-                if (loadId !== activeLoad) return;
-                console.error(`Error loading file in ${editorName}:`, err);
-                enterErrorState(loadId, err);
-            });
-    });
+            void replaceContentFromDisk(currentBasepath, currentFilename, loadId)
+                .then((applied) => {
+                    if (applied) enterReadyState(loadId);
+                })
+                .catch((err: unknown) => {
+                    if (loadId !== activeLoad) return;
+                    console.error(`Error loading file in ${editorName}:`, err);
+                    enterErrorState(loadId, err);
+                });
+        })
+    );
 
     onCleanup(() => {
         activeLoad += 1;

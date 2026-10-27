@@ -19,6 +19,9 @@ import {
 } from "./FileEditorController";
 
 let appContext: AppContextValues;
+const localizationState = vi.hoisted(() => ({
+    revision: null as (() => number) | null,
+}));
 
 vi.mock("./AppContext", () => ({
     useAppContext: () => appContext,
@@ -27,7 +30,10 @@ vi.mock("./AppContext", () => ({
 vi.mock("./Localization", () => ({
     hasTranslationKey: (key: string) => key === "backendErrors.read_failed",
     useI18N: () => ({
-        t: (key: string) => key,
+        t: (key: string) => {
+            localizationState.revision?.();
+            return key;
+        },
     }),
 }));
 
@@ -38,8 +44,10 @@ describe("createFileEditorController", () => {
     let onunload: OnunloadHandler | null;
     let showAppMessage: AppContextValues["main"]["showAppMessage"];
     let showAppConfirmation: AppContextValues["main"]["showAppConfirmation"];
+    let changeLocale: () => void;
 
     beforeEach(() => {
+        const [localeRevision, setLocaleRevision] = createSignal(0);
         const [basepath, setBasepath] = createSignal("/documents");
         const [filename, setFilename] = createSignal("notes.md");
         const [fileModified, setFileModified] = createSignal(false);
@@ -58,6 +66,8 @@ describe("createFileEditorController", () => {
         showAppConfirmation = vi.fn<AppContextValues["main"]["showAppConfirmation"]>(() =>
             Promise.resolve(true)
         );
+        localizationState.revision = localeRevision;
+        changeLocale = () => setLocaleRevision((revision) => revision + 1);
 
         appContext = {
             main: {
@@ -115,6 +125,35 @@ describe("createFileEditorController", () => {
     afterEach(() => {
         dispose?.();
         dispose = undefined;
+        localizationState.revision = null;
+    });
+
+    it("does not reload the file when the translation locale changes", async () => {
+        const adapter: FileEditorAdapter = {
+            getContent: vi.fn(() => Promise.resolve("edited content")),
+            replaceContent: vi.fn(() => Promise.resolve()),
+            destroy: vi.fn(),
+        };
+        const storage: FileEditorStorage<string> = {
+            read: vi.fn(() => Promise.resolve({ content: "loaded", isNew: false })),
+            write: vi.fn(() => Promise.resolve()),
+        };
+        let controller!: FileEditorController;
+
+        createRoot((rootDispose) => {
+            dispose = rootDispose;
+            controller = createFileEditorController("TestEditor", adapter, storage);
+        });
+
+        await vi.waitFor(() => expect(controller.state().status).toBe("ready"));
+        appContext.editor.setFileModified(true);
+
+        changeLocale();
+        await Promise.resolve();
+
+        expect(storage.read).toHaveBeenCalledOnce();
+        expect(adapter.replaceContent).toHaveBeenCalledOnce();
+        expect(appContext.editor.fileModified()).toBe(true);
     });
 
     it("uses the same persistent error state when a reload fails", async () => {
