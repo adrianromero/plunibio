@@ -4,17 +4,23 @@
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 import { configDefaults } from "vitest/config";
+import { fileURLToPath, URL } from "node:url";
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
   plugins: [solid()],
 
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+
   test: {
     environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    setupFiles: ["./src/__tests__/setup.ts"],
     exclude: [...configDefaults.exclude, "src-tauri/**"],
   },
 

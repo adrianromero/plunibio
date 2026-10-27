@@ -3,9 +3,9 @@ import addonDocs from "@storybook/addon-docs";
 import { UPDATE_GLOBALS } from "storybook/internal/core-events";
 import { getChannel, useGlobals } from "storybook/preview-api";
 import { createJSXDecorator, definePreview } from "storybook-solidjs-vite";
-import I18NProvider from "../src/Localization";
-import { applyTheme, type AppTheme } from "../src/ThemePreferences";
-import "../src/theme.css";
+import I18NProvider from "../src/i18n/Localization";
+import { applyTheme, type AppTheme } from "../src/preferences/ThemePreferences";
+import "../src/styles/theme.css";
 import "./storybook.css";
 
 type UpdateGlobalsPayload = {
@@ -23,7 +23,7 @@ function ensureThemeListener(): void {
         return;
     }
 
-    getChannel().on(UPDATE_GLOBALS, ({ globals }: UpdateGlobalsPayload) => {
+    getChannel()?.on(UPDATE_GLOBALS, ({ globals }: UpdateGlobalsPayload) => {
         if ("theme" in globals) {
             applyTheme(getTheme(globals.theme));
         }

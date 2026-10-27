@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+import { hasTranslationKey, type Translator } from "@/i18n/Localization";
+import { formatPathForDisplay } from "../paths/PathPresentation";
+
+type AppErrorPayload = {
+    code: string;
+    path?: string;
+    target?: string;
+};
+
+function parsePayload(error: unknown): AppErrorPayload | null {
+    let candidate: unknown = error;
+
+    if (typeof candidate === "string") {
+        try {
+            candidate = JSON.parse(candidate) as unknown;
+        } catch {
+            return null;
+        }
+    }
+
+    if (typeof candidate !== "object" || candidate === null) {
+        return null;
+    }
+
+    const payload = candidate as Record<string, unknown>;
+    if (
+        typeof payload.code !== "string" ||
+        (payload.path !== undefined && typeof payload.path !== "string") ||
+        (payload.target !== undefined && typeof payload.target !== "string")
+    ) {
+        return null;
+    }
+
+    return {
+        code: payload.code,
+        ...(typeof payload.path === "string" ? { path: payload.path } : {}),
+        ...(typeof payload.target === "string" ? { target: payload.target } : {}),
+    };
+}
+
+export function translateAppError(error: unknown, t: Translator, fallback?: string): string {
+    const fallbackMessage = fallback ?? t("errors.unknown");
+    const payload = parsePayload(error);
+    if (!payload) {
+        return fallbackMessage;
+    }
+
+    const path = payload.path ?? "[ . ]";
+    const target = payload.target ? formatPathForDisplay(payload.target) : "[ . ]";
+    const translationKey = `backendErrors.${payload.code}`;
+    if (!hasTranslationKey(translationKey)) {
+        return fallbackMessage;
+    }
+    return t(translationKey, { path, target });
+}

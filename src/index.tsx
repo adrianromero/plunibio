@@ -6,15 +6,15 @@
 /* @refresh reload */
 import { invoke } from "@tauri-apps/api/core";
 import { render } from "solid-js/web";
-import App from "./App";
-import type { InitialConfig } from "./rusttypes";
-import { applyTheme, loadTheme } from "./ThemePreferences";
-import { applyTypography, loadTypography } from "./TypographyPreferences";
-import "./theme.css";
+import App from "./app/App";
+import type { InitialConfig } from "./backend/rusttypes";
+import { applyTheme, loadTheme } from "./preferences/ThemePreferences";
+import { applyTypography, loadTypography } from "./preferences/TypographyPreferences";
+import "./styles/theme.css";
 
 // Import base styles first
 import "@milkdown/crepe/theme/common/style.css";
-import "./milkdowntheme.css";
+import "./styles/milkdowntheme.css";
 
 applyTheme(loadTheme());
 applyTypography(loadTypography());

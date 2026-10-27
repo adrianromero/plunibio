@@ -8,9 +8,14 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
     "noEmit": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
