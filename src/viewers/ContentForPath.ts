@@ -15,7 +15,7 @@ import EditorText from "./EditorText";
 
 export type PathResult = { kind: PathKind; error?: never } | { kind: "error"; error: string };
 
-export type ContextualToolbarSection = "files" | "markdown";
+export type ContextualToolbarSection = "markdown";
 
 type ContentProps = {
     extensions?: readonly LanguageSupport[];
@@ -102,7 +102,7 @@ export function contentForPath(
                 kind: "content",
                 component: EditorFolder,
                 props: {},
-                toolbarSections: ["files"],
+                toolbarSections: noToolbarSections,
             };
         case "other":
             return { kind: "unsupported", toolbarSections: noToolbarSections };

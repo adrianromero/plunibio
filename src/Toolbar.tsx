@@ -172,40 +172,29 @@ export function Toolbar(props: ToolbarProps) {
                                         setLocale(nextLocale);
                                     },
                                 } satisfies ToolbarMenuChoiceItem<Locale>,
+                                {
+                                    kind: "choice",
+                                    id: "hidden-files",
+                                    label: t("folder.hiddenFiles"),
+                                    value: hiddenFilesVisibility,
+                                    options: [
+                                        {
+                                            value: "show",
+                                            label: t("folder.show"),
+                                            icon: Eye,
+                                        },
+                                        {
+                                            value: "hide",
+                                            label: t("folder.hide"),
+                                            icon: EyeOff,
+                                        },
+                                    ],
+                                    onChange: (visibility): void => {
+                                        setShowHiddenFiles(visibility === "show");
+                                    },
+                                } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
                             ],
                         },
-                        ...(props.contextualSections.includes("files")
-                            ? [
-                                  {
-                                      kind: "section",
-                                      id: "files",
-                                      label: t("toolbar.filesSection"),
-                                      items: [
-                                        {
-                                            kind: "choice",
-                                            id: "hidden-files",
-                                            label: t("folder.hiddenFiles"),
-                                            value: hiddenFilesVisibility,
-                                            options: [
-                                                {
-                                                    value: "show",
-                                                    label: t("folder.show"),
-                                                    icon: Eye,
-                                                },
-                                                {
-                                                    value: "hide",
-                                                    label: t("folder.hide"),
-                                                    icon: EyeOff,
-                                                },
-                                            ],
-                                            onChange: (visibility): void => {
-                                                setShowHiddenFiles(visibility === "show");
-                                            },
-                                        } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
-                                      ],
-                                  } as const,
-                              ]
-                            : []),
                         ...(props.contextualSections.includes("markdown")
                             ? [
                                   {

@@ -59,7 +59,7 @@ describe("Toolbar", () => {
         typography = typographySignal;
         [contextualSections, setContextualSections] = createSignal<
             readonly ContextualToolbarSection[]
-        >(["files", "markdown"]);
+        >(["markdown"]);
         [locale, setLocale] = createSignal<Locale>("en");
         setSaveFile = (handler) => setSaveFileSignal(() => handler);
         setReloadFile = (handler) => setReloadFileSignal(() => handler);
@@ -324,39 +324,33 @@ describe("Toolbar", () => {
         const sections = menu?.querySelectorAll<HTMLElement>("[data-toolbar-menu-section]");
         expect(
             Array.from(sections ?? []).map((section) => section.dataset.toolbarMenuSection)
-        ).toEqual(["general", "files", "markdown", "information"]);
+        ).toEqual(["general", "markdown", "information"]);
         expect(sections?.[0]?.firstElementChild?.textContent).toBe("toolbar.generalSection");
-        expect(sections?.[1]?.firstElementChild?.textContent).toBe("toolbar.filesSection");
-        expect(sections?.[2]?.firstElementChild?.textContent).toBe("toolbar.markdownSection");
-        expect(sections?.[3]?.getAttribute("aria-labelledby")).toBeNull();
-        expect(sections?.[3]?.firstElementChild?.getAttribute("data-toolbar-menu-entry")).toBe(
+        expect(sections?.[1]?.firstElementChild?.textContent).toBe("toolbar.markdownSection");
+        expect(sections?.[2]?.getAttribute("aria-labelledby")).toBeNull();
+        expect(sections?.[2]?.firstElementChild?.getAttribute("data-toolbar-menu-entry")).toBe(
             "about"
         );
         expect(
             Array.from(
                 sections?.[0]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
             ).map((entry) => entry.dataset.toolbarMenuEntry)
-        ).toEqual(["theme", "language"]);
+        ).toEqual(["theme", "language", "hidden-files"]);
         expect(
             Array.from(
                 sections?.[1]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
             ).map((entry) => entry.dataset.toolbarMenuEntry)
-        ).toEqual(["hidden-files"]);
-        expect(
-            Array.from(
-                sections?.[2]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
-            ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["typography"]);
         expect(
             Array.from(
-                sections?.[3]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
+                sections?.[2]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
             ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["about"]);
         expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(8);
         expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(13);
     });
 
-    it("reactively shows only the contextual section selected for the current path", () => {
+    it("always shows hidden-file visibility and only the selected contextual section", () => {
         const root = document.createElement("div");
         document.body.append(root);
         setContextualSections(["markdown"]);
@@ -372,14 +366,11 @@ describe("Toolbar", () => {
 
         expect(sectionIds()).toEqual(["general", "markdown", "information"]);
         expect(root.querySelector('[data-toolbar-menu-entry="typography"]')).not.toBeNull();
-        expect(root.querySelector('[data-toolbar-menu-entry="hidden-files"]')).toBeNull();
-
-        setContextualSections(["files"]);
-        expect(sectionIds()).toEqual(["general", "files", "information"]);
-        expect(root.querySelector('[data-toolbar-menu-entry="typography"]')).toBeNull();
         expect(root.querySelector('[data-toolbar-menu-entry="hidden-files"]')).not.toBeNull();
 
         setContextualSections([]);
         expect(sectionIds()).toEqual(["general", "information"]);
+        expect(root.querySelector('[data-toolbar-menu-entry="typography"]')).toBeNull();
+        expect(root.querySelector('[data-toolbar-menu-entry="hidden-files"]')).not.toBeNull();
     });
 });

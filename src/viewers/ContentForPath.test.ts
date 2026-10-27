@@ -38,7 +38,7 @@ describe("contentForPath", () => {
         expect(selection?.kind).toBe("content");
         if (selection?.kind !== "content") return;
         expect(selection.component).toBe(EditorFolder);
-        expect(selection.toolbarSections).toEqual(["files"]);
+        expect(selection.toolbarSections).toEqual([]);
     });
 
     it("does not expose contextual sections for unsupported paths and errors", () => {
