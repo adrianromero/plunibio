@@ -25,15 +25,15 @@ features:
       image_alt: Editor visual de Markdown de Plunibio mostrando un archivo README y las herramientas de formato.
     - title: Edición de texto
       text: Edita archivos de texto y código con resaltado de sintaxis, números de línea y búsqueda y reemplazo integrados, para realizar cambios precisos de forma rápida y sencilla.
-      image: plunibio-text-es.webp
+      image: plunibio-features-text-search-es.webp
       image_alt: Editor de texto de Plunibio mostrando un archivo HTML y el panel de búsqueda y reemplazo.
     - title: Visor de imágenes
       text: Previsualiza imágenes sin cambiar de aplicación, amplía los detalles y aplica giros, volteos y otros ajustes rápidos, manteniendo siempre el archivo original a mano.
-      image: plunibio-image-es.webp
+      image: plunibio-features-image-transform-es.webp
       image_alt: Visor de imágenes de Plunibio mostrando controles de zoom, rotación y volteo.
     - title: Navegación de archivos
       text: Explora archivos y carpetas directamente en Plunibio, sigue una ruta de navegación clara y recorre cualquier proyecto sin importarlo a una biblioteca propietaria ni modificar su estructura.
-      image: plunibio-folder-es.webp
+      image: plunibio-features-folders-en.webp
       image_alt: Navegador de archivos de Plunibio mostrando el contenido de una carpeta de proyecto.
 principle_eyebrow: Una idea sencilla
 principle_title: Tus textos deberían sobrevivir a tus herramientas.

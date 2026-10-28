@@ -25,15 +25,15 @@ features:
       image_alt: Plunibio visual Markdown editor showing a README and formatting tools.
     - title: Text editing
       text: Edit plain-text and source files with clear syntax highlighting, line numbers, and built-in search and replace, so precise changes stay quick and easy to review.
-      image: plunibio-text-en.webp
+      image: plunibio-features-text-search-en.webp
       image_alt: Plunibio text editor showing an HTML file and the search and replace panel.
     - title: Image viewer
       text: Preview images without switching applications, zoom in to inspect details, and apply quick rotations, flips, and other adjustments while keeping the original file close at hand.
-      image: plunibio-image-en.webp
+      image: plunibio-features-image-transform-en.webp
       image_alt: Plunibio image viewer showing zoom, rotation, and flip controls.
     - title: File navigation
       text: Browse files and folders directly in Plunibio, follow clear breadcrumbs, and move through an existing project without importing it into a proprietary library or changing its structure.
-      image: plunibio-folder-en.webp
+      image: plunibio-features-folders-en.webp
       image_alt: Plunibio file browser showing the contents of a project folder.
 principle_eyebrow: Built on a simple idea
 principle_title: Your writing should outlive your tools.

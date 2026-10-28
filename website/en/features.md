@@ -52,14 +52,7 @@ feature_nav:
         <li>Keyboard shortcuts</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 01</span>
-        <strong>Markdown formatting</strong>
-        <p>Capture a document with selected text and the Format tab open. Block style, Text formatting, and Lists should all be visible.</p>
-        <code>plunibio-features-markdown-format-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-markdown-format-en.webp" label="Markdown formatting" alt="Plunibio visual Markdown editor with the formatting tools open." %}
   </div>
 
   <div class="feature-story">
@@ -75,14 +68,7 @@ feature_nav:
         <li>Mathematics</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 02</span>
-        <strong>Blocks and a Mermaid diagram</strong>
-        <p>Show the Blocks section and a document containing a table, a code block, and a rendered Mermaid diagram. Prioritize making the diagram legible.</p>
-        <code>plunibio-features-markdown-blocks-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-markdown-blocks-en.webp" label="Blocks and a Mermaid diagram" alt="Markdown document in Plunibio showing content blocks and a Mermaid diagram preview." %}
   </div>
 
   <aside class="feature-note">
@@ -117,14 +103,7 @@ feature_nav:
       <p>Work with JavaScript, TypeScript, HTML, CSS, JSON, YAML, TOML, Rust, Python, Java, C, C++, SQL, XML, LaTeX, and other common formats. Plain text, logs, and configuration files open directly as well.</p>
       <p>The same search panel moves forward and backward through results, supports case-sensitive, whole-word, and regular-expression searches, and can replace the current match or every match at once.</p>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 03</span>
-        <strong>Text highlighting and search</strong>
-        <p>Open a visibly highlighted file, preferably HTML, TypeScript, or Rust, and leave the Search panel open with several matches and the Replace field visible.</p>
-        <code>plunibio-features-text-search-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-text-search-en.webp" label="Text highlighting and search" alt="Plunibio text editor with syntax highlighting and the search and replace panel open." %}
   </div>
 </section>
 
@@ -148,14 +127,7 @@ feature_nav:
         <li>Flip</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 04</span>
-        <strong>Transform and zoom</strong>
-        <p>Show a large image with the complete Transform tab visible: zoom level, view buttons, rotation, and flip controls.</p>
-        <code>plunibio-features-image-transform-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-image-transform-en.webp" label="Transform and zoom" alt="Plunibio image viewer with zoom, rotation, and flip controls." %}
   </div>
 
   <div class="feature-story">
@@ -164,14 +136,7 @@ feature_nav:
       <p>Change brightness, contrast, saturation, grayscale, sepia, and inversion with sliders. For a faster starting point, apply Normal, Monochrome, Vintage, Vivid, Dramatic, or Negative presets and continue refining from there.</p>
       <p>Changes can be saved directly to JPEG, PNG, and WebP files, with controls to reset transformations or filters whenever you want to return to the starting point.</p>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 05</span>
-        <strong>Adjustments and presets</strong>
-        <p>Use an image where color changes are obvious. Capture either the Adjust or Presets tab, choosing the one that best shows both the controls and the result.</p>
-        <code>plunibio-features-image-adjust-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-image-adjust-en.webp" label="Adjustments and presets" alt="Plunibio image viewer showing color controls and adjustment presets." %}
   </div>
 </section>
 
@@ -196,14 +161,7 @@ feature_nav:
         <li>Direct saving</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 06</span>
-        <strong>Folders and breadcrumbs</strong>
-        <p>Capture a project folder containing several subdirectories and files. Keep the breadcrumb and Back/Forward buttons visible, and avoid an almost empty folder.</p>
-        <code>plunibio-features-folders-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-folders-en.webp" label="Folders and breadcrumbs" alt="Plunibio folder browser with files, subdirectories, and breadcrumb navigation." %}
   </div>
 </section>
 
@@ -241,22 +199,8 @@ feature_nav:
   </div>
 
   <div class="feature-shot-grid">
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 07</span>
-        <strong>General menu and theme</strong>
-        <p>Open the options menu and expand Theme so both Light and Dark are visible. If possible, capture the application while it is using the dark theme.</p>
-        <code>plunibio-features-menu-theme-en.webp</code>
-      </div>
-    </figure>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">SCREENSHOT 08</span>
-        <strong>Markdown typography</strong>
-        <p>With a Markdown document open, expand Typography and show all four options. Leave enough document text visible to make the selected style easy to appreciate.</p>
-        <code>plunibio-features-menu-typography-en.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-menu-theme-en.webp" label="General menu and theme" alt="Plunibio options menu showing the light and dark theme selection." %}
+    {% include feature-shot.html image="plunibio-features-menu-typography-en.webp" label="Markdown typography" alt="Plunibio menu showing the typography options available for Markdown documents." %}
   </div>
 
   <aside class="features-alpha-note">
