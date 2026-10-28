@@ -1,0 +1,28 @@
+{
+  "city": "Lúmina",
+  "theme": "light",
+  "districts": [
+    {
+      "id": "serene-harbour",
+      "name": "Puerto Sereno",
+      "light": "golden",
+      "bestTime": "morning",
+      "highlights": ["arcades", "cafés", "water taxis"]
+    },
+    {
+      "id": "upper-gardens",
+      "name": "Jardines Altos",
+      "light": "coral",
+      "bestTime": "sunset",
+      "highlights": ["hanging gardens", "canal views"]
+    },
+    {
+      "id": "astral-quarter",
+      "name": "Barrio Astral",
+      "light": "indigo",
+      "bestTime": "night",
+      "highlights": ["observatory", "tidal archive"]
+    }
+  ]
+}
+

@@ -18,8 +18,8 @@ layout: default
       <img
         class="editor-screenshot"
         src="{{ '/assets/images/plunibio-editor-' | append: page.lang | append: '.webp' | relative_url }}"
-        width="1010"
-        height="668"
+        width="1024"
+        height="768"
         alt="{{ page.demo_label }}"
         fetchpriority="high"
       >
@@ -36,9 +36,24 @@ layout: default
   <div class="feature-grid">
     {% for feature in page.features %}
       <article class="feature-card">
-        <span class="feature-icon">{% include icon.html name=feature.icon %}</span>
-        <h3>{{ feature.title }}</h3>
-        <p>{{ feature.text }}</p>
+        <button
+          class="feature-media"
+          type="button"
+          data-image-viewer-trigger
+          aria-label="{{ page.image_viewer_open }}: {{ feature.title }}"
+        >
+          <img
+            src="{{ '/assets/images/' | append: feature.image | relative_url }}"
+            width="1024"
+            height="768"
+            alt="{{ feature.image_alt }}"
+            loading="lazy"
+          >
+        </button>
+        <div class="feature-card-copy">
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.text }}</p>
+        </div>
       </article>
     {% endfor %}
   </div>
@@ -54,3 +69,10 @@ layout: default
     <p>{{ page.principle_text }}</p>
   </div>
 </section>
+
+<div class="image-viewer" data-image-viewer role="dialog" aria-modal="true" aria-label="{{ page.image_viewer_label }}" hidden>
+  <button class="image-viewer-close" type="button" data-image-viewer-close aria-label="{{ page.image_viewer_close }}">&times;</button>
+  <img data-image-viewer-image alt="">
+</div>
+
+<script src="{{ '/assets/js/feature-viewer.js' | relative_url }}" defer></script>
