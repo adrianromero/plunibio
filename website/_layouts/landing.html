@@ -36,9 +36,19 @@ layout: default
   <div class="feature-grid">
     {% for feature in page.features %}
       <article class="feature-card">
-        <span class="feature-icon">{% include icon.html name=feature.icon %}</span>
-        <h3>{{ feature.title }}</h3>
-        <p>{{ feature.text }}</p>
+        <div class="feature-card-copy">
+          <h3>{{ feature.title }}</h3>
+          <div class="feature-media">
+            <img
+              src="{{ '/assets/images/' | append: feature.image | relative_url }}"
+              width="1010"
+              height="668"
+              alt="{{ feature.image_alt }}"
+              loading="lazy"
+            >
+          </div>
+          <p>{{ feature.text }}</p>
+        </div>
       </article>
     {% endfor %}
   </div>
