@@ -1,0 +1,11 @@
+name: Lúmina
+timezone: LUM+01:00
+map:
+  center: mirror-bay
+  default_zoom: 13
+guide:
+  languages:
+    - es
+    - en
+  walking_speed: relaxed
+
