@@ -40,14 +40,6 @@ impl AppState {
             .map_err(|error| format!("unable to read the current location: {error}"))
     }
 
-    pub(crate) fn basepath(&self) -> Result<PathBuf, String> {
-        self.location().map(|location| location.basepath)
-    }
-
-    pub(crate) fn filename(&self) -> Result<String, String> {
-        self.location().map(|location| location.filename)
-    }
-
     pub(crate) fn set_filename(&self, filename: String) -> Result<(), String> {
         let mut location = self
             .location

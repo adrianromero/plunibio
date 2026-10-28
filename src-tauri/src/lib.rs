@@ -19,14 +19,37 @@ pub(crate) struct PropertiesState {
     properties: Properties,
 }
 
-fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath: bool) {
+fn apply_override<T>(configured: T, cli_override: Option<T>) -> T {
+    cli_override.unwrap_or(configured)
+}
+
+fn initial_window_dimensions(
+    properties: &Properties,
+    width: Option<u32>,
+    height: Option<u32>,
+) -> (u32, u32) {
+    (
+        apply_override(properties.width, width),
+        apply_override(properties.height, height),
+    )
+}
+
+fn run_with_configuration(
+    basepath: Option<PathBuf>,
+    filename: Option<String>,
+    width: Option<u32>,
+    height: Option<u32>,
+) {
+    let default_basepath = std::env::current_dir()
+        .and_then(std::fs::canonicalize)
+        .expect("failed to resolve the current directory");
     let application_properties = Arc::new(Mutex::new(PropertiesState::default()));
     let setup_properties = Arc::clone(&application_properties);
     let event_properties = Arc::clone(&application_properties);
     let managed_properties = Arc::clone(&application_properties);
 
     tauri::Builder::default()
-        .manage(AppState::new(basepath, filename))
+        .manage(AppState::new(default_basepath.clone(), String::new()))
         .manage(managed_properties)
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
@@ -50,54 +73,56 @@ fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath:
                 }
             };
 
-            let app_state = app.state::<AppState>();
-            if restore_basepath {
+            let saved_basepath = if basepath.is_none() {
                 match application_properties.resolved_basepath() {
                     Ok(Some(canonical)) => {
-                        if let Err(message) =
-                            app_state.set_location(canonical.clone(), app_state.filename()?)
-                        {
-                            error!("Failed to restore the saved base path: {message}");
+                        info!(
+                            basepath = %canonical.display(),
+                            "Restored the saved base path"
+                        );
+                        Some(canonical)
+                    }
+                    Ok(None) => None,
+                    Err(message) => {
+                        error!(
+                            error = message,
+                            "Ignored an invalid saved base path"
+                        );
+                        None
+                    }
+                }
+            } else {
+                None
+            };
+            let configured_basepath = saved_basepath.unwrap_or_else(|| default_basepath.clone());
+            let initial_basepath = apply_override(configured_basepath, basepath.clone());
+            let saved_filename = if filename.is_none() {
+                application_properties
+                    .filename_for(&initial_basepath)
+                    .and_then(|saved_filename| {
+                        if paths::validate_relative_filename(saved_filename).is_ok() {
+                            Some(saved_filename.to_owned())
                         } else {
-                            info!(
-                                basepath = %canonical.display(),
-                                "Restored the saved base path"
+                            error!(
+                                filename = saved_filename,
+                                "Ignored an invalid saved filename"
                             );
+                            None
                         }
-                    }
-                    Ok(None) => {}
-                    Err(message) => error!(
-                        error = message,
-                        "Ignored an invalid saved base path"
-                    ),
-                }
-            }
-            let initial_basepath = app_state.basepath();
-            match app_state.filename() {
-                Ok(filename) if filename.is_empty() => {
-                    if let Ok(basepath) = initial_basepath.as_ref() {
-                        if let Some(saved_filename) = application_properties.filename_for(basepath) {
-                            if paths::validate_relative_filename(saved_filename).is_ok() {
-                                if let Err(message) =
-                                    app_state.set_filename(saved_filename.to_owned())
-                                {
-                                    error!("Failed to restore the saved filename: {message}");
-                                }
-                            } else {
-                                error!(
-                                    filename = saved_filename,
-                                    "Ignored an invalid saved filename"
-                                );
-                            }
-                        }
-                    }
-                }
-                Ok(_) => {}
-                Err(message) => error!("Failed to read the initial filename: {message}"),
+                    })
+            } else {
+                None
+            };
+            let configured_filename = saved_filename.unwrap_or_default();
+            let initial_filename = apply_override(configured_filename, filename.clone());
+
+            let app_state = app.state::<AppState>();
+            if let Err(message) = app_state.set_location(initial_basepath, initial_filename) {
+                error!("Failed to apply the initial application location: {message}");
             }
 
-            let width = application_properties.width;
-            let height = application_properties.height;
+            let (width, height) =
+                initial_window_dimensions(&application_properties, width, height);
             match setup_properties.lock() {
                 Ok(mut state) => {
                     state.path = properties_path;
@@ -233,16 +258,45 @@ fn run_with_configuration(basepath: PathBuf, filename: String, restore_basepath:
         .expect("error while running tauri application");
 }
 
-pub fn run_with_path(basepath: PathBuf, filename: String) {
-    run_with_configuration(basepath, filename, false);
-}
-
-pub fn run_with_default_path(basepath: PathBuf, filename: String) {
-    run_with_configuration(basepath, filename, true);
+pub fn run_with_options(
+    basepath: Option<PathBuf>,
+    filename: Option<String>,
+    width: Option<u32>,
+    height: Option<u32>,
+) {
+    run_with_configuration(basepath, filename, width, height);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let basepath = std::env::current_dir().expect("failed to get current directory");
-    run_with_default_path(basepath, String::new());
+    run_with_options(None, None, None, None);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cli_dimensions_override_saved_properties() {
+        let properties = Properties::new(800, 600);
+
+        assert_eq!(
+            initial_window_dimensions(&properties, Some(1280), Some(720)),
+            (1280, 720)
+        );
+    }
+
+    #[test]
+    fn each_cli_dimension_overrides_its_saved_property_independently() {
+        let properties = Properties::new(800, 600);
+
+        assert_eq!(
+            initial_window_dimensions(&properties, Some(1024), None),
+            (1024, 600)
+        );
+        assert_eq!(
+            initial_window_dimensions(&properties, None, Some(768)),
+            (800, 768)
+        );
+    }
 }

@@ -72,7 +72,7 @@ The extra separators are required because npm and the Tauri CLI each process the
 The packaged executable accepts an optional relative filename and an optional base path:
 
 ```text
-plunibio [FILENAME] [--base-path BASEPATH]
+plunibio [FILENAME] [--base-path BASEPATH] [--width WIDTH] [--height HEIGHT]
 ```
 
 - `FILENAME` is a file or folder path relative to the base path. Absolute paths and paths containing `..` are rejected.
@@ -82,6 +82,8 @@ plunibio [FILENAME] [--base-path BASEPATH]
 - Reloading discards current content changes. If the file does not exist, it reloads as an empty document and remains marked unsaved because it has not yet been created.
 
 - `BASEPATH` must identify an existing directory. It may be absolute or relative; a relative base path is resolved against the process working directory.
+
+- `WIDTH` and `HEIGHT` set the initial window dimensions and must be greater than zero. Each supplied value takes precedence over its corresponding value in `~/.plunibio/properties.toml`; omitted dimensions continue to use their saved values.
 
 - When `FILENAME` is omitted, Plunibio restores the last filename opened for that base path. If the base path has no saved filename, it opens with no selected filename.
 
@@ -101,7 +103,7 @@ The arguments resolve as follows:
 | Both, with an absolute `BASEPATH` | Relative file or folder path                             | Absolute `BASEPATH`                                           |
 | Both, with a relative `BASEPATH`  | Relative file or folder path                             | `BASEPATH` resolved from the process working directory        |
 
-On a normal shutdown, Plunibio stores the current canonical base path and its last filename in `~/.plunibio/properties.toml`, alongside the window dimensions. Changing the workspace from the application also updates the base path held in memory for the next configuration save. An explicitly supplied `--base-path` or `FILENAME` always takes precedence over its corresponding saved value. Configuration read, path restoration, window sizing, and configuration write failures are logged without displaying an error to the user.
+On a normal shutdown, Plunibio stores the current canonical base path and its last filename in `~/.plunibio/properties.toml`, alongside the window dimensions. Changing the workspace from the application also updates the base path held in memory for the next configuration save. An explicitly supplied `--base-path`, `FILENAME`, `--width`, or `--height` always takes precedence over its corresponding saved value. Configuration read, path restoration, window sizing, and configuration write failures are logged without displaying an error to the user.
 
 Examples:
 
@@ -111,6 +113,7 @@ plunibio README.md
 plunibio guides
 plunibio --base-path /home/user/Documents/notes
 plunibio daily/today.md --base-path ./notes
+plunibio --width 1280 --height 720
 ```
 
 Run `plunibio --help` to display the built-in command-line help.

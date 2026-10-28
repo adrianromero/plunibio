@@ -17,13 +17,13 @@ fn main() {
     });
 
     info!(
-        "Starting Plunibio with base path {} and filename {}",
-        configuration.basepath.display(),
-        configuration.filename
+        "Starting Plunibio with base path {:?}, filename {:?}, width {:?}, and height {:?}",
+        configuration.basepath, configuration.filename, configuration.width, configuration.height
     );
-    if configuration.use_saved_basepath {
-        plunibio_lib::run_with_default_path(configuration.basepath, configuration.filename)
-    } else {
-        plunibio_lib::run_with_path(configuration.basepath, configuration.filename)
-    }
+    plunibio_lib::run_with_options(
+        configuration.basepath,
+        configuration.filename,
+        configuration.width,
+        configuration.height,
+    )
 }
