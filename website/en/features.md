@@ -9,6 +9,9 @@ description: Explore Plunibio's visual Markdown editing, text editor, image view
 eyebrow: Your files, your tools
 intro: Plunibio brings visual Markdown editing, text and image tools, and local file navigation together in an interface that adapts to the way you work.
 overview_label: Feature sections
+image_viewer_label: Enlarged feature preview
+image_viewer_open: Enlarge screenshot
+image_viewer_close: Close enlarged preview
 feature_nav:
     - href: "#markdown"
       label: Markdown

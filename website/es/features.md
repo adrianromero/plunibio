@@ -9,6 +9,9 @@ description: Descubre la edición visual de Markdown, el editor de texto, el vis
 eyebrow: Tus archivos, tus herramientas
 intro: Plunibio reúne edición visual de Markdown, herramientas para texto e imágenes y navegación local en una interfaz que puedes adaptar a tu forma de trabajar.
 overview_label: Secciones de funcionalidades
+image_viewer_label: Vista ampliada de una funcionalidad
+image_viewer_open: Ampliar captura
+image_viewer_close: Cerrar vista ampliada
 feature_nav:
     - href: "#markdown"
       label: Markdown
@@ -49,14 +52,7 @@ feature_nav:
         <li>Atajos de teclado</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 01</span>
-        <strong>Formato de Markdown</strong>
-        <p>Captura un documento con texto seleccionado y la pestaña Formato abierta. Deben verse Estilo de bloque, Formato de texto y Listas.</p>
-        <code>plunibio-features-markdown-format-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-markdown-format-es.webp" label="Formato de Markdown" alt="Editor visual de Markdown de Plunibio con las herramientas de formato abiertas." %}
   </div>
 
   <div class="feature-story">
@@ -72,14 +68,7 @@ feature_nav:
         <li>Matemáticas</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 02</span>
-        <strong>Bloques y diagrama Mermaid</strong>
-        <p>Muestra la sección Bloques del panel y un documento con una tabla, un bloque de código y la previsualización de un diagrama Mermaid. Prioriza que el diagrama sea legible.</p>
-        <code>plunibio-features-markdown-blocks-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-markdown-blocks-es.webp" label="Bloques y diagrama Mermaid" alt="Documento Markdown en Plunibio mostrando bloques de contenido y la previsualización de un diagrama Mermaid." %}
   </div>
 
   <aside class="feature-note">
@@ -114,14 +103,7 @@ feature_nav:
       <p>Trabaja con JavaScript, TypeScript, HTML, CSS, JSON, YAML, TOML, Rust, Python, Java, C, C++, SQL, XML, LaTeX y otros formatos comunes. Los archivos de texto simple, registros y configuraciones también se abren directamente.</p>
       <p>El mismo panel de búsqueda permite avanzar y retroceder por los resultados, usar mayúsculas, palabras completas o expresiones regulares, y reemplazar la coincidencia actual o todas a la vez.</p>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 03</span>
-        <strong>Resaltado y búsqueda en texto</strong>
-        <p>Abre un archivo con resaltado visible, preferiblemente HTML, TypeScript o Rust, y deja abierto el panel Buscar con varias coincidencias y el campo Reemplazar.</p>
-        <code>plunibio-features-text-search-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-text-search-es.webp" label="Resaltado y búsqueda en texto" alt="Editor de texto de Plunibio con resaltado de sintaxis y el panel de búsqueda y reemplazo." %}
   </div>
 </section>
 
@@ -145,14 +127,7 @@ feature_nav:
         <li>Volteo</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 04</span>
-        <strong>Transformación y zoom</strong>
-        <p>Muestra una imagen grande y la pestaña Transformar completa: nivel de zoom, botones de vista, rotación y controles de volteo.</p>
-        <code>plunibio-features-image-transform-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-image-transform-es.webp" label="Transformación y zoom" alt="Visor de imágenes de Plunibio con controles de zoom, rotación y volteo." %}
   </div>
 
   <div class="feature-story">
@@ -161,14 +136,7 @@ feature_nav:
       <p>Modifica brillo, contraste, saturación, escala de grises, sepia e inversión con controles deslizantes. Si quieres empezar más rápido, aplica los ajustes predefinidos Normal, Monocromo, Vintage, Vívido, Dramático o Negativo y continúa afinando desde ahí.</p>
       <p>Los cambios pueden guardarse directamente en archivos JPEG, PNG y WebP, con una opción para restablecer transformaciones o filtros cuando quieras volver al punto de partida.</p>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 05</span>
-        <strong>Ajustes y predefinidos</strong>
-        <p>Usa una imagen donde los cambios de color sean evidentes. Captura la pestaña Ajustar o Predefinidos abierta; elige la que mejor muestre los controles y el resultado.</p>
-        <code>plunibio-features-image-adjust-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-image-adjust-es.webp" label="Ajustes y predefinidos" alt="Visor de imágenes de Plunibio mostrando controles de color y ajustes predefinidos." %}
   </div>
 </section>
 
@@ -193,14 +161,7 @@ feature_nav:
         <li>Guardado directo</li>
       </ul>
     </div>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 06</span>
-        <strong>Carpetas y ruta de navegación</strong>
-        <p>Captura una carpeta de proyecto con varios subdirectorios y archivos. Deben verse la ruta superior y los botones Atrás y Adelante; evita una carpeta casi vacía.</p>
-        <code>plunibio-features-folders-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-folders-es.webp" label="Carpetas y ruta de navegación" alt="Navegador de carpetas de Plunibio con archivos, subdirectorios y ruta de navegación." %}
   </div>
 </section>
 
@@ -238,22 +199,8 @@ feature_nav:
   </div>
 
   <div class="feature-shot-grid">
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 07</span>
-        <strong>Menú general y tema</strong>
-        <p>Abre el menú de opciones y despliega Tema para que se vean Claro y Oscuro. Si es posible, toma la captura con la aplicación usando el tema oscuro.</p>
-        <code>plunibio-features-menu-theme-es.webp</code>
-      </div>
-    </figure>
-    <figure class="feature-shot-placeholder">
-      <div class="feature-shot-placeholder-inner">
-        <span class="feature-shot-slot">CAPTURA 08</span>
-        <strong>Tipografía de Markdown</strong>
-        <p>Con un documento Markdown abierto, despliega Tipografía y muestra las cuatro opciones. Deja visible suficiente texto para apreciar el estilo seleccionado.</p>
-        <code>plunibio-features-menu-typography-es.webp</code>
-      </div>
-    </figure>
+    {% include feature-shot.html image="plunibio-features-menu-theme-es.webp" label="Menú general y tema" alt="Menú de opciones de Plunibio mostrando la selección de tema claro u oscuro." %}
+    {% include feature-shot.html image="plunibio-features-menu-typography-es.webp" label="Tipografía de Markdown" alt="Menú de Plunibio mostrando las opciones tipográficas disponibles para documentos Markdown." %}
   </div>
 
   <aside class="features-alpha-note">
