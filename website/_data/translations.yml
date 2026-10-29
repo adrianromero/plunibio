@@ -3,6 +3,7 @@ en:
   home: Plunibio home
   primary_nav: Primary navigation
   features: Features
+  installation: Installation
   docs: Docs
   about: About
   github: View on GitHub
@@ -17,6 +18,7 @@ es:
   home: Inicio de Plunibio
   primary_nav: Navegación principal
   features: Funcionalidades
+  installation: Instalación
   docs: Documentación
   about: Acerca de
   github: Ver en GitHub

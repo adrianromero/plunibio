@@ -9,7 +9,7 @@ layout: default
       <h1>{{ page.hero_title }}</h1>
       <p class="hero-lede">{{ page.hero_lede }}</p>
       <div class="hero-actions">
-        <a class="button button-primary" href="{{ '/' | append: page.lang | append: '/docs/' | relative_url }}">{{ page.primary_action }} {% include icon.html name="arrow" %}</a>
+        <a class="button button-primary" href="{{ '/' | append: page.lang | append: '/install/' | relative_url }}">{{ page.primary_action }} {% include icon.html name="arrow" %}</a>
         <a class="button button-secondary" href="{{ site.github_url }}">{% include icon.html name="github" %} {{ page.secondary_action }}</a>
       </div>
       <p class="hero-note"><span aria-hidden="true">●</span> {{ page.hero_note }}</p>
@@ -36,24 +36,9 @@ layout: default
   <div class="feature-grid">
     {% for feature in page.features %}
       <article class="feature-card">
-        <button
-          class="feature-media"
-          type="button"
-          data-image-viewer-trigger
-          aria-label="{{ page.image_viewer_open }}: {{ feature.title }}"
-        >
-          <img
-            src="{{ '/assets/images/' | append: feature.image | relative_url }}"
-            width="1024"
-            height="768"
-            alt="{{ feature.image_alt }}"
-            loading="lazy"
-          >
-        </button>
-        <div class="feature-card-copy">
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.text }}</p>
-        </div>
+        <span class="feature-icon">{% include icon.html name=feature.icon %}</span>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.text }}</p>
       </article>
     {% endfor %}
   </div>
@@ -69,10 +54,3 @@ layout: default
     <p>{{ page.principle_text }}</p>
   </div>
 </section>
-
-<div class="image-viewer" data-image-viewer role="dialog" aria-modal="true" aria-label="{{ page.image_viewer_label }}" hidden>
-  <button class="image-viewer-close" type="button" data-image-viewer-close aria-label="{{ page.image_viewer_close }}">&times;</button>
-  <img data-image-viewer-image alt="">
-</div>
-
-<script src="{{ '/assets/js/feature-viewer.js' | relative_url }}" defer></script>

@@ -66,12 +66,10 @@ h1, h2 { font-family: "Newsreader", Georgia, serif; font-weight: 600; letter-spa
 .section-heading h2, .principle-grid h2 { margin: 0; font-size: clamp(40px, 5vw, 62px); }
 .section-heading > p { margin: 0 0 6px; color: var(--muted); }
 .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 52px; }
-.feature-card { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.45); }
-.feature-media { display: grid; place-items: center; width: 100%; overflow: hidden; margin: 0; padding: 18px; border: 0; border-right: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.28); cursor: zoom-in; }
-.feature-media img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; border: 1px solid var(--line); border-radius: 10px; object-fit: cover; object-position: top center; }
-.feature-media:focus-visible { position: relative; z-index: 1; outline: 3px solid var(--gold); outline-offset: -3px; }
-.feature-card-copy { display: flex; flex-direction: column; justify-content: center; padding: 24px; }
-.feature-card h3 { margin: 0 0 16px; font-size: 18px; }
+.feature-card { min-height: 245px; padding: 27px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.45); }
+.feature-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--green-soft); color: var(--green); }
+.feature-icon svg { width: 20px; height: 20px; }
+.feature-card h3 { margin: 34px 0 10px; font-size: 18px; }
 .feature-card p { margin: 0; color: var(--muted); font-size: 14px; }
 .image-viewer { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 40px; background: rgba(11, 20, 16, .84); cursor: zoom-out; }
 .image-viewer[hidden] { display: none; }
@@ -179,8 +177,6 @@ body.image-viewer-open { overflow: hidden; }
   .hero h1 { font-size: 51px; }
   .editor-showcase { margin-inline: -4px; transform: rotate(.7deg); }
   .editor-showcase::after { inset: 12px -8px -12px 10px; }
-  .feature-card { grid-template-columns: 1fr; }
-  .feature-media { border-right: 0; border-bottom: 1px solid var(--line); }
   .image-viewer { padding: 18px; }
   .image-viewer img { max-height: calc(100vh - 36px); }
   .image-viewer-close { top: 12px; right: 12px; }

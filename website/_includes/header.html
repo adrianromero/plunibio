@@ -7,6 +7,7 @@
     </a>
     <nav class="main-nav" aria-label="{{ include.t.primary_nav }}">
       <a {% if page.section == 'features' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/features/' | relative_url }}">{{ include.t.features }}</a>
+      <a {% if page.section == 'installation' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/install/' | relative_url }}">{{ include.t.installation }}</a>
       <a {% if page.section == 'docs' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/docs/' | relative_url }}">{{ include.t.docs }}</a>
       <a {% if page.section == 'about' %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/about/' | relative_url }}">{{ include.t.about }}</a>
     </nav>
