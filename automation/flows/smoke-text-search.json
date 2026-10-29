@@ -1,0 +1,45 @@
+{
+    "name": "Atlas de Lúmina: teclado y búsqueda de texto",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "file": "data/distritos.json",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "automation/output/smoke-text-search",
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "text-editor" },
+            "state": "visible"
+        },
+        { "action": "keys", "keys": ["Control", "f"] },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "search-input" },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "light",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "replace-input" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "json-search-viewport"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "app-sidebar" },
+            "name": "json-search-sidebar"
+        }
+    ]
+}

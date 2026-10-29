@@ -35,10 +35,16 @@ export function FileBreadcrumb(): JSX.Element {
 
     return (
         <div class={styles.container}>
-            <nav class={styles.breadcrumb} aria-label={t("toolbar.pathNavigation")}>
+            <nav
+                class={styles.breadcrumb}
+                aria-label={t("toolbar.pathNavigation")}
+                data-testid="file-breadcrumb"
+            >
                 <button
                     type="button"
                     class={styles.segmentLink}
+                    data-testid="breadcrumb-segment"
+                    data-path=""
                     aria-label={formatPathForDisplay(basepath())}
                     title={formatPathForDisplay(basepath())}
                     disabled={segments().length === 0}
@@ -69,6 +75,8 @@ export function FileBreadcrumb(): JSX.Element {
                                     <button
                                         type="button"
                                         class={styles.segmentLink}
+                                        data-testid="breadcrumb-segment"
+                                        data-path={segment.filename}
                                         onClick={() => void loadFilename(segment.filename)}
                                     >
                                         {segment.name}

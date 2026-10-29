@@ -117,6 +117,7 @@ export function AppProvider(props: {
 
     createEffect(() => {
         const title = `Plunibio - ${formatPathForDisplay(basepath())}`;
+        document.title = title;
         void invoke("set_window_title", { title }).catch((error: unknown) => {
             console.error("Unable to update the window title:", error);
         });

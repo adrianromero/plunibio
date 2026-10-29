@@ -66,6 +66,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
         <dialog
             ref={dialogRef}
             class={`${dialogStyles.dialog} ${styles.aboutDialog}`}
+            data-testid="about-dialog"
             aria-labelledby="about-dialog-title"
             aria-describedby="about-dialog-details"
             tabIndex={-1}

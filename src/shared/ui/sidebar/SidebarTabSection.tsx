@@ -32,6 +32,8 @@ export function SidebarTabSection(props: SidebarTabSectionProps): JSX.Element {
                     id={tabId}
                     type="button"
                     role="tab"
+                    data-testid="sidebar-tab"
+                    data-tab-key={props.key}
                     class={`stdButton tab ${selected() ? "selected" : ""}`}
                     aria-controls={panelId}
                     aria-selected={selected()}
@@ -46,6 +48,8 @@ export function SidebarTabSection(props: SidebarTabSectionProps): JSX.Element {
                     id={panelId}
                     class="sidebarPanel"
                     role="tabpanel"
+                    data-testid="sidebar-panel"
+                    data-tab-key={props.key}
                     aria-labelledby={tabId}
                 >
                     {props.children}

@@ -112,6 +112,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
         <dialog
             ref={dialogRef}
             class={`${dialogStyles.dialog} ${styles.workspaceDialog}`}
+            data-testid="workspace-dialog"
             aria-labelledby="open-workspace-title"
             tabIndex={-1}
             onCancel={(event) => {
@@ -177,6 +178,8 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                                     <li>
                                         <button
                                             class={`${folderStyles.entryButton} ${folderStyles.entryButtonSmall}`}
+                                            data-testid="workspace-directory"
+                                            data-path={entry.path}
                                             type="button"
                                             disabled={confirming()}
                                             onClick={() => void loadDirectory(entry.path)}

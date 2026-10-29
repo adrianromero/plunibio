@@ -309,13 +309,14 @@ export function EditorImage(): JSX.Element {
     };
 
     return (
-        <section class={styles.studio}>
+        <section class={styles.studio} data-testid="image-view">
             <Show when={error()}>
                 <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
             </Show>
             <div
                 ref={viewportRef}
                 class={`${styles.viewport} ${error() ? styles.errorViewport : ""}`}
+                data-testid="image-viewport"
                 onWheel={(event) => {
                     event.preventDefault();
                     setZoom((value) =>
@@ -330,6 +331,7 @@ export function EditorImage(): JSX.Element {
                 <canvas
                     ref={canvasRef}
                     class={styles.canvas}
+                    data-testid="image-canvas"
                     style={{
                         transform: `translate(-50%, -50%) translate(${panX()}px, ${panY()}px) scale(${zoom()})`,
                     }}
@@ -347,7 +349,11 @@ export function EditorImage(): JSX.Element {
             <AppSidebar disabled={editorDisabled()}>
                 <SidebarTab defaultKey="transform">
                     <SidebarTabSection key="transform" label={t("image.transform")}>
-                        <Control label={t("image.zoom")} value={`${Math.round(zoom() * 100)}%`}>
+                        <Control
+                            label={t("image.zoom")}
+                            value={`${Math.round(zoom() * 100)}%`}
+                            controlId="zoom"
+                        >
                             <input
                                 type="range"
                                 min="10"
@@ -362,6 +368,8 @@ export function EditorImage(): JSX.Element {
                         <div class="sidebarButtonGrid sidebarButtonGrid--5">
                             <button
                                 class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="zoom-out"
                                 title={t("image.zoomOut")}
                                 onClick={() => setZoom((value) => Math.max(0.1, value / 1.2))}
                             >
@@ -369,6 +377,8 @@ export function EditorImage(): JSX.Element {
                             </button>
                             <button
                                 class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="fit"
                                 title={t("image.fit")}
                                 onClick={fitImage}
                             >
@@ -376,6 +386,8 @@ export function EditorImage(): JSX.Element {
                             </button>
                             <button
                                 class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="center"
                                 title={t("image.center")}
                                 onClick={() => {
                                     setPanX(0);
@@ -386,6 +398,8 @@ export function EditorImage(): JSX.Element {
                             </button>
                             <button
                                 class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="actual-size"
                                 title={t("image.actualSize")}
                                 onClick={() => setZoom(1)}
                             >
@@ -393,6 +407,8 @@ export function EditorImage(): JSX.Element {
                             </button>
                             <button
                                 class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="zoom-in"
                                 title={t("image.zoomIn")}
                                 onClick={() => setZoom((value) => Math.min(5, value * 1.2))}
                             >
@@ -400,7 +416,11 @@ export function EditorImage(): JSX.Element {
                             </button>
                         </div>
 
-                        <Control label={t("image.rotation")} value={`${settings().rotation}°`}>
+                        <Control
+                            label={t("image.rotation")}
+                            value={`${settings().rotation}°`}
+                            controlId="rotation"
+                        >
                             <input
                                 type="range"
                                 min="-180"
@@ -414,11 +434,21 @@ export function EditorImage(): JSX.Element {
                             />
                         </Control>
                         <div class="sidebarButtonGrid sidebarButtonGrid--2">
-                            <button class="stdButton toolbar" onClick={() => rotateBy(-90)}>
+                            <button
+                                class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="rotate-left"
+                                onClick={() => rotateBy(-90)}
+                            >
                                 <RotateCcw aria-hidden="true" />
                                 {t("image.rotateLeft")}
                             </button>
-                            <button class="stdButton toolbar" onClick={() => rotateBy(90)}>
+                            <button
+                                class="stdButton toolbar"
+                                data-testid="image-action"
+                                data-action="rotate-right"
+                                onClick={() => rotateBy(90)}
+                            >
                                 <RotateCw aria-hidden="true" />
                                 {t("image.rotateRight")}
                             </button>
@@ -428,6 +458,8 @@ export function EditorImage(): JSX.Element {
                             <div class="sidebarButtonGrid sidebarButtonGrid--2">
                                 <button
                                     class="stdButton toolbar"
+                                    data-testid="image-action"
+                                    data-action="flip-horizontal"
                                     onClick={() =>
                                         updateSettings({
                                             flipHorizontal: !settings().flipHorizontal,
@@ -439,6 +471,8 @@ export function EditorImage(): JSX.Element {
                                 </button>
                                 <button
                                     class="stdButton toolbar"
+                                    data-testid="image-action"
+                                    data-action="flip-vertical"
                                     onClick={() =>
                                         updateSettings({
                                             flipVertical: !settings().flipVertical,
@@ -453,6 +487,8 @@ export function EditorImage(): JSX.Element {
 
                         <button
                             class="stdButton toolbar"
+                            data-testid="image-action"
+                            data-action="reset-transform"
                             onClick={() => {
                                 updateSettings({
                                     flipHorizontal: false,
@@ -471,6 +507,7 @@ export function EditorImage(): JSX.Element {
                                 <Control
                                     label={t(`image.${filter.name}`)}
                                     value={`${settings()[filter.name]}${filter.unit}`}
+                                    controlId={filter.name}
                                 >
                                     <input
                                         type="range"
@@ -486,7 +523,12 @@ export function EditorImage(): JSX.Element {
                                 </Control>
                             )}
                         </For>
-                        <button class="stdButton toolbar" onClick={() => resetFilters()}>
+                        <button
+                            class="stdButton toolbar"
+                            data-testid="image-action"
+                            data-action="reset-filters"
+                            onClick={() => resetFilters()}
+                        >
                             {t("image.resetFilters")}
                         </button>
                     </SidebarTabSection>
@@ -496,6 +538,8 @@ export function EditorImage(): JSX.Element {
                                 {(preset) => (
                                     <button
                                         class="stdButton toolbar"
+                                        data-testid="image-preset"
+                                        data-preset={preset}
                                         onClick={() => applyPreset(preset)}
                                     >
                                         {t(`image.preset.${preset}`)}

@@ -16,6 +16,10 @@ import "./styles/theme.css";
 import "@milkdown/crepe/theme/common/style.css";
 import "./styles/milkdowntheme.css";
 
+if (import.meta.env.VITE_PLUNIBIO_AUTOMATION === "1") {
+    void import("@wdio/tauri-plugin");
+}
+
 applyTheme(loadTheme());
 applyTypography(loadTypography());
 

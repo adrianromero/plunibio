@@ -15,6 +15,9 @@ edition = "2021"
 name = "plunibio_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[features]
+automation = ["dep:tauri-plugin-wdio", "dep:tauri-plugin-wdio-webdriver"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -25,6 +28,8 @@ percent-encoding = "2"
 tauri = { version = "2", features = [] }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-opener = "2"
+tauri-plugin-wdio = { version = "1.5.1", optional = true }
+tauri-plugin-wdio-webdriver = { version = "1.5.1", optional = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 toml = "0.9.12"

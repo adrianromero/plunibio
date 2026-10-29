@@ -372,6 +372,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
             <button
                 ref={trigger}
                 class="stdButton mainbar"
+                data-testid="toolbar-menu-trigger"
                 style={{ "anchor-name": anchorName }}
                 type="button"
                 aria-label={props.label}
@@ -401,6 +402,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                 style={{ "position-anchor": anchorName }}
                 popover="auto"
                 role="menu"
+                data-testid="toolbar-menu"
                 aria-label={props.label}
                 onToggle={handleToggle}
                 onKeyDown={handleKeyDown}

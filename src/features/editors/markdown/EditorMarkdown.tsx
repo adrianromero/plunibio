@@ -505,22 +505,31 @@ export function EditorMarkdown(): JSX.Element {
     });
 
     return (
-        <section class={styles.studio}>
+        <section class={styles.studio} data-testid="markdown-view">
             <Show when={error()}>
                 <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
             </Show>
             <div class={`scrollingView ${error() ? "errorView" : ""}`}>
                 <div
                     class={`contentView ${styles.frontmatterPanel}`}
+                    data-testid="frontmatter-panel"
                     classList={{ [styles.hidden]: !frontmatterVisible() }}
                     aria-hidden={!frontmatterVisible()}
                 >
                     <div class={styles.frontmatterTitle}>
                         {t("markdownToolbar.frontmatterEditor")}
                     </div>
-                    <div ref={frontmatterRef} class={styles.frontmatterEditor} />
+                    <div
+                        ref={frontmatterRef}
+                        class={styles.frontmatterEditor}
+                        data-testid="frontmatter-editor"
+                    />
                 </div>
-                <div ref={editorRef} class={`contentView milkdowntheme ${styles.editorMarkdown}`} />
+                <div
+                    ref={editorRef}
+                    class={`contentView milkdowntheme ${styles.editorMarkdown}`}
+                    data-testid="markdown-editor"
+                />
                 <MarkdownLinkActions
                     editorRoot={() => editorRef}
                     crepe={imageActionsCrepe}

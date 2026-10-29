@@ -38,10 +38,11 @@ export function EditorExternalFile(): JSX.Element {
     };
 
     return (
-        <section class="scrollingView">
+        <section class="scrollingView" data-testid="external-file-view">
             <div class={`contentView ${styles.externalFile}`}>
                 <button
                     class="stdButton"
+                    data-testid="open-external-file"
                     type="button"
                     disabled={opening()}
                     onClick={() => void openFile()}

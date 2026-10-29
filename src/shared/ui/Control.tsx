@@ -10,11 +10,16 @@ export type ControlProps = {
     label: JSX.Element;
     value: JSX.Element;
     children: JSX.Element;
+    controlId?: string;
 };
 
 export function Control(props: ControlProps): JSX.Element {
     return (
-        <label class={styles.control}>
+        <label
+            class={styles.control}
+            data-testid={props.controlId ? "control" : undefined}
+            data-control-id={props.controlId}
+        >
             <span>
                 <strong>{props.label}</strong>
                 <output>{props.value}</output>

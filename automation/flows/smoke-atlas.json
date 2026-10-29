@@ -1,0 +1,65 @@
+{
+    "name": "Atlas de Lúmina: formato y captura",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "file": "README.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "automation/output/smoke-atlas",
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "text", "value": "Atlas de Lúmina" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='format']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "sidebar-toggle" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='format']"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "sidebar-toggle" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='format']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "markdown-format-viewport"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "app-sidebar" },
+            "name": "markdown-format-sidebar"
+        },
+        {
+            "action": "capture",
+            "scope": "native-window",
+            "name": "markdown-format-window"
+        }
+    ]
+}

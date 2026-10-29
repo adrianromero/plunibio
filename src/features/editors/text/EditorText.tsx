@@ -96,12 +96,16 @@ export function EditorText(props: EditorTextProps): JSX.Element {
     onCleanup(() => setSearchFile(null));
 
     return (
-        <section class={styles.studio}>
+        <section class={styles.studio} data-testid="text-view">
             <Show when={error()}>
                 <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
             </Show>
             <div class={`scrollingView ${error() ? "errorView" : ""}`}>
-                <div ref={editorRef} class={`contentView ${styles.editorText}`} />
+                <div
+                    ref={editorRef}
+                    class={`contentView ${styles.editorText}`}
+                    data-testid="text-editor"
+                />
             </div>
             <AppSidebar disabled={editorDisabled()}>
                 <SidebarTab

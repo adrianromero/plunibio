@@ -41,6 +41,8 @@ export function Dialog(props: DialogProps): JSX.Element {
         <dialog
             ref={dialogRef}
             class={`${styles.dialog} ${styles[info().class]}`}
+            data-testid="message-dialog"
+            data-message-kind={kind()}
             aria-labelledby={titleId}
             tabIndex={-1}
             onCancel={(e) => {

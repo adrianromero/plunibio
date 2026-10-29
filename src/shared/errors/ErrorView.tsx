@@ -21,7 +21,11 @@ export function ErrorView(props: ErrorViewProps): JSX.Element {
     const info = (): MessageInfo => messagesinfo[kind()];
 
     return (
-        <section class={`${styles.errorView} ${styles[info().class]}`}>
+        <section
+            class={`${styles.errorView} ${styles[info().class]}`}
+            data-testid="error-view"
+            data-message-kind={kind()}
+        >
             <div class={styles.errorContent}>
                 <Dynamic component={info().icon} class={styles.icon} aria-hidden="true" />
                 <div class={styles.title}>{t(info().literal)}</div>

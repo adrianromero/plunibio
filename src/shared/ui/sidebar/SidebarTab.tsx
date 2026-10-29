@@ -55,7 +55,12 @@ export function SidebarTab(props: SidebarTabProps): JSX.Element {
 
     return (
         <div class={styles.tabbedSidebar}>
-            <div ref={setTabList} class={`tabs ${styles.tabList}`} role="tablist" />
+            <div
+                ref={setTabList}
+                class={`tabs ${styles.tabList}`}
+                role="tablist"
+                data-testid="sidebar-tabs"
+            />
             <Show when={tabList()}>
                 {(resolvedTabList) => (
                     <SidebarTabContext.Provider

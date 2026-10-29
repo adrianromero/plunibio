@@ -62,7 +62,7 @@ export function EditorFolder(): JSX.Element {
     // </ToolbarView>
 
     return (
-        <section class={styles.studio}>
+        <section class={styles.studio} data-testid="folder-view">
             <div class="scrollingView">
                 <Show when={!directoryResult.loading}>
                     <Switch>
@@ -81,6 +81,9 @@ export function EditorFolder(): JSX.Element {
                                                 <li>
                                                     <button
                                                         class={styles.entryButton}
+                                                        data-testid="folder-entry"
+                                                        data-path={entry.filename}
+                                                        data-entry-kind={entry.kind}
                                                         onClick={() =>
                                                             void loadFilename(entry.filename)
                                                         }

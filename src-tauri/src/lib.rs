@@ -48,9 +48,16 @@ fn run_with_configuration(
     let event_properties = Arc::clone(&application_properties);
     let managed_properties = Arc::clone(&application_properties);
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .manage(AppState::new(default_basepath.clone(), String::new()))
-        .manage(managed_properties)
+        .manage(managed_properties);
+
+    #[cfg(feature = "automation")]
+    let builder = builder
+        .plugin(tauri_plugin_wdio::init())
+        .plugin(tauri_plugin_wdio_webdriver::init());
+
+    builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
         .setup(move |app| {

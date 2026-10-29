@@ -59,12 +59,17 @@ export function SearchPanel(props: SearchPanelProps): JSX.Element {
     const counterText = (): string => `${status().current ?? 0} / ${status().total}`;
 
     return (
-        <section class={styles.panel} aria-label={t("search.title")}>
+        <section
+            class={styles.panel}
+            aria-label={t("search.title")}
+            data-testid="search-panel"
+        >
             <div class={styles.searchField}>
                 <input
                     ref={searchInput}
                     class={`${styles.input} ${styles.searchInput}`}
                     type="text"
+                    data-testid="search-input"
                     value={query().search}
                     aria-label={t("search.searchFor")}
                     placeholder={t("search.searchFor")}
@@ -84,18 +89,21 @@ export function SearchPanel(props: SearchPanelProps): JSX.Element {
 
             <div class={styles.options}>
                 <ToggleSwitch
+                    testId="search-match-case"
                     label={t("search.matchCase")}
                     checked={query().caseSensitive}
                     size="small"
                     onChange={(checked) => updateQuery({ caseSensitive: checked })}
                 />
                 <ToggleSwitch
+                    testId="search-whole-word"
                     label={t("search.wholeWord")}
                     checked={query().wholeWord}
                     size="small"
                     onChange={(checked) => updateQuery({ wholeWord: checked })}
                 />
                 <ToggleSwitch
+                    testId="search-regexp"
                     label={t("search.regexp")}
                     checked={query().regexp}
                     size="small"
@@ -128,6 +136,7 @@ export function SearchPanel(props: SearchPanelProps): JSX.Element {
             <input
                 class={styles.input}
                 type="text"
+                data-testid="replace-input"
                 value={query().replacement}
                 aria-label={t("search.replaceWith")}
                 placeholder={t("search.replaceWith")}

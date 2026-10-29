@@ -27,6 +27,7 @@ export function Sidebar(props: SidebarProps): JSX.Element {
             <div class={styles.sidebarSlot} classList={{ [styles.hidden]: !visible() }}>
                 <aside
                     class={styles.sidebar}
+                    data-testid="app-sidebar"
                     classList={{ [styles.disabled]: props.disabled }}
                     aria-disabled={props.disabled}
                     aria-hidden={!visible()}

@@ -15,6 +15,7 @@ export function SpinnerPanel(props: SpinnerPanelProps): JSX.Element {
     return (
         <div
             class={styles.spinnerOverlay}
+            data-testid="spinner-overlay"
             classList={{ [styles.visible]: props.visible }}
             aria-hidden={!props.visible}
             aria-live="polite"

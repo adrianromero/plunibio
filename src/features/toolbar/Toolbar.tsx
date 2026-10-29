@@ -48,7 +48,7 @@ export function Toolbar(props: ToolbarProps) {
         showHiddenFiles() ? "show" : "hide";
 
     return (
-        <header class={styles.editorToolbar}>
+        <header class={styles.editorToolbar} data-testid="main-toolbar">
             <div class={styles.toolbarLeft}>
                 <FileNavigation />
                 <FileBreadcrumb />
@@ -67,6 +67,7 @@ export function Toolbar(props: ToolbarProps) {
                 <Show when={toggleSidebar()}>
                     <button
                         class={`stdButton mainbar ${sidebarVisible() ? "selected" : ""}`}
+                        data-testid="sidebar-toggle"
                         type="button"
                         aria-label={t(
                             sidebarVisible() ? "toolbar.hideSidebar" : "toolbar.showSidebar"

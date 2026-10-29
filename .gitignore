@@ -7,3 +7,5 @@ website/_site
 website/.jekyll-cache
 website/.jekyll-metadata
 website/.sass-cache
+logs/
+automation/output/

@@ -13,6 +13,7 @@ export type ToggleSwitchProps = {
     checked: boolean;
     size?: ToggleSwitchSize;
     disabled?: boolean;
+    testId?: string;
     onChange: (checked: boolean) => void;
 };
 
@@ -22,6 +23,7 @@ export function ToggleSwitch(props: ToggleSwitchProps): JSX.Element {
     return (
         <label
             class={styles.root}
+            data-testid={props.testId}
             classList={{
                 [styles.small]: size() === "small",
                 [styles.medium]: size() === "medium",

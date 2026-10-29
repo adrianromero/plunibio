@@ -1,0 +1,6 @@
+{
+  "identifier": "automation",
+  "description": "WebDriver bridge enabled only by tauri.automation.conf.json",
+  "windows": ["main"],
+  "permissions": ["wdio:default"]
+}
