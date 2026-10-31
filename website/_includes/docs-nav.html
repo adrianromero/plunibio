@@ -1,0 +1,18 @@
+{% assign docs_data = site.data.docs %}
+{% assign docs_labels = docs_data.labels[page.lang] %}
+<nav class="docs-nav" aria-label="{{ docs_labels.contents }}">
+  <a class="docs-nav-home" {% if page.layout == "docs-index" %}aria-current="page"{% endif %} href="{{ '/' | append: page.lang | append: '/docs/' | relative_url }}">
+    {{ docs_labels.docs_home }}
+  </a>
+  {% assign current_group = "" %}
+  {% for chapter in docs_data.chapters %}
+    {% if chapter.group != current_group %}
+      {% assign current_group = chapter.group %}
+      <p class="docs-nav-group">{{ docs_labels.groups[current_group] }}</p>
+    {% endif %}
+    {% assign localized_chapter = chapter[page.lang] %}
+    <a {% if chapter.docs_key == page.docs_key %}aria-current="page"{% endif %} href="{{ localized_chapter.url | relative_url }}">
+      {{ localized_chapter.title }}
+    </a>
+  {% endfor %}
+</nav>

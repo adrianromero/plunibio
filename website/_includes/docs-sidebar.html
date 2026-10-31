@@ -1,0 +1,16 @@
+{% assign docs_data = site.data.docs %}
+{% assign docs_labels = docs_data.labels[page.lang] %}
+<aside class="docs-sidebar">
+  <div class="docs-nav-desktop">
+    {% include docs-nav.html %}
+  </div>
+  <details class="docs-nav-mobile">
+    <summary>
+      <span>{{ docs_labels.contents }}</span>
+      {% if page.docs_key %}<strong>{{ page.title }}</strong>{% endif %}
+    </summary>
+    <div class="docs-nav-mobile-content">
+      {% include docs-nav.html %}
+    </div>
+  </details>
+</aside>

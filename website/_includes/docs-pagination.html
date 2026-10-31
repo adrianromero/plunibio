@@ -1,0 +1,34 @@
+{% assign docs_data = site.data.docs %}
+{% assign docs_labels = docs_data.labels[page.lang] %}
+{% assign previous_chapter = nil %}
+{% assign next_chapter = nil %}
+{% assign current_found = false %}
+{% for chapter in docs_data.chapters %}
+  {% if current_found %}
+    {% assign next_chapter = chapter %}
+    {% break %}
+  {% endif %}
+  {% if chapter.docs_key == page.docs_key %}
+    {% assign current_found = true %}
+  {% else %}
+    {% assign previous_chapter = chapter %}
+  {% endif %}
+{% endfor %}
+<nav class="docs-pagination" aria-label="{{ docs_labels.pagination }}">
+  {% if previous_chapter %}
+    {% assign previous_localized = previous_chapter[page.lang] %}
+    <a class="docs-pagination-previous" href="{{ previous_localized.url | relative_url }}">
+      <span>{{ docs_labels.previous }}</span>
+      <strong>{{ previous_localized.title }}</strong>
+    </a>
+  {% else %}
+    <span></span>
+  {% endif %}
+  {% if next_chapter %}
+    {% assign next_localized = next_chapter[page.lang] %}
+    <a class="docs-pagination-next" href="{{ next_localized.url | relative_url }}">
+      <span>{{ docs_labels.next }}</span>
+      <strong>{{ next_localized.title }}</strong>
+    </a>
+  {% endif %}
+</nav>

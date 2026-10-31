@@ -22,7 +22,7 @@
   <body class="page-{{ page.section | default: 'home' }}">
     {% assign t = site.data.translations[page.lang] %}
     {% include header.html t=t %}
-    <main id="main-content">{{ content }}</main>
+    <main id="main-content" tabindex="-1">{{ content }}</main>
     {% include footer.html t=t %}
   </body>
 </html>

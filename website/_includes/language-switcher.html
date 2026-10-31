@@ -1,4 +1,4 @@
-<div class="language-switcher" aria-label="{{ include.t.language }}">
+<nav class="language-switcher" aria-label="{{ include.t.language }}">
   {% assign translated_pages = site.pages | where: "translation_key", page.translation_key %}
   {% for translated_page in translated_pages %}
     {% if translated_page.lang and translated_page.lang != page.lang %}
@@ -7,4 +7,4 @@
       </a>
     {% endif %}
   {% endfor %}
-</div>
+</nav>

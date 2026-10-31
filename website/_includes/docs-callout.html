@@ -1,0 +1,7 @@
+{% assign docs_labels = site.data.docs.labels[page.lang] %}
+{% assign callout_type = include.type | default: "note" %}
+{% assign callout_title = include.title | default: docs_labels[callout_type] %}
+<aside class="docs-callout docs-callout-{{ callout_type }}" role="note">
+  <p class="docs-callout-title">{{ callout_title }}</p>
+  <div class="docs-callout-content">{{ include.content | markdownify }}</div>
+</aside>

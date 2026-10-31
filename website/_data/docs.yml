@@ -1,0 +1,164 @@
+labels:
+  en:
+    manual: User manual
+    contents: Documentation contents
+    pagination: Chapter navigation
+    chapters: Browse the manual
+    docs_home: Documentation home
+    previous: Previous
+    next: Next
+    note: Note
+    warning: Warning
+    tip: Tip
+    groups:
+      start: Get started
+      editing: Edit content
+      reference: Reference and help
+  es:
+    manual: Manual de usuario
+    contents: Contenido de la documentación
+    pagination: Navegación entre capítulos
+    chapters: Consulta el manual
+    docs_home: Portada de la documentación
+    previous: Anterior
+    next: Siguiente
+    note: Nota
+    warning: Advertencia
+    tip: Consejo
+    groups:
+      start: Primeros pasos
+      editing: Editar contenido
+      reference: Referencia y ayuda
+
+chapters:
+  - docs_key: getting-started
+    order: 1
+    group: start
+    en:
+      title: Getting started
+      url: /en/docs/getting-started/
+      description: Open a workspace, recognize the interface, and make your first change.
+    es:
+      title: Primeros pasos
+      url: /es/docs/primeros-pasos/
+      description: Abre un espacio, reconoce la interfaz y realiza tu primer cambio.
+
+  - docs_key: workspaces-files
+    order: 2
+    group: start
+    en:
+      title: Workspaces and files
+      url: /en/docs/workspaces-and-files/
+      description: Navigate local folders and files, save changes, and reload from disk.
+    es:
+      title: Espacios y archivos
+      url: /es/docs/espacios-y-archivos/
+      description: Recorre carpetas y archivos locales, guarda cambios y recarga desde el disco.
+
+  - docs_key: edit-markdown
+    order: 3
+    group: editing
+    en:
+      title: Edit Markdown
+      url: /en/docs/edit-markdown/
+      description: Format text, work with lists, and edit document properties.
+    es:
+      title: Editar Markdown
+      url: /es/docs/editar-markdown/
+      description: Da formato al texto, trabaja con listas y edita las propiedades del documento.
+
+  - docs_key: links-images
+    order: 4
+    group: editing
+    en:
+      title: Links and images
+      url: /en/docs/links-and-images/
+      description: Create links and insert images by selecting, pasting, or dragging files.
+    es:
+      title: Enlaces e imágenes
+      url: /es/docs/enlaces-e-imagenes/
+      description: Crea enlaces e inserta imágenes seleccionando, pegando o arrastrando archivos.
+
+  - docs_key: tables-code-advanced
+    order: 5
+    group: editing
+    en:
+      title: Tables, code, and advanced content
+      url: /en/docs/tables-code-and-advanced-content/
+      description: Add tables, code blocks, Mermaid diagrams, and mathematical formulas.
+    es:
+      title: Tablas, código y contenido avanzado
+      url: /es/docs/tablas-codigo-y-contenido-avanzado/
+      description: Añade tablas, bloques de código, diagramas Mermaid y fórmulas matemáticas.
+
+  - docs_key: find-replace
+    order: 6
+    group: editing
+    en:
+      title: Find and replace
+      url: /en/docs/find-and-replace/
+      description: Find text and replace individual matches or every result.
+    es:
+      title: Buscar y reemplazar
+      url: /es/docs/buscar-y-reemplazar/
+      description: Busca texto y reemplaza coincidencias individuales o todos los resultados.
+
+  - docs_key: edit-text-code
+    order: 7
+    group: editing
+    en:
+      title: Edit text and code
+      url: /en/docs/edit-text-and-code/
+      description: Edit plain text and source code with language-aware tools.
+    es:
+      title: Editar texto y código
+      url: /es/docs/editar-texto-y-codigo/
+      description: Edita texto sin formato y código fuente con herramientas adaptadas al lenguaje.
+
+  - docs_key: view-edit-images
+    order: 8
+    group: editing
+    en:
+      title: View and edit images
+      url: /en/docs/view-and-edit-images/
+      description: Zoom, rotate, flip, adjust, and save supported image formats.
+    es:
+      title: Ver y editar imágenes
+      url: /es/docs/ver-y-editar-imagenes/
+      description: Amplía, gira, voltea, ajusta y guarda los formatos de imagen compatibles.
+
+  - docs_key: customize
+    order: 9
+    group: reference
+    en:
+      title: Customize Plunibio
+      url: /en/docs/customize-plunibio/
+      description: Choose the theme, language, Markdown typography, and file visibility.
+    es:
+      title: Personalizar Plunibio
+      url: /es/docs/personalizar-plunibio/
+      description: Elige el tema, el idioma, la tipografía Markdown y la visibilidad de archivos.
+
+  - docs_key: command-line
+    order: 10
+    group: reference
+    en:
+      title: Command line
+      url: /en/docs/command-line/
+      description: Start Plunibio with a workspace, file, or custom window size.
+    es:
+      title: Línea de comandos
+      url: /es/docs/linea-de-comandos/
+      description: Inicia Plunibio con un espacio, un archivo o un tamaño de ventana personalizado.
+
+  - docs_key: shortcuts-troubleshooting
+    order: 11
+    group: reference
+    en:
+      title: Shortcuts and troubleshooting
+      url: /en/docs/shortcuts-and-troubleshooting/
+      description: Look up verified keyboard shortcuts and solve common problems.
+    es:
+      title: Atajos y solución de problemas
+      url: /es/docs/atajos-y-solucion-de-problemas/
+      description: Consulta atajos de teclado verificados y resuelve problemas habituales.
