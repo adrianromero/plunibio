@@ -1,9 +1,22 @@
+{% assign docs_image = nil %}
+{% if include.id %}
+  {% assign docs_image_matches = site.data.docs_images.images | where: "id", include.id %}
+  {% assign docs_image = docs_image_matches | first %}
+{% endif %}
+{% assign figure_src = include.src | default: docs_image.path %}
+{% assign figure_width = include.width | default: docs_image.width %}
+{% assign figure_height = include.height | default: docs_image.height %}
+{% if include.alt != nil %}
+  {% assign figure_alt = include.alt %}
+{% else %}
+  {% assign figure_alt = docs_image.alt | default: "" %}
+{% endif %}
 <figure class="docs-figure">
   <img
-    src="{{ include.src | relative_url }}"
-    alt="{{ include.alt | escape }}"
-    {% if include.width %}width="{{ include.width }}"{% endif %}
-    {% if include.height %}height="{{ include.height }}"{% endif %}
+    src="{{ figure_src | relative_url }}"
+    alt="{{ figure_alt | escape }}"
+    {% if figure_width %}width="{{ figure_width }}"{% endif %}
+    {% if figure_height %}height="{{ figure_height }}"{% endif %}
     loading="lazy"
   >
   {% if include.caption %}<figcaption>{{ include.caption }}</figcaption>{% endif %}
