@@ -1,0 +1,7 @@
+{
+  "districts": [
+    { "name": "Harbour", "status": "active" },
+    { "name": "Gardens", "status": "active" },
+    { "name": "Observatory", "status": "inactive" }
+  ]
+}

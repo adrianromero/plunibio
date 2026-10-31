@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-labelledby="title description">
+  <title id="title">Green documentation sample</title>
+  <desc id="description">A green card labelled Source A</desc>
+  <rect width="640" height="360" rx="24" fill="#dcece2"/>
+  <circle cx="126" cy="180" r="64" fill="#28634b"/>
+  <text x="224" y="196" fill="#174532" font-family="sans-serif" font-size="48" font-weight="700">Source A</text>
+</svg>
