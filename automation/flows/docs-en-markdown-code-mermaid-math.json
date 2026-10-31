@@ -1,0 +1,253 @@
+{
+    "name": "Docs EN: code, Mermaid, and math",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "markdown/editor-lab.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/tables-code-advanced",
+    "settleMs": 700,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block",
+                "index": 0
+            },
+            "block": "center"
+        },
+        {
+            "action": "hover",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block",
+                "index": 0
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .language-button",
+                "index": 0
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .language-picker .search-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .language-picker .search-input"
+            },
+            "text": "py"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .language-list-item[data-language='Python']"
+            },
+            "state": "visible"
+        },
+        { "action": "capture", "scope": "viewport", "name": "code-language-picker" },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .language-list-item[data-language='Python']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//*[contains(concat(' ', normalize-space(@class), ' '), ' milkdown-code-block ')]//button[contains(concat(' ', normalize-space(@class), ' '), ' language-button ') and contains(normalize-space(.), 'Python')]",
+                "index": 0
+            },
+            "state": "existing"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .copy-button",
+                "index": 0
+            }
+        },
+        {
+            "action": "waitClipboard",
+            "text": "const districts = [\"Harbour\", \"Gardens\", \"Observatory\"];\nconst visibleDistricts = districts.filter((district) => district.length > 7);"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .cm-content",
+                "index": 0
+            }
+        },
+        { "action": "keys", "keys": ["Control", "End"] },
+        { "action": "keys", "keys": ["Enter", "# Edited for the documentation flow"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .cm-content",
+                "index": 0
+            },
+            "text": "Edited for the documentation flow"
+        },
+        { "action": "capture", "scope": "element", "target": { "using": "css", "value": "[data-testid='markdown-editor'] .milkdown-code-block", "index": 0 }, "name": "code-block-edited" },
+        { "action": "keys", "keys": ["Control", "s"] },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "missing"
+        },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" } },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" } },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//*[contains(concat(' ', normalize-space(@class), ' '), ' milkdown-code-block ')]//button[contains(concat(' ', normalize-space(@class), ' '), ' language-button ') and contains(normalize-space(.), 'Python')]",
+                "index": 0
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .cm-content",
+                "index": 0
+            },
+            "text": "Edited for the documentation flow"
+        },
+
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block",
+                "index": 1
+            },
+            "block": "center"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .preview svg"
+            },
+            "state": "visible",
+            "timeoutMs": 20000
+        },
+        { "action": "capture", "scope": "element", "target": { "using": "css", "value": "[data-testid='markdown-editor'] .milkdown-code-block", "index": 1 }, "name": "mermaid-preview" },
+        {
+            "action": "hover",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block",
+                "index": 1
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .preview-toggle-button",
+                "index": 0
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .codemirror-host:not(.hidden)",
+                "index": 1
+            },
+            "state": "visible"
+        },
+        { "action": "capture", "scope": "element", "target": { "using": "css", "value": "[data-testid='markdown-editor'] .milkdown-code-block", "index": 1 }, "name": "mermaid-edit-preview" },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .preview-toggle-button",
+                "index": 0
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .codemirror-host.hidden",
+                "index": 0
+            },
+            "state": "existing"
+        },
+
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "block": "center"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline'] .katex"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block .preview .katex-display"
+            },
+            "state": "visible"
+        },
+        { "action": "capture", "scope": "viewport", "name": "inline-block-math" }
+    ]
+}

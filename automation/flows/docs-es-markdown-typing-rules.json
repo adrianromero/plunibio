@@ -1,0 +1,270 @@
+{
+    "name": "Docs ES: reglas de escritura Markdown",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "markdown/typing-rules.es.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/edit-markdown",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "# ", "Título creado al escribir"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > h1:last-child"
+            },
+            "state": "existing",
+            "text": "Título creado al escribir"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-heading" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > h1:last-child"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "> ", "Cita creada al escribir"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror blockquote"
+            },
+            "state": "existing",
+            "text": "Cita creada al escribir"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-quote" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror blockquote"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "- ", "Viñeta creada al escribir"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ul"
+            },
+            "state": "existing",
+            "text": "Viñeta creada al escribir"
+        },
+        { "action": "keys", "keys": ["Enter", "[ ] ", "Tarea creada al escribir"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-list-item-block .label.unchecked"
+            },
+            "state": "existing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-lists" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ul"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "1", "Decimal", " "] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ol"
+            },
+            "state": "existing"
+        },
+        { "action": "keys", "keys": ["Elemento numerado creado al escribir"] },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ol"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "``` "] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block"
+            },
+            "state": "visible"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-code-fence" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "---"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror hr"
+            },
+            "state": "existing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-divider" }
+    ]
+}

@@ -1,0 +1,110 @@
+{
+    "name": "Docs EN: workspaces and files",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "read-only",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "README.en.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/workspaces-and-files",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "folder-view" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "workspace-root"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='notes']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "file-breadcrumb" },
+            "state": "visible",
+            "text": "notes"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='notes/field-notes.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "markdown-editor" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "file-breadcrumb" },
+            "state": "visible",
+            "text": "field-notes.md"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "nested-file"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='open-workspace']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "workspace-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Computer locations" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "workspace-directory" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "workspace-dialog" },
+            "name": "workspace-selector"
+        }
+    ]
+}

@@ -1,0 +1,150 @@
+{
+    "name": "Docs EN: Markdown links and images",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "README.en.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/links-and-images",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror a[href='routes/lantern-walk.md']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror a[href='routes/lantern-walk.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Link actions" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "link-actions"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Edit link" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Link address" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "link-address-edit"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Link actions'] button[aria-label='Cancel']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Link address" },
+            "state": "missing"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "block": "center"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Image actions" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "image-actions"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Edit link" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Link address" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "image-address-edit"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Image actions'] button[aria-label='Cancel']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Link address" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Image actions'] button[title='assets/atlas-de-lumina.png']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "image-view" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "spinner-overlay" },
+            "state": "hidden"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "linked-image-opened"
+        }
+    ]
+}

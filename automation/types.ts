@@ -8,13 +8,21 @@ export type Target = {
 
 export type FlowApp = {
     basePath: string;
+    workspaceMode: "read-only" | "temporary-copy";
+    preferences?: {
+        locale?: "en" | "es" | "ca" | "gl" | "eu";
+        theme?: "light" | "dark";
+        typography?: "sans-serif" | "serif" | "modern" | "reading";
+        sidebarVisible?: boolean;
+        showHiddenFiles?: boolean;
+    };
     file?: string;
     width?: number;
     height?: number;
 };
 
 export type ClickStep = {
-    action: "click" | "doubleClick" | "contextClick";
+    action: "click" | "domClick" | "doubleClick" | "contextClick";
     target: Target;
     x?: number;
     y?: number;
@@ -34,8 +42,35 @@ export type KeyStep = {
 };
 
 export type FocusStep = {
-    action: "focus" | "hover" | "clear";
+    action: "focus" | "hover" | "pointerOver" | "clear";
     target: Target;
+};
+
+export type CaretStep = {
+    action: "caret";
+    target: Target;
+    position: "start" | "end";
+};
+
+export type PointerMoveStep = {
+    action: "pointerMove";
+    target: Target;
+    xRatio?: number;
+    yRatio?: number;
+};
+
+export type PointerDragStep = {
+    action: "pointerDrag";
+    target: Target;
+    x: number;
+    y: number;
+    durationMs?: number;
+};
+
+export type SetRangeStep = {
+    action: "setRange";
+    target: Target;
+    value: number;
 };
 
 export type ScrollStep =
@@ -77,6 +112,22 @@ export type WaitStep =
           text?: string;
       };
 
+export type WaitSelectionStep = {
+    action: "waitSelection";
+    target: Target;
+    timeoutMs?: number;
+};
+
+export type WaitClipboardStep = {
+    action: "waitClipboard";
+    text: string;
+    timeoutMs?: number;
+};
+
+export type RefreshStep = {
+    action: "refresh";
+};
+
 export type CaptureStep = {
     action: "capture";
     name: string;
@@ -91,10 +142,17 @@ export type FlowStep =
     | TypeStep
     | KeyStep
     | FocusStep
+    | CaretStep
+    | PointerMoveStep
+    | PointerDragStep
+    | SetRangeStep
     | ScrollStep
     | SelectStep
     | DragStep
     | WaitStep
+    | WaitSelectionStep
+    | WaitClipboardStep
+    | RefreshStep
     | CaptureStep;
 
 export type AutomationFlow = {

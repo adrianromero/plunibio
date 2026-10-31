@@ -8,7 +8,9 @@ if (!flowFilename) {
     throw new Error("PLUNIBIO_AUTOMATION_FLOW is not set");
 }
 const flow = await loadFlow(flowFilename);
-const basePath = resolve(projectRoot, flow.app.basePath);
+const basePath = process.env.PLUNIBIO_AUTOMATION_BASE_PATH
+    ? resolve(process.env.PLUNIBIO_AUTOMATION_BASE_PATH)
+    : resolve(projectRoot, flow.app.basePath);
 const application = resolve(projectRoot, "src-tauri/target/debug/plunibio");
 const appArgs = [
     "--base-path",

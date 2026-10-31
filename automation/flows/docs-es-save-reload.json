@@ -1,0 +1,175 @@
+{
+    "name": "Docs ES: guardar y recargar",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "notes/notas-de-campo.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/workspaces-and-files",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "Cambio guardado para la guía."]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']:not(:disabled)"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "unsaved-indicator"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "¿Recargar el archivo desde el disco?"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "name": "reload-confirmation"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:last-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "Este cambio se descartará."]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "¿Recargar el archivo y descartar los cambios sin guardar?"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "name": "reload-discard-changes"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[contains(concat(' ', normalize-space(@class), ' '), ' ProseMirror ') and contains(., 'Este cambio se descartará.')]"
+            },
+            "state": "missing"
+        }
+    ]
+}

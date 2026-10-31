@@ -1,0 +1,59 @@
+{
+    "name": "Docs ES: primeros pasos",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "read-only",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "README.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/getting-started",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "markdown-editor" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] h1"
+            },
+            "state": "visible",
+            "text": "Atlas de Lúmina"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "main-interface"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "toolbar-menu" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "general-menu"
+        }
+    ]
+}

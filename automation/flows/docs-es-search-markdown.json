@@ -1,0 +1,125 @@
+{
+    "name": "Docs ES: buscar y reemplazar en Markdown",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "markdown/search-lab.es.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/search-replace",
+    "settleMs": 500,
+    "steps": [
+        { "action": "wait", "target": { "using": "css", "value": "html[lang='es']" }, "state": "existing" },
+        { "action": "wait", "target": { "using": "testId", "value": "markdown-editor" }, "state": "visible" },
+        { "action": "keys", "keys": ["Control", "f"] },
+        { "action": "wait", "target": { "using": "testId", "value": "search-panel" }, "state": "visible" },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "lumen",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "0 / 4"
+        },
+        { "action": "keys", "keys": ["Enter"] },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "1 / 4"
+        },
+        { "action": "keys", "keys": ["Shift", "Enter"] },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "4 / 4"
+        },
+        { "action": "capture", "scope": "viewport", "name": "markdown-search" },
+
+        { "action": "click", "target": { "using": "testId", "value": "search-match-case" } },
+        { "action": "click", "target": { "using": "testId", "value": "search-whole-word" } },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "0 / 2"
+        },
+        { "action": "capture", "scope": "viewport", "name": "markdown-search-options" },
+
+        { "action": "click", "target": { "using": "testId", "value": "search-regexp" } },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "(",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='search-input'][aria-invalid='true']" },
+            "state": "visible"
+        },
+        { "action": "wait", "target": { "using": "text", "value": "Expresión no válida" }, "state": "visible" },
+        { "action": "capture", "scope": "element", "target": { "using": "testId", "value": "search-panel" }, "name": "invalid-regexp" },
+
+        { "action": "click", "target": { "using": "testId", "value": "search-match-case" } },
+        { "action": "click", "target": { "using": "testId", "value": "search-whole-word" } },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "lumen(s)?",
+            "replace": true
+        },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "replace-input" },
+            "text": "faro",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "4 / 4"
+        },
+        { "action": "click", "target": { "using": "text", "value": "Reemplazar todo" } },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "faro con mayúscula"
+        },
+        { "action": "capture", "scope": "viewport", "name": "markdown-replace-all" },
+        { "action": "keys", "keys": ["Control", "s"] },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "missing" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "message-dialog" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" } },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "faro con mayúscula"
+        }
+    ]
+}
+

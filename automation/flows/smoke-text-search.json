@@ -2,6 +2,7 @@
     "name": "Atlas de Lúmina: teclado y búsqueda de texto",
     "app": {
         "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "read-only",
         "file": "data/distritos.json",
         "width": 1024,
         "height": 768

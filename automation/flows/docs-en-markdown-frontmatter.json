@@ -1,0 +1,116 @@
+{
+    "name": "Docs EN: Markdown properties",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "README.en.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/edit-markdown",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "frontmatter-panel" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "state": "visible",
+            "text": "title: Atlas of Lúmina"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "frontmatter-panel"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "reviewed: true"]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']:not(:disabled)"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "Reload the file from disk?"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "state": "visible",
+            "text": "reviewed: true"
+        }
+    ]
+}

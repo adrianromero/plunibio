@@ -1,0 +1,117 @@
+{
+    "name": "Docs EN: search and replace in text and code",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "code/search-lab.json",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/search-replace",
+    "settleMs": 500,
+    "steps": [
+        { "action": "wait", "target": { "using": "css", "value": "html[lang='en']" }, "state": "existing" },
+        { "action": "wait", "target": { "using": "testId", "value": "text-editor" }, "state": "visible" },
+        { "action": "keys", "keys": ["Control", "f"] },
+        { "action": "wait", "target": { "using": "testId", "value": "search-panel" }, "state": "visible" },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "active",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "0 / 3"
+        },
+        { "action": "keys", "keys": ["Enter"] },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "1 / 3"
+        },
+        { "action": "keys", "keys": ["Shift", "Enter"] },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "3 / 3"
+        },
+        { "action": "capture", "scope": "viewport", "name": "text-search" },
+
+        { "action": "click", "target": { "using": "testId", "value": "search-regexp" } },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "[",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='search-input'][aria-invalid='true']" },
+            "state": "visible"
+        },
+        { "action": "wait", "target": { "using": "text", "value": "Invalid expression" }, "state": "visible" },
+        { "action": "click", "target": { "using": "testId", "value": "search-regexp" } },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "search-input" },
+            "text": "active",
+            "replace": true
+        },
+        { "action": "click", "target": { "using": "testId", "value": "search-whole-word" } },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "/ 2"
+        },
+        {
+            "action": "type",
+            "target": { "using": "testId", "value": "replace-input" },
+            "text": "enabled",
+            "replace": true
+        },
+        { "action": "click", "target": { "using": "text", "value": "Replace all" } },
+        {
+            "action": "wait",
+            "target": { "using": "xpath", "value": "//*[@data-testid='search-input']/following-sibling::span" },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='text-editor'] .cm-content" },
+            "state": "visible",
+            "text": "enabled"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='text-editor'] .cm-content" },
+            "state": "visible",
+            "text": "inactive"
+        },
+        { "action": "capture", "scope": "viewport", "name": "text-replace-all" },
+        { "action": "keys", "keys": ["Control", "s"] },
+        { "action": "wait", "target": { "using": "aria", "value": "Unsaved changes" }, "state": "missing" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "message-dialog" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" } },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='text-editor'] .cm-content" },
+            "state": "visible",
+            "text": "enabled"
+        }
+    ]
+}

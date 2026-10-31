@@ -1,0 +1,150 @@
+{
+    "name": "Docs ES: enlaces e imágenes Markdown",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "README.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/links-and-images",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror a[href='routes/paseo-faroles.md']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror a[href='routes/paseo-faroles.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Acciones del enlace" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "link-actions"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Editar enlace" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Dirección del enlace" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "link-address-edit"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones del enlace'] button[aria-label='Cancelar']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Dirección del enlace" },
+            "state": "missing"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "block": "center"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Acciones de la imagen" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "image-actions"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Editar enlace" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Dirección del enlace" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "image-address-edit"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la imagen'] button[aria-label='Cancelar']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Dirección del enlace" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la imagen'] button[title='assets/atlas-de-lumina.png']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "image-view" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "spinner-overlay" },
+            "state": "hidden"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "linked-image-opened"
+        }
+    ]
+}

@@ -20,6 +20,32 @@ do not contain or start the WebDriver server.
 Every action locates UI by a semantic target. Prefer `aria`, then `text`, then `testId`; use raw CSS
 or XPath only when the interface has no stable accessible name.
 
+Every flow must also declare how it treats its workspace:
+
+- `"workspaceMode": "read-only"` opens `basePath` directly and is allowed only when the flow never
+  saves, imports, transforms, or otherwise changes a file.
+- `"workspaceMode": "temporary-copy"` copies the complete `basePath` to a unique directory under
+  the operating system temporary directory before Tauri starts. The copy is removed after WebdriverIO
+  exits, including after a failed flow.
+
+Use `temporary-copy` for every mutable documentation flow. The original example path is never passed
+to Plunibio in that mode.
+
+Documentation flows may set deterministic application preferences before their first step. The runner
+writes these values to the WebView storage and refreshes the frontend once:
+
+```json
+"preferences": {
+  "locale": "es",
+  "theme": "light",
+  "typography": "sans-serif",
+  "sidebarVisible": true,
+  "showHiddenFiles": false
+}
+```
+
+Only include preferences that matter to the capture. Supported values match the application settings.
+
 ```json
 { "using": "aria", "value": "Formato" }
 { "using": "text", "value": "Atlas de Lúmina" }
@@ -60,8 +86,18 @@ for flows that must run in several interface languages.
 
 ## Actions
 
-Supported actions are `click`, `doubleClick`, `contextClick`, `type`, `keys`, `focus`, `hover`,
-`clear`, `scroll`, `scrollIntoView`, `select`, `drag`, `pause`, `wait`, and `capture`.
+Supported actions are `click`, `domClick`, `doubleClick`, `contextClick`, `type`, `keys`, `focus`, `hover`,
+`pointerOver`, `pointerMove`, `clear`, `caret`, `scroll`, `scrollIntoView`, `select`, `drag`,
+`pointerDrag`, `setRange`, `pause`, `wait`, `waitSelection`, `waitClipboard`, `refresh`, and `capture`. `pointerOver` dispatches the standard pointer event
+used by hover-only application controls when WebKitGTK's WebDriver `moveTo` does not emit it.
+`pointerMove` accepts `xRatio` and `yRatio` within a target, which is useful for table boundaries;
+`waitSelection` confirms that the browser selection has moved inside a semantic target. `waitClipboard`
+compares clipboard text after a user-visible copy action without printing its contents.
+`domClick` is reserved for existing hover-only controls that WebKitGTK locates but reports as hidden
+because its WebDriver implementation does not apply CSS `:hover` after `moveTo`.
+`pointerDrag` performs a real mouse gesture from the centre of one target by an `x`/`y` offset;
+`setRange` changes a range input and dispatches its normal `input` event. `refresh` reloads the
+complete frontend and is intended for verifying persisted preferences.
 
 `capture` supports:
 
@@ -73,7 +109,10 @@ Supported actions are `click`, `doubleClick`, `contextClick`, `type`, `keys`, `f
 
 Text editing is performed with real WebDriver keyboard events. A step can focus a ProseMirror or
 CodeMirror editor and subsequent `keys` steps can use shortcuts such as `Control+a`, arrow keys,
-Backspace, Enter, and Tab.
+Backspace, Enter, and Tab. For deterministic contenteditable insertion, `caret` places the cursor
+at the `start` or `end` of a semantic target before a `keys` step. Use the WebDriver key name
+`Decimal` when a flow must type a full stop: WebKitGTK drops a literal `.` from synthesized keyboard
+input on the documentation machine.
 
 ## Flow example
 
@@ -82,6 +121,7 @@ Backspace, Enter, and Tab.
   "name": "Search in a JSON file",
   "app": {
     "basePath": "examples/atlas-de-lumina",
+    "workspaceMode": "read-only",
     "file": "data/distritos.json",
     "width": 1024,
     "height": 768
@@ -99,5 +139,6 @@ Backspace, Enter, and Tab.
 }
 ```
 
-Flows should copy editable fixtures to a temporary directory when they save or transform files. A
-read-only documentation flow may use `examples/atlas-de-lumina` directly.
+The runner copies editable fixtures automatically when `workspaceMode` is `temporary-copy`. A
+read-only documentation flow may use `examples/atlas-de-lumina` directly. Do not implement ad hoc
+copy or cleanup steps inside a flow.

@@ -13,7 +13,29 @@ type ExecutionContext = {
     settleMs: number;
 };
 
+type FlowPreferences = NonNullable<AutomationFlow["app"]["preferences"]>;
+
 const execFileAsync = promisify(execFile);
+
+async function applyPreferences(preferences: FlowPreferences | undefined): Promise<void> {
+    if (!preferences) return;
+    await browser.execute((values: FlowPreferences) => {
+        const keys: Record<keyof FlowPreferences, string> = {
+            locale: "plunibio.locale",
+            theme: "plunibio.theme",
+            typography: "plunibio.typography",
+            sidebarVisible: "plunibio.sidebarVisible",
+            showHiddenFiles: "plunibio.showHiddenFiles",
+        };
+        for (const [name, value] of Object.entries(values) as [
+            keyof FlowPreferences,
+            FlowPreferences[keyof FlowPreferences],
+        ][]) {
+            window.localStorage.setItem(keys[name], String(value));
+        }
+    }, preferences);
+    await browser.refresh();
+}
 
 function captureFilename(context: ExecutionContext, name: string): string {
     const normalized = name.endsWith(".png") ? name : `${name}.png`;
@@ -55,9 +77,15 @@ async function captureElement(filename: string, target: Target): Promise<void> {
 async function executeStep(step: FlowStep, context: ExecutionContext): Promise<void> {
     switch (step.action) {
         case "click":
+        case "domClick":
         case "doubleClick":
         case "contextClick": {
             const element = await findTarget(step.target);
+            if (step.action === "domClick") {
+                await element.waitForExist({ timeout: context.timeoutMs });
+                await browser.execute((node: HTMLElement) => node.click(), element);
+                break;
+            }
             await element.waitForDisplayed({ timeout: context.timeoutMs });
             if (step.action === "doubleClick") {
                 await element.doubleClick();
@@ -97,8 +125,96 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             await (await findTarget(step.target)).moveTo();
             break;
         }
+        case "pointerOver": {
+            const element = await findTarget(step.target);
+            await element.waitForDisplayed({ timeout: context.timeoutMs });
+            await browser.execute((node: Element) => {
+                node.dispatchEvent(
+                    new PointerEvent("pointerover", {
+                        bubbles: true,
+                        cancelable: true,
+                        composed: true,
+                        pointerType: "mouse",
+                    })
+                );
+            }, element);
+            break;
+        }
+        case "pointerMove": {
+            const element = await findTarget(step.target);
+            await element.waitForDisplayed({ timeout: context.timeoutMs });
+            await browser.execute(
+                (node: Element, xRatio: number, yRatio: number) => {
+                    const rect = node.getBoundingClientRect();
+                    node.dispatchEvent(
+                        new PointerEvent("pointermove", {
+                            bubbles: true,
+                            cancelable: true,
+                            composed: true,
+                            pointerType: "mouse",
+                            clientX: rect.left + rect.width * xRatio,
+                            clientY: rect.top + rect.height * yRatio,
+                        })
+                    );
+                },
+                element,
+                step.xRatio ?? 0.5,
+                step.yRatio ?? 0.5
+            );
+            break;
+        }
+        case "pointerDrag": {
+            const element = await findTarget(step.target);
+            await element.waitForDisplayed({ timeout: context.timeoutMs });
+            await browser
+                .action("pointer", { parameters: { pointerType: "mouse" } })
+                .move({ duration: 0, origin: element, x: 0, y: 0 })
+                .down({ button: 0 })
+                .pause(50)
+                .move({
+                    duration: step.durationMs ?? 400,
+                    origin: "pointer",
+                    x: step.x,
+                    y: step.y,
+                })
+                .up({ button: 0 })
+                .perform();
+            break;
+        }
+        case "setRange": {
+            const element = await findTarget(step.target);
+            await element.waitForExist({ timeout: context.timeoutMs });
+            await browser.execute(
+                (input: HTMLInputElement, value: number) => {
+                    input.value = String(value);
+                    input.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+                },
+                element,
+                step.value
+            );
+            break;
+        }
         case "clear": {
             await (await findTarget(step.target)).clearValue();
+            break;
+        }
+        case "caret": {
+            const element = await findTarget(step.target);
+            await element.waitForDisplayed({ timeout: context.timeoutMs });
+            await browser.execute(
+                (node: Element, position: "start" | "end") => {
+                    const editable = node.closest<HTMLElement>("[contenteditable='true']");
+                    editable?.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(node);
+                    range.collapse(position === "start");
+                    const selection = window.getSelection();
+                    selection?.removeAllRanges();
+                    selection?.addRange(range);
+                },
+                element,
+                step.position
+            );
             break;
         }
         case "scroll": {
@@ -163,6 +279,57 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             }
             break;
         }
+        case "waitSelection": {
+            const element = await findTarget(step.target);
+            const timeout = step.timeoutMs ?? context.timeoutMs;
+            await element.waitForExist({ timeout });
+            await browser.waitUntil(
+                async () =>
+                    await browser.execute((node: Element) => {
+                        const selection = window.getSelection();
+                        return Boolean(selection?.anchorNode && node.contains(selection.anchorNode));
+                    }, element),
+                {
+                    timeout,
+                    timeoutMsg: "Selection did not move inside the requested target",
+                }
+            );
+            break;
+        }
+        case "waitClipboard": {
+            const timeout = step.timeoutMs ?? context.timeoutMs;
+            await browser.waitUntil(
+                async () =>
+                    await browser.execute(async (expected: string) => {
+                        try {
+                            const internals = (
+                                window as Window & {
+                                    __TAURI_INTERNALS__?: {
+                                        invoke<T>(command: string): Promise<T>;
+                                    };
+                                }
+                            ).__TAURI_INTERNALS__;
+                            const actual = internals
+                                ? await internals.invoke<string>(
+                                      "plugin:clipboard-manager|read_text"
+                                  )
+                                : await navigator.clipboard.readText();
+                            return actual === expected;
+                        } catch {
+                            return false;
+                        }
+                    }, step.text),
+                {
+                    timeout,
+                    timeoutMsg: "Clipboard text did not match the requested value",
+                }
+            );
+            break;
+        }
+        case "refresh": {
+            await browser.refresh();
+            break;
+        }
         case "capture": {
             const filename = captureFilename(context, step.name);
             await mkdir(dirname(filename), { recursive: true });
@@ -192,6 +359,7 @@ export async function executeFlow(flow: AutomationFlow, projectRoot: string): Pr
         settleMs: flow.settleMs ?? 300,
     };
     await mkdir(outputDir, { recursive: true });
+    await applyPreferences(flow.app.preferences);
 
     for (const [index, step] of flow.steps.entries()) {
         console.log(`[${index + 1}/${flow.steps.length}] ${step.action}`);

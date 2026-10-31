@@ -1,0 +1,47 @@
+{
+    "name": "Docs ES: ajustar, preajustar, guardar y recargar una imagen",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "images/editor/image-lab.png",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/view-edit-images",
+    "settleMs": 500,
+    "steps": [
+        { "action": "wait", "target": { "using": "css", "value": "html[lang='es']" }, "state": "existing" },
+        { "action": "wait", "target": { "using": "testId", "value": "image-view" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']" } },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='sidebar-panel'][data-tab-key='adjust']" }, "state": "visible" },
+        { "action": "capture", "scope": "viewport", "name": "image-adjust" },
+
+        { "action": "setRange", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='brightness'] input[type='range']" }, "value": 75 },
+        { "action": "setRange", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='contrast'] input[type='range']" }, "value": 130 },
+        { "action": "setRange", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='saturation'] input[type='range']" }, "value": 140 },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='brightness']" }, "state": "visible", "text": "75%" },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='contrast']" }, "state": "visible", "text": "130%" },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='control'][data-control-id='saturation']" }, "state": "visible", "text": "140%" },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "visible" },
+        { "action": "capture", "scope": "viewport", "name": "image-adjusted" },
+
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='reset-filters']" } },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='sidebar-tab'][data-tab-key='presets']" } },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='sidebar-panel'][data-tab-key='presets']" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-preset'][data-preset='vivid']" } },
+        { "action": "capture", "scope": "viewport", "name": "image-presets" },
+        { "action": "keys", "keys": ["Control", "s"] },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "missing" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "message-dialog" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" } },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='image-canvas'][width='1200'][height='500']" }, "state": "existing" }
+    ]
+}

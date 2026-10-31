@@ -1,0 +1,116 @@
+{
+    "name": "Docs ES: propiedades Markdown",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "README.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/edit-markdown",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "frontmatter-panel" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "state": "visible",
+            "text": "title: Atlas de Lúmina"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "frontmatter-panel"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "reviewed: true"]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']:not(:disabled)"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "¿Recargar el archivo desde el disco?"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='frontmatter-editor'] .cm-content[contenteditable='true']"
+            },
+            "state": "visible",
+            "text": "reviewed: true"
+        }
+    ]
+}

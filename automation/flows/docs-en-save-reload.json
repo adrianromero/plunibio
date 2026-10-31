@@ -1,0 +1,175 @@
+{
+    "name": "Docs EN: save and reload",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "notes/field-notes.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/workspaces-and-files",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "Saved change for the guide."]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']:not(:disabled)"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "unsaved-indicator"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "Reload the file from disk?"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "name": "reload-confirmation"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:last-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": ["Enter", "This change will be discarded."]
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Unsaved changes" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible",
+            "text": "Reload the file and discard your unsaved changes?"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "name": "reload-discard-changes"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[contains(concat(' ', normalize-space(@class), ' '), ' ProseMirror ') and contains(., 'This change will be discarded.')]"
+            },
+            "state": "missing"
+        }
+    ]
+}

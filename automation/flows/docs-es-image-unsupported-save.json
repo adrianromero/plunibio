@@ -1,0 +1,30 @@
+{
+    "name": "Docs ES: error al guardar una imagen editada no compatible",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "images/editor/image-lab.bmp",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/view-edit-images",
+    "settleMs": 500,
+    "steps": [
+        { "action": "wait", "target": { "using": "css", "value": "html[lang='es']" }, "state": "existing" },
+        { "action": "wait", "target": { "using": "testId", "value": "image-view" }, "state": "visible" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='rotate-right']" } },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "visible" },
+        { "action": "keys", "keys": ["Control", "s"] },
+        { "action": "wait", "target": { "using": "testId", "value": "message-dialog" }, "state": "visible", "text": "Este formato de imagen se puede visualizar, pero no guardar después de editarlo. Se pueden guardar PNG, JPEG y WebP." },
+        { "action": "capture", "scope": "element", "target": { "using": "testId", "value": "message-dialog" }, "name": "unsupported-image-save" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='message-dialog'] button:last-child" } },
+        { "action": "wait", "target": { "using": "testId", "value": "message-dialog" }, "state": "hidden" },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "visible" }
+    ]
+}

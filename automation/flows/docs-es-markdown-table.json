@@ -1,0 +1,297 @@
+{
+    "name": "Docs ES: tablas Markdown",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "tables/table-lab.es.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/tables-code-advanced",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-table-block table.children"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-overview"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :first-child p"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Tab"] },
+        {
+            "action": "waitSelection",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :nth-child(2)"
+            }
+        },
+        { "action": "keys", "keys": ["Shift", "Tab"] },
+        {
+            "action": "waitSelection",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :first-child"
+            }
+        },
+        { "action": "keys", "keys": ["Enter"] },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": ".milkdown-table-block + p" },
+            "state": "existing"
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3) > :first-child"
+            },
+            "xRatio": 0.5,
+            "yRatio": 0.5
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='col-drag-handle'][data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='row-drag-handle'][data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-handles"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='col-drag-handle']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='col-drag-handle'] .button-group[data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-column-actions"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='col-drag-handle'] .button-group button:nth-child(2)"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :first-child[style*='center']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3) > :first-child"
+            },
+            "xRatio": 0.99,
+            "yRatio": 0.5
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='y-line-drag-handle'][data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-add-column"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='y-line-drag-handle'] .add-button"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :nth-child(6)"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3) > :first-child"
+            },
+            "xRatio": 0.5,
+            "yRatio": 0.99
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='x-line-drag-handle'][data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-add-row"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='x-line-drag-handle'] .add-button"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(8)"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(4) > :first-child"
+            },
+            "xRatio": 0.5,
+            "yRatio": 0.5
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='row-drag-handle']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block [data-role='row-drag-handle'] .button-group[data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "table-row-actions"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='save']:not(:disabled)"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Cambios sin guardar" },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :nth-child(6)"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :first-child[style*='center']"
+            },
+            "state": "existing"
+        }
+    ]
+}

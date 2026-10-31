@@ -1,0 +1,64 @@
+{
+    "name": "Docs ES: formato Markdown",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "read-only",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "README.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/edit-markdown",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='es']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-panel'][data-tab-key='format']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Encabezado 1" },
+            "state": "enabled"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "app-sidebar" },
+            "name": "format-panel"
+        },
+        {
+            "action": "scroll",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-panel'][data-tab-key='format']"
+            },
+            "y": 700
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Diagrama Mermaid" },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": { "using": "testId", "value": "app-sidebar" },
+            "name": "lists-and-blocks"
+        }
+    ]
+}

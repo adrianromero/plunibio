@@ -1,0 +1,270 @@
+{
+    "name": "Docs EN: Markdown typing rules",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false
+        },
+        "file": "markdown/typing-rules.md",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/en/edit-markdown",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "html[lang='en']" },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "# ", "Heading created by typing"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > h1:last-child"
+            },
+            "state": "existing",
+            "text": "Heading created by typing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-heading" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > h1:last-child"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "> ", "Quote created by typing"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror blockquote"
+            },
+            "state": "existing",
+            "text": "Quote created by typing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-quote" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror blockquote"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "- ", "Bullet created by typing"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ul"
+            },
+            "state": "existing",
+            "text": "Bullet created by typing"
+        },
+        { "action": "keys", "keys": ["Enter", "[ ] ", "Task created by typing"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-list-item-block .label.unchecked"
+            },
+            "state": "existing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-lists" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ul"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "1", "Decimal", " "] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ol"
+            },
+            "state": "existing"
+        },
+        { "action": "keys", "keys": ["Numbered item created by typing"] },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror ol"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "``` "] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block"
+            },
+            "state": "visible"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-code-fence" },
+        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
+        },
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "message-dialog" },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-testid='message-dialog'] button:first-child" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-code-block"
+            },
+            "state": "missing"
+        },
+
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        { "action": "keys", "keys": ["Enter", "---"] },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror hr"
+            },
+            "state": "existing"
+        },
+        { "action": "capture", "scope": "viewport", "name": "typing-divider" }
+    ]
+}

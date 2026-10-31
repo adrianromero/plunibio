@@ -1,0 +1,43 @@
+{
+    "name": "Docs ES: transformar y desplazar una imagen",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "sidebarVisible": true,
+            "showHiddenFiles": false
+        },
+        "file": "images/editor/image-lab.png",
+        "width": 1024,
+        "height": 768
+    },
+    "outputDir": "website/assets/images/docs/es/view-edit-images",
+    "settleMs": 500,
+    "steps": [
+        { "action": "wait", "target": { "using": "css", "value": "html[lang='es']" }, "state": "existing" },
+        { "action": "wait", "target": { "using": "testId", "value": "image-view" }, "state": "visible" },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='image-canvas'][width='1200'][height='500']" }, "state": "existing" },
+        { "action": "capture", "scope": "viewport", "name": "image-transform-panel" },
+
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='actual-size']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "image-viewport" }, "state": "visible", "text": "100%" },
+        { "action": "pointerDrag", "target": { "using": "testId", "value": "image-viewport" }, "x": 100, "y": 60, "durationMs": 400 },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='image-canvas'][style*='translate(100px, 60px)']" }, "state": "existing" },
+        { "action": "capture", "scope": "viewport", "name": "image-panned" },
+
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='center']" } },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='image-canvas'][style*='translate(0px)']" }, "state": "existing" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='rotate-right']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "image-viewport" }, "state": "visible", "text": "× 1200 px" },
+        { "action": "wait", "target": { "using": "testId", "value": "image-viewport" }, "state": "visible", "text": "90°" },
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='flip-horizontal']" } },
+        { "action": "wait", "target": { "using": "aria", "value": "Cambios sin guardar" }, "state": "visible" },
+        { "action": "capture", "scope": "viewport", "name": "image-rotated-flipped" },
+
+        { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='reset-transform']" } },
+        { "action": "wait", "target": { "using": "testId", "value": "image-viewport" }, "state": "visible", "text": "1200 × 500 px" },
+        { "action": "wait", "target": { "using": "testId", "value": "image-viewport" }, "state": "visible", "text": "0°" }
+    ]
+}
