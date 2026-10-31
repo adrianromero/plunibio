@@ -11,6 +11,7 @@ type ExecutionContext = {
     outputDir: string;
     timeoutMs: number;
     settleMs: number;
+    verifyOnly: boolean;
 };
 
 type FlowPreferences = NonNullable<AutomationFlow["app"]["preferences"]>;
@@ -331,10 +332,36 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             break;
         }
         case "capture": {
-            const filename = captureFilename(context, step.name);
-            await mkdir(dirname(filename), { recursive: true });
             await browser.pause(step.settleMs ?? context.settleMs);
             const scope = step.scope ?? "viewport";
+            if (context.verifyOnly) {
+                if (scope === "element") {
+                    if (!step.target) {
+                        throw new Error("An element capture requires target");
+                    }
+                    const element = await findTarget(step.target);
+                    await element.waitForDisplayed({ timeout: context.timeoutMs });
+                    const bounds = await browser.execute((node: Element) => {
+                        const rect = node.getBoundingClientRect();
+                        return { width: rect.width, height: rect.height };
+                    }, element);
+                    if (bounds.width <= 0 || bounds.height <= 0) {
+                        throw new Error(`Capture target '${step.name}' has no visible area`);
+                    }
+                } else {
+                    const viewport = await browser.execute(() => ({
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    }));
+                    if (viewport.width <= 0 || viewport.height <= 0) {
+                        throw new Error(`Capture viewport '${step.name}' has no visible area`);
+                    }
+                }
+                break;
+            }
+
+            const filename = captureFilename(context, step.name);
+            await mkdir(dirname(filename), { recursive: true });
             if (scope === "element") {
                 if (!step.target) {
                     throw new Error("An element capture requires target");
@@ -357,8 +384,9 @@ export async function executeFlow(flow: AutomationFlow, projectRoot: string): Pr
         outputDir,
         timeoutMs: flow.timeoutMs ?? 10_000,
         settleMs: flow.settleMs ?? 300,
+        verifyOnly: process.env.PLUNIBIO_AUTOMATION_VERIFY_ONLY === "1",
     };
-    await mkdir(outputDir, { recursive: true });
+    if (!context.verifyOnly) await mkdir(outputDir, { recursive: true });
     await applyPreferences(flow.app.preferences);
 
     for (const [index, step] of flow.steps.entries()) {

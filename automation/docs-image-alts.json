@@ -1,0 +1,206 @@
+{
+    "getting-started/main-interface": {
+        "en": "Plunibio with Atlas of Lúmina open in the Markdown editor and the formatting sidebar visible.",
+        "es": "Plunibio con Atlas de Lúmina abierto en el editor Markdown y el panel de formato visible."
+    },
+    "getting-started/general-menu": {
+        "en": "General options menu with theme, language, hidden-file, and Markdown typography settings.",
+        "es": "Menú de opciones generales con los ajustes de tema, idioma, archivos ocultos y tipografía Markdown."
+    },
+    "view-edit-images/image-adjust": {
+        "en": "Image editor Adjust tab with brightness, contrast, saturation, grayscale, sepia, and invert controls.",
+        "es": "Pestaña Ajustar del editor de imágenes con controles de brillo, contraste, saturación, escala de grises, sepia e inversión."
+    },
+    "view-edit-images/image-adjusted": {
+        "en": "Image after changing brightness to 75 percent, contrast to 130 percent, and saturation to 140 percent.",
+        "es": "Imagen después de ajustar el brillo al 75 %, el contraste al 130 % y la saturación al 140 %."
+    },
+    "view-edit-images/image-presets": {
+        "en": "Image editor Presets tab with the Vivid preset applied to the image.",
+        "es": "Pestaña Preajustes del editor de imágenes con el preajuste Vívido aplicado."
+    },
+    "view-edit-images/image-transform-panel": {
+        "en": "Image editor Transform tab with zoom, rotation, centering, flipping, and reset controls.",
+        "es": "Pestaña Transformar del editor de imágenes con controles de zoom, rotación, centrado, volteo y restablecimiento."
+    },
+    "view-edit-images/image-panned": {
+        "en": "Image displayed at 100 percent and displaced within the editor viewport.",
+        "es": "Imagen mostrada al 100 % y desplazada dentro del área de edición."
+    },
+    "view-edit-images/image-rotated-flipped": {
+        "en": "Image rotated 90 degrees and mirrored horizontally in the image editor.",
+        "es": "Imagen girada 90 grados y reflejada horizontalmente en el editor."
+    },
+    "view-edit-images/unsupported-image-save": {
+        "en": "Error explaining that an edited BMP can be viewed but only PNG, JPEG, and WebP can be saved.",
+        "es": "Error que explica que un BMP editado puede visualizarse, pero solo se pueden guardar PNG, JPEG y WebP."
+    },
+    "tables-code-advanced/code-language-picker": {
+        "en": "Language selector open above a fenced Markdown code block.",
+        "es": "Selector de lenguaje abierto sobre un bloque de código delimitado de Markdown."
+    },
+    "tables-code-advanced/code-block-edited": {
+        "en": "Edited fenced code block with syntax highlighting in the Markdown editor.",
+        "es": "Bloque de código delimitado y editado con resaltado de sintaxis en el editor Markdown."
+    },
+    "tables-code-advanced/mermaid-preview": {
+        "en": "Mermaid diagram rendered as a preview inside the Markdown document.",
+        "es": "Diagrama Mermaid representado como vista previa dentro del documento Markdown."
+    },
+    "tables-code-advanced/mermaid-edit-preview": {
+        "en": "Mermaid source and its rendered preview visible together while editing.",
+        "es": "Código Mermaid y su vista previa representada visibles a la vez durante la edición."
+    },
+    "tables-code-advanced/inline-block-math": {
+        "en": "Inline and block mathematical expressions rendered in the Markdown document.",
+        "es": "Expresiones matemáticas en línea y en bloque representadas en el documento Markdown."
+    },
+    "edit-markdown/format-panel": {
+        "en": "Markdown Format panel with document, block style, and text formatting controls.",
+        "es": "Panel Formato de Markdown con controles de documento, estilo de bloque y formato de texto."
+    },
+    "edit-markdown/lists-and-blocks": {
+        "en": "Lower part of the Markdown Format panel with list, image, table, code, math, and Mermaid actions.",
+        "es": "Parte inferior del panel Formato con acciones de listas, imagen, tabla, código, matemáticas y Mermaid."
+    },
+    "edit-markdown/frontmatter-panel": {
+        "en": "Document properties editor showing YAML front matter above the Markdown content.",
+        "es": "Editor de propiedades del documento con el bloque de front matter YAML sobre el contenido Markdown."
+    },
+    "links-and-images/link-actions": {
+        "en": "Floating actions for editing, copying, opening, or removing a Markdown link.",
+        "es": "Acciones flotantes para editar, copiar, abrir o eliminar un enlace Markdown."
+    },
+    "links-and-images/link-address-edit": {
+        "en": "Markdown link address being edited in the floating link controls.",
+        "es": "Dirección de un enlace Markdown en edición dentro de los controles flotantes."
+    },
+    "links-and-images/image-actions": {
+        "en": "Floating image actions for opening the file, editing its link, and showing its caption.",
+        "es": "Acciones flotantes de imagen para abrir el archivo, editar el enlace y mostrar el pie."
+    },
+    "links-and-images/image-address-edit": {
+        "en": "Relative image path being edited in the Markdown image controls.",
+        "es": "Ruta relativa de una imagen en edición dentro de los controles de imagen Markdown."
+    },
+    "links-and-images/linked-image-opened": {
+        "en": "A locally linked Markdown image opened in Plunibio's image editor.",
+        "es": "Imagen local enlazada desde Markdown y abierta en el editor de imágenes de Plunibio."
+    },
+    "tables-code-advanced/table-overview": {
+        "en": "Markdown table with several rows and columns selected in the editor.",
+        "es": "Tabla Markdown con varias filas y columnas seleccionada en el editor."
+    },
+    "tables-code-advanced/table-handles": {
+        "en": "Row and column handles visible around a selected Markdown table cell.",
+        "es": "Asas de fila y columna visibles alrededor de una celda seleccionada de la tabla Markdown."
+    },
+    "tables-code-advanced/table-column-actions": {
+        "en": "Selected table column with left, center, and right alignment controls plus the delete action.",
+        "es": "Columna de tabla seleccionada con controles de alineación izquierda, centrada y derecha, además de la acción de eliminar."
+    },
+    "tables-code-advanced/table-add-column": {
+        "en": "Add-column control displayed on the right edge of a Markdown table.",
+        "es": "Control para añadir una columna mostrado en el borde derecho de una tabla Markdown."
+    },
+    "tables-code-advanced/table-add-row": {
+        "en": "Add-row control displayed below a Markdown table.",
+        "es": "Control para añadir una fila mostrado debajo de una tabla Markdown."
+    },
+    "tables-code-advanced/table-row-actions": {
+        "en": "Selected table row with its row handle and delete control visible.",
+        "es": "Fila de tabla seleccionada con su asa y el control de eliminación visibles."
+    },
+    "edit-markdown/typing-heading": {
+        "en": "Heading created by typing a number sign followed by a space at the start of a line.",
+        "es": "Encabezado creado al escribir una almohadilla seguida de un espacio al principio de una línea."
+    },
+    "edit-markdown/typing-quote": {
+        "en": "Block quote created with the Markdown greater-than typing rule.",
+        "es": "Cita en bloque creada mediante la regla de escritura Markdown del signo mayor que."
+    },
+    "edit-markdown/typing-lists": {
+        "en": "Bullet, task, and numbered lists created with Markdown typing rules.",
+        "es": "Listas con viñetas, de tareas y numerada creadas mediante reglas de escritura Markdown."
+    },
+    "edit-markdown/typing-code-fence": {
+        "en": "Fenced code block created by typing three backticks.",
+        "es": "Bloque de código delimitado creado al escribir tres acentos graves."
+    },
+    "edit-markdown/typing-divider": {
+        "en": "Horizontal divider created with the Markdown three-hyphen typing rule.",
+        "es": "Separador horizontal creado mediante la regla Markdown de tres guiones."
+    },
+    "customize/preferences-menu": {
+        "en": "General options menu showing the current theme, language, hidden-file setting, and Markdown typography.",
+        "es": "Menú de opciones generales con el tema, idioma, ajuste de archivos ocultos y tipografía Markdown actuales."
+    },
+    "customize/language-menu": {
+        "en": "Language menu offering English, Spanish, Catalan, Galician, and Basque.",
+        "es": "Menú de idioma con inglés, español, catalán, gallego y euskera."
+    },
+    "customize/reading-typography": {
+        "en": "Markdown document displayed with the Reading typography in the light theme.",
+        "es": "Documento Markdown mostrado con la tipografía Lectura y el tema claro."
+    },
+    "customize/dark-theme": {
+        "en": "Markdown editor and formatting controls displayed with the dark theme.",
+        "es": "Editor Markdown y controles de formato mostrados con el tema oscuro."
+    },
+    "customize/hidden-files-before": {
+        "en": "Workspace root with hidden files disabled; dot-prefixed entries are absent.",
+        "es": "Raíz del espacio con los archivos ocultos desactivados; no aparecen elementos cuyo nombre empieza por punto."
+    },
+    "customize/hidden-files-after": {
+        "en": "Workspace root showing the dot-prefixed hidden folder and hidden Markdown file.",
+        "es": "Raíz del espacio mostrando la carpeta oculta y el archivo Markdown oculto cuyos nombres empiezan por punto."
+    },
+    "workspaces-and-files/unsaved-indicator": {
+        "en": "Dot beside the current filename indicating unsaved changes.",
+        "es": "Punto junto al nombre del archivo actual que indica cambios sin guardar."
+    },
+    "workspaces-and-files/reload-confirmation": {
+        "en": "Confirmation dialog shown before reloading the current file.",
+        "es": "Diálogo de confirmación mostrado antes de recargar el archivo actual."
+    },
+    "workspaces-and-files/reload-discard-changes": {
+        "en": "Warning that reloading will discard unsaved changes in the current file.",
+        "es": "Advertencia de que la recarga descartará los cambios sin guardar del archivo actual."
+    },
+    "search-replace/markdown-search": {
+        "en": "Markdown Search panel with the current match highlighted and a match counter.",
+        "es": "Panel Buscar de Markdown con la coincidencia actual resaltada y un contador."
+    },
+    "search-replace/markdown-search-options": {
+        "en": "Markdown search using case-sensitive and whole-word options.",
+        "es": "Búsqueda Markdown con las opciones de distinguir mayúsculas y palabra completa."
+    },
+    "search-replace/invalid-regexp": {
+        "en": "Search panel reporting an invalid regular expression.",
+        "es": "Panel de búsqueda que informa de una expresión regular no válida."
+    },
+    "search-replace/markdown-replace-all": {
+        "en": "Markdown document after replacing every matching occurrence.",
+        "es": "Documento Markdown después de reemplazar todas las coincidencias."
+    },
+    "search-replace/text-search": {
+        "en": "Text and code editor search panel with JSON matches highlighted.",
+        "es": "Panel de búsqueda del editor de texto y código con coincidencias resaltadas en JSON."
+    },
+    "search-replace/text-replace-all": {
+        "en": "JSON file in the text and code editor after replacing all whole-word matches.",
+        "es": "Archivo JSON en el editor de texto y código después de reemplazar todas las palabras coincidentes."
+    },
+    "workspaces-and-files/workspace-root": {
+        "en": "Workspace root listing the Atlas of Lúmina folders and files.",
+        "es": "Raíz del espacio con las carpetas y archivos de Atlas de Lúmina."
+    },
+    "workspaces-and-files/nested-file": {
+        "en": "Nested Markdown file open with its location shown in the file path.",
+        "es": "Archivo Markdown anidado abierto con su ubicación en la ruta del archivo."
+    },
+    "workspaces-and-files/workspace-selector": {
+        "en": "Workspace selection dialog displaying the available computer locations.",
+        "es": "Diálogo de selección de espacio con las ubicaciones disponibles del equipo."
+    }
+}

@@ -18,6 +18,7 @@
     "steps": [
         { "action": "wait", "target": { "using": "css", "value": "html[lang='en']" }, "state": "existing" },
         { "action": "wait", "target": { "using": "testId", "value": "image-view" }, "state": "visible" },
+        { "action": "wait", "target": { "using": "css", "value": "[data-testid='image-canvas'][width='1200'][height='500']" }, "state": "existing" },
         { "action": "click", "target": { "using": "css", "value": "[data-testid='image-action'][data-action='rotate-right']" } },
         { "action": "wait", "target": { "using": "aria", "value": "Unsaved changes" }, "state": "visible" },
         { "action": "keys", "keys": ["Control", "s"] },

@@ -142,3 +142,40 @@ input on the documentation machine.
 The runner copies editable fixtures automatically when `workspaceMode` is `temporary-copy`. A
 read-only documentation flow may use `examples/atlas-de-lumina` directly. Do not implement ad hoc
 copy or cleanup steps inside a flow.
+
+## Optimize documentation captures
+
+Documentation flows always produce PNG source captures. After regenerating the complete selected
+batch, convert them to the single publishable WebP copy with:
+
+```bash
+npm run docs:images:optimize
+```
+
+The command uses ImageMagick lossless WebP at method 6, strips non-visual metadata, and compares each
+decoded result with its PNG source using the absolute error metric. It replaces the PNG only when the
+number of different pixels is zero. A failed conversion leaves the source in place and exits with an
+error. Run this command before creating or validating the capture manifest:
+
+```bash
+npm run docs:images:manifest
+```
+
+The manifest command matches every WebP to its flow and one-based capture step, reads its dimensions
+and byte size, and adds the reviewed bilingual alternative text from `automation/docs-image-alts.json`.
+It fails on PNG sources, missing or unowned WebP files, duplicate destinations, missing translations,
+or a capture without its English/Spanish counterpart. The generated Jekyll data lives at
+`website/_data/docs_images.json`; edit the alternative-text source and regenerate instead of changing
+the manifest by hand.
+
+To replay every documentation flow while checking its capture checkpoints without writing image
+files, run:
+
+```bash
+npm run docs:images:regression
+```
+
+The suite launches each flow with `--verify-only`. Viewport checkpoints must have positive dimensions;
+element checkpoints must still resolve to a displayed element with a positive bounding box. The suite
+hashes the complete published WebP tree before and after execution and fails if any image is added,
+removed, or changed. It requires the automation binary produced by `npm run automation:build`.

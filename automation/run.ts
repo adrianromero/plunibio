@@ -5,10 +5,18 @@ import { loadFlow, resolveFlowPath } from "./flow";
 import { prepareFlowWorkspace } from "./workspace";
 
 const projectRoot = resolve(import.meta.dirname, "..");
-const requestedFlow = process.argv[2];
+const argumentsList = process.argv.slice(2);
+const requestedFlow = argumentsList.find((argument) => !argument.startsWith("--"));
+const verifyOnly = argumentsList.includes("--verify-only");
+const unknownOptions = argumentsList.filter(
+    (argument) => argument.startsWith("--") && argument !== "--verify-only"
+);
 
-if (!requestedFlow || requestedFlow === "--help" || requestedFlow === "-h") {
-    console.log("Usage: npm run automation:run -- <flow.json>");
+if (unknownOptions.length > 0) {
+    throw new Error(`Unknown automation option: ${unknownOptions.join(", ")}`);
+}
+if (!requestedFlow || argumentsList.includes("--help") || argumentsList.includes("-h")) {
+    console.log("Usage: npm run automation:run -- <flow.json> [--verify-only]");
     process.exit(requestedFlow ? 0 : 2);
 }
 
@@ -30,6 +38,7 @@ try {
 
     process.env.PLUNIBIO_AUTOMATION_FLOW = flowFilename;
     process.env.PLUNIBIO_AUTOMATION_BASE_PATH = workspace.basePath;
+    process.env.PLUNIBIO_AUTOMATION_VERIFY_ONLY = verifyOnly ? "1" : "0";
     const child = spawn(
         resolve(projectRoot, "node_modules/.bin/wdio"),
         ["run", resolve(import.meta.dirname, "wdio.conf.ts")],
