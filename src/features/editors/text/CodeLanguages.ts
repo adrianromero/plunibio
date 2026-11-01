@@ -21,6 +21,7 @@ import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { codeBlockConfig } from "@milkdown/kit/component/code-block";
 import type { Ctx } from "@milkdown/kit/ctx";
 import { createMermaidPreviewRenderer } from "../markdown/MermaidPreview";
+import { mermaidLanguageSupport } from "./MermaidLanguage";
 
 const PLAIN_TEXT_LANGUAGE_NAME = "Text";
 const plainTextSupport = new LanguageSupport(
@@ -93,7 +94,7 @@ export const CODE_LANGUAGES: readonly LanguageDescription[] = [
         name: "Mermaid",
         alias: ["mmd"],
         extensions: ["mmd", "mermaid"],
-        support: plainTextSupport,
+        support: mermaidLanguageSupport,
     }),
     LanguageDescription.of({
         name: "Markdown",
