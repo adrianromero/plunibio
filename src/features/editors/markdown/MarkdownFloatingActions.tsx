@@ -9,6 +9,7 @@ import Clipboard from "lucide-solid/icons/clipboard";
 import ImageIcon from "lucide-solid/icons/image";
 import LinkIcon from "lucide-solid/icons/link";
 import Pencil from "lucide-solid/icons/pencil";
+import Sigma from "lucide-solid/icons/sigma";
 import X from "lucide-solid/icons/x";
 import { useI18N } from "@/i18n/Localization";
 import styles from "./MarkdownFloatingActions.module.css";
@@ -21,11 +22,11 @@ export type MarkdownFloatingAction = {
 };
 
 export interface MarkdownFloatingActionsProps {
-    kind: "link" | "image";
-    href: string;
+    kind: "link" | "image" | "math";
+    value: string;
     editing: boolean;
-    onNavigate: () => void;
-    onSaveHref: (href: string) => boolean | Promise<boolean>;
+    onNavigate?: () => void;
+    onSaveValue: (value: string) => boolean | Promise<boolean>;
     actions?: readonly MarkdownFloatingAction[];
     onEditingChange: (editing: boolean) => void;
     onPointerEnter?: JSX.EventHandlerUnion<HTMLFormElement, PointerEvent>;
@@ -38,7 +39,7 @@ export function MarkdownFloatingActions(
     props: MarkdownFloatingActionsProps
 ): JSX.Element {
     let inputRef!: HTMLInputElement;
-    const [draftHref, setDraftHref] = createSignal(props.href);
+    const [draftValue, setDraftValue] = createSignal(props.value);
     const [saving, setSaving] = createSignal(false);
     const { t } = useI18N();
     let wasEditing = false;
@@ -48,7 +49,7 @@ export function MarkdownFloatingActions(
     };
 
     const startEditing = (): void => {
-        setDraftHref(props.href);
+        setDraftValue(props.value);
         setEditMode(true);
         requestAnimationFrame(() => {
             inputRef.focus();
@@ -57,7 +58,7 @@ export function MarkdownFloatingActions(
     };
 
     const cancelEditing = (): void => {
-        setDraftHref(props.href);
+        setDraftValue(props.value);
         setEditMode(false);
     };
 
@@ -67,7 +68,7 @@ export function MarkdownFloatingActions(
     createEffect(() => {
         const isEditing = props.editing;
         if (isEditing && !wasEditing) {
-            setDraftHref(props.href);
+            setDraftValue(props.value);
             requestAnimationFrame(() => {
                 inputRef?.focus();
                 inputRef?.select();
@@ -76,11 +77,11 @@ export function MarkdownFloatingActions(
         wasEditing = isEditing;
     });
 
-    const saveHref = async (): Promise<void> => {
+    const saveValue = async (): Promise<void> => {
         if (saving()) return;
         setSaving(true);
         try {
-            if (await props.onSaveHref(draftHref())) {
+            if (await props.onSaveValue(draftValue())) {
                 setEditMode(false);
             }
         } finally {
@@ -88,11 +89,11 @@ export function MarkdownFloatingActions(
         }
     };
 
-    const copyHref = async (): Promise<void> => {
+    const copyValue = async (): Promise<void> => {
         try {
-            await navigator.clipboard.writeText(props.href);
+            await navigator.clipboard.writeText(props.value);
         } catch (err: unknown) {
-            console.error("Unable to copy Markdown link:", err);
+            console.error("Unable to copy Markdown floating action value:", err);
         }
     };
 
@@ -101,7 +102,9 @@ export function MarkdownFloatingActions(
     };
 
     const ElementIcon = (): JSX.Element =>
-        props.kind === "image" ? (
+        props.kind === "math" ? (
+            <Sigma aria-hidden="true" />
+        ) : props.kind === "image" ? (
             <ImageIcon aria-hidden="true" />
         ) : (
             <LinkIcon aria-hidden="true" />
@@ -112,14 +115,16 @@ export function MarkdownFloatingActions(
             ref={props.ref}
             class={styles.actions}
             aria-label={t(
-                props.kind === "image"
-                    ? "markdownToolbar.imageActions"
-                    : "markdownToolbar.linkActions"
+                props.kind === "math"
+                    ? "markdownToolbar.mathActions"
+                    : props.kind === "image"
+                      ? "markdownToolbar.imageActions"
+                      : "markdownToolbar.linkActions"
             )}
             onSubmit={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                void saveHref();
+                void saveValue();
             }}
             onPointerDown={stopPointerDown}
             onPointerEnter={props.onPointerEnter}
@@ -135,10 +140,14 @@ export function MarkdownFloatingActions(
                         <input
                             ref={inputRef}
                             class={styles.input}
-                            aria-label={t("markdownToolbar.linkAddress")}
-                            value={draftHref()}
+                            aria-label={t(
+                                props.kind === "math"
+                                    ? "markdownToolbar.mathExpression"
+                                    : "markdownToolbar.linkAddress"
+                            )}
+                            value={draftValue()}
                             disabled={saving()}
-                            onInput={(event) => setDraftHref(event.currentTarget.value)}
+                            onInput={(event) => setDraftValue(event.currentTarget.value)}
                             onKeyDown={(event) => {
                                 event.stopPropagation();
                                 if (event.key === "Escape") {
@@ -169,19 +178,33 @@ export function MarkdownFloatingActions(
                     </>
                 }
             >
-                <button
-                    class={styles.address}
-                    type="button"
-                    title={props.href}
-                    onClick={props.onNavigate}
+                <Show
+                    when={props.kind === "math"}
+                    fallback={
+                        <button
+                            class={styles.address}
+                            type="button"
+                            onClick={() => props.onNavigate?.()}
+                        >
+                            {props.value}
+                        </button>
+                    }
                 >
-                    {props.href}
-                </button>
+                    <span class={styles.staticValue}>{props.value}</span>
+                </Show>
                 <button
                     class={styles.iconButton}
                     type="button"
-                    aria-label={t("markdownToolbar.editLink")}
-                    title={t("markdownToolbar.editLink")}
+                    aria-label={t(
+                        props.kind === "math"
+                            ? "markdownToolbar.editMath"
+                            : "markdownToolbar.editLink"
+                    )}
+                    title={t(
+                        props.kind === "math"
+                            ? "markdownToolbar.editMath"
+                            : "markdownToolbar.editLink"
+                    )}
                     onClick={startEditing}
                 >
                     <Pencil aria-hidden="true" />
@@ -189,9 +212,17 @@ export function MarkdownFloatingActions(
                 <button
                     class={styles.iconButton}
                     type="button"
-                    aria-label={t("markdownToolbar.copyLink")}
-                    title={t("markdownToolbar.copyLink")}
-                    onClick={() => void copyHref()}
+                    aria-label={t(
+                        props.kind === "math"
+                            ? "markdownToolbar.copyMath"
+                            : "markdownToolbar.copyLink"
+                    )}
+                    title={t(
+                        props.kind === "math"
+                            ? "markdownToolbar.copyMath"
+                            : "markdownToolbar.copyLink"
+                    )}
+                    onClick={() => void copyValue()}
                 >
                     <Clipboard aria-hidden="true" />
                 </button>

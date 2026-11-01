@@ -20,13 +20,13 @@ import styles from "./MarkdownFloatingActionsHost.module.css";
 
 export interface MarkdownFloatingTarget {
     key: object;
-    kind: "link" | "image";
+    kind: "link" | "image" | "math";
     activation: "selection" | "hover" | "explicit";
-    href: () => string;
+    value: () => string;
     getAnchorRect: () => DOMRect | null;
     isConnected?: () => boolean;
-    onNavigate: () => void | Promise<void>;
-    onSaveHref: (href: string) => boolean | Promise<boolean>;
+    onNavigate?: () => void | Promise<void>;
+    onSaveValue: (value: string) => boolean | Promise<boolean>;
     actions?: () => readonly MarkdownFloatingAction[];
     dismissAfterEditing?: boolean;
     onEditingEnd?: () => void;
@@ -205,9 +205,9 @@ export default function MarkdownFloatingActionsHost(
         resizeObserver.disconnect();
     });
 
-    const href = (): string => {
+    const value = (): string => {
         props.controller.revision();
-        return props.controller.target()?.href() ?? "";
+        return props.controller.target()?.value() ?? "";
     };
 
     return (
@@ -217,18 +217,18 @@ export default function MarkdownFloatingActionsHost(
                 hidden={!props.controller.target()}
                 style={{ left: `${position().left}px`, top: `${position().top}px` }}
             >
-                <Show when={props.controller.target()}>
+                <Show keyed when={props.controller.target()}>
                     {(target) => (
                         <MarkdownFloatingActions
                             ref={(element) => {
                                 props.controller.setActionsElement(element);
                             }}
-                            kind={target().kind}
-                            href={href()}
+                            kind={target.kind}
+                            value={value()}
                             editing={props.controller.editing()}
-                            onNavigate={() => void target().onNavigate()}
-                            onSaveHref={(nextHref) => {
-                                const saved = target().onSaveHref(nextHref);
+                            onNavigate={() => void target.onNavigate?.()}
+                            onSaveValue={(nextValue) => {
+                                const saved = target.onSaveValue(nextValue);
                                 if (typeof saved === "boolean") {
                                     if (saved) props.controller.refresh();
                                     return saved;
@@ -242,9 +242,9 @@ export default function MarkdownFloatingActionsHost(
                                 cancelEditing = cancel;
                             }}
                             onEditingChange={props.controller.setEditing}
-                            onPointerEnter={() => target().onPointerEnter?.()}
-                            onPointerLeave={(event) => target().onPointerLeave?.(event)}
-                            actions={target().actions?.()}
+                            onPointerEnter={() => target.onPointerEnter?.()}
+                            onPointerLeave={(event) => target.onPointerLeave?.(event)}
+                            actions={target.actions?.()}
                         />
                     )}
                 </Show>

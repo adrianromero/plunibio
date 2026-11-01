@@ -42,7 +42,13 @@ import {
 import { lift } from "@milkdown/kit/prose/commands";
 import type { MarkType, Node as ProseMirrorNode, NodeType } from "@milkdown/kit/prose/model";
 import { liftListItem, wrapInList } from "@milkdown/kit/prose/schema-list";
-import { Plugin, TextSelection, type Selection, type Transaction } from "@milkdown/kit/prose/state";
+import {
+    NodeSelection,
+    Plugin,
+    TextSelection,
+    type Selection,
+    type Transaction,
+} from "@milkdown/kit/prose/state";
 
 import { type LucideIcon } from "lucide-solid";
 import Bold from "lucide-solid/icons/bold";
@@ -91,6 +97,7 @@ type EditorMarkdownSidebarProps = {
     onSelectedTabChange: (key: string) => void;
     registerSearchFocus?: (focus: (() => void) | null) => void;
     onCreateLink?: () => void;
+    onCreateMath?: () => void;
 };
 
 type ListKind = "bullet" | "ordered" | "task";
@@ -323,6 +330,16 @@ function toggleLink(ctx: Ctx, onCreateLink?: () => void): void {
     }
 
     onCreateLink();
+}
+
+export function toggleInlineMath(ctx: Ctx, onCreateMath?: () => void): void {
+    const view = ctx.get(editorViewCtx);
+    const selectedMath =
+        view.state.selection instanceof NodeSelection &&
+        view.state.selection.node.type.name === "math_inline";
+
+    ctx.get(commandsCtx).call("ToggleLatex");
+    if (!selectedMath) onCreateMath?.();
 }
 
 function getListContext(ctx: Ctx): ListContext | null {
@@ -752,7 +769,7 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                                 icon={Sigma}
                                 label={t("markdownToolbar.inlineMath")}
                                 onRun={(ctx) => {
-                                    ctx.get(commandsCtx).call("ToggleLatex");
+                                    toggleInlineMath(ctx, props.onCreateMath);
                                     updateSelectedState(ctx);
                                 }}
                             />

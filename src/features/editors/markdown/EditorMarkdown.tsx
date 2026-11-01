@@ -33,6 +33,9 @@ import EditorMarkdownSidebar from "./EditorMarkdownSidebar";
 import { createMarkdownImageProxy, type MarkdownImageProxy } from "./MarkdownImageProxy";
 import MarkdownImageActions from "./MarkdownImageActions";
 import MarkdownLinkActions from "./MarkdownLinkActions";
+import MarkdownMathActions, {
+    disableNativeInlineMathTooltip,
+} from "./MarkdownMathActions";
 import MarkdownFloatingActionsHost, {
     createMarkdownFloatingActionsController,
 } from "./MarkdownFloatingActionsHost";
@@ -98,9 +101,10 @@ export function EditorMarkdown(): JSX.Element {
     let currentSearchController: ProseMirrorSearchController | null = null;
     let focusSearch: (() => void) | null = null;
     let createLink: (() => void) | null = null;
+    let createMath: (() => void) | null = null;
     const floatingActions = createMarkdownFloatingActionsController();
     const [editorReady, setEditorReady] = createSignal(false);
-    const [imageActionsCrepe, setImageActionsCrepe] = createSignal<Crepe | null>(null);
+    const [floatingActionsCrepe, setFloatingActionsCrepe] = createSignal<Crepe | null>(null);
     const [frontmatterVisible, setFrontmatterVisible] = createSignal(false);
     const [searchController, setSearchController] = createSignal<SearchController | null>(null);
     const [selectedSidebarTab, setSelectedSidebarTab] = createSignal("format");
@@ -169,7 +173,7 @@ export function EditorMarkdown(): JSX.Element {
         },
         replaceContent: async (content, currentFilename, onModified) => {
             setEditorReady(false);
-            setImageActionsCrepe(null);
+            setFloatingActionsCrepe(null);
             currentSearchController?.destroy();
             currentSearchController = null;
             setSearchController(null);
@@ -358,6 +362,7 @@ export function EditorMarkdown(): JSX.Element {
             nextCrepe.editor.config(
                 configureCodeLanguages(t("markdownToolbar.codePreviewMermaidError"))
             );
+            nextCrepe.editor.config(disableNativeInlineMathTooltip);
             nextCrepe.editor.config(configureMarkdownSerialization);
 
             let firstUpdate = true;
@@ -380,10 +385,10 @@ export function EditorMarkdown(): JSX.Element {
             });
 
             await nextCrepe.create();
-            // Markdown image actions read editorViewCtx. Expose Crepe only after
-            // create() has populated that context; an image-first document can
-            // otherwise emit a selection update during editor initialization.
-            setImageActionsCrepe(nextCrepe);
+            // Floating actions read editorViewCtx. Expose Crepe only after create()
+            // has populated that context; an image-first document can otherwise
+            // emit a selection update during editor initialization.
+            setFloatingActionsCrepe(nextCrepe);
             let editorView!: MilkdownEditorView;
             nextCrepe.editor.action((ctx) => {
                 editorView = ctx.get(editorViewCtx);
@@ -443,7 +448,7 @@ export function EditorMarkdown(): JSX.Element {
         },
         destroy: async () => {
             setEditorReady(false);
-            setImageActionsCrepe(null);
+            setFloatingActionsCrepe(null);
             currentSearchController?.destroy();
             currentSearchController = null;
             setSearchController(null);
@@ -532,7 +537,7 @@ export function EditorMarkdown(): JSX.Element {
                 />
                 <MarkdownLinkActions
                     editorRoot={() => editorRef}
-                    crepe={imageActionsCrepe}
+                    crepe={floatingActionsCrepe}
                     controller={floatingActions}
                     onNavigate={navigateToLink}
                     registerCreateLink={(handler) => {
@@ -541,8 +546,16 @@ export function EditorMarkdown(): JSX.Element {
                 />
                 <MarkdownImageActions
                     editorRoot={() => editorRef}
-                    crepe={imageActionsCrepe}
+                    crepe={floatingActionsCrepe}
                     controller={floatingActions}
+                />
+                <MarkdownMathActions
+                    editorRoot={() => editorRef}
+                    crepe={floatingActionsCrepe}
+                    controller={floatingActions}
+                    registerCreateMath={(handler) => {
+                        createMath = handler;
+                    }}
                 />
                 <MarkdownFloatingActionsHost
                     editorRoot={() => editorRef}
@@ -561,6 +574,7 @@ export function EditorMarkdown(): JSX.Element {
                     focusSearch = focus;
                 }}
                 onCreateLink={() => createLink?.()}
+                onCreateMath={() => createMath?.()}
             />
         </section>
     );
