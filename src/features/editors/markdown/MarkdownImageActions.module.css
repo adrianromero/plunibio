@@ -1,8 +1,0 @@
-/*
- * Copyright (c) 2026 Adrián Romero
- * SPDX-License-Identifier: MIT
- */
-
-:global(.milkdowntheme > .milkdown .milkdown-image-block > .image-wrapper > .operation) {
-    display: none;
-}

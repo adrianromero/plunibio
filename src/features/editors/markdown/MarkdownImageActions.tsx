@@ -23,7 +23,6 @@ import type {
     MarkdownFloatingActionsController,
     MarkdownFloatingTarget,
 } from "./MarkdownFloatingActionsHost";
-import "./MarkdownImageActions.module.css";
 
 interface MarkdownImageActionsProps {
     editorRoot: () => HTMLDivElement;

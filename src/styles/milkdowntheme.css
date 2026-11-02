@@ -105,6 +105,9 @@
     flex: 1;
 }
 
+.milkdown .milkdown-image-block > .image-wrapper > .operation {
+    display: none;
+}
 .milkdown .milkdown-image-block > .image-edit {
     font-family: var(--font-interface);
 }
