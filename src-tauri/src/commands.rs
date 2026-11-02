@@ -9,6 +9,7 @@ use crate::paths::{
 use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use std::time::UNIX_EPOCH;
 use tauri::image::JsImage;
 use tauri::Manager;
 use tauri::Webview;
@@ -90,6 +91,20 @@ pub(crate) struct DirectoryEntry {
     name: String,
     filename: String,
     kind: PathKind,
+    size_bytes: Option<u64>,
+    item_count: Option<u64>,
+    modified_at: Option<u64>,
+}
+
+fn modified_at_millis(metadata: &std::fs::Metadata) -> Option<u64> {
+    metadata
+        .modified()
+        .ok()?
+        .duration_since(UNIX_EPOCH)
+        .ok()?
+        .as_millis()
+        .try_into()
+        .ok()
 }
 
 fn validate_entry_name(name: &str) -> Result<(), AppError> {
@@ -111,6 +126,7 @@ fn created_entry(
     path: &Path,
     name: String,
     kind: PathKind,
+    metadata: Option<&std::fs::Metadata>,
 ) -> Result<DirectoryEntry, AppError> {
     let filename = path
         .strip_prefix(base)
@@ -124,10 +140,18 @@ fn created_entry(
         })?
         .to_string_lossy()
         .into_owned();
+    let (size_bytes, item_count) = match &kind {
+        PathKind::Directory => (None, Some(0)),
+        PathKind::File => (Some(metadata.map_or(0, std::fs::Metadata::len)), None),
+        PathKind::Other => (None, None),
+    };
     Ok(DirectoryEntry {
         name,
         filename,
         kind,
+        size_bytes,
+        item_count,
+        modified_at: metadata.and_then(modified_at_millis),
     })
 }
 
@@ -536,6 +560,17 @@ pub(crate) async fn list_directory(
             continue;
         };
 
+        let item_count = if metadata.is_dir() {
+            match count_directory_entries(&entry_path, show_hidden).await {
+                Ok(count) => Some(count),
+                Err(error) => {
+                    warn!(path = %entry_path.display(), error = %error, "Unable to count directory entries");
+                    None
+                }
+            }
+        } else {
+            None
+        };
         entries.push(DirectoryEntry {
             name: entry_name,
             filename: entry_path
@@ -551,6 +586,9 @@ pub(crate) async fn list_directory(
                 .to_string_lossy()
                 .into_owned(),
             kind,
+            size_bytes: metadata.is_file().then(|| metadata.len()),
+            item_count,
+            modified_at: modified_at_millis(&metadata),
         });
     }
 
@@ -562,6 +600,26 @@ pub(crate) async fn list_directory(
             .then_with(|| left.name.cmp(&right.name))
     });
     Ok(entries)
+}
+
+async fn count_directory_entries(path: &Path, show_hidden: bool) -> std::io::Result<u64> {
+    let mut directory = tokio::fs::read_dir(path).await?;
+    let mut count = 0;
+    while let Some(entry) = directory.next_entry().await? {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let entry_path = entry.path();
+        if should_hide_entry(&name, &entry_path, show_hidden).await {
+            continue;
+        }
+        match tokio::fs::metadata(&entry_path).await {
+            Ok(metadata) if metadata.is_dir() || metadata.is_file() => count += 1,
+            Ok(_) => {}
+            Err(error) => {
+                warn!(path = %entry_path.display(), error = %error, "Unable to inspect child directory entry");
+            }
+        }
+    }
+    Ok(count)
 }
 
 #[tauri::command]
@@ -581,7 +639,8 @@ pub(crate) async fn create_directory(
             AppErrorCode::CreateDirectoryFailed,
         )
     })?;
-    created_entry(&base, &path, name, PathKind::Directory)
+    let metadata = tokio::fs::metadata(&path).await.ok();
+    created_entry(&base, &path, name, PathKind::Directory, metadata.as_ref())
 }
 
 #[tauri::command]
@@ -593,7 +652,7 @@ pub(crate) async fn create_file(
     validate_entry_name(&name)?;
     let (base, parent) = resolve_existing_path(&basepath, &filename).await?;
     let path = parent.join(&name);
-    tokio::fs::OpenOptions::new()
+    let file = tokio::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(&path)
@@ -601,7 +660,8 @@ pub(crate) async fn create_file(
         .map_err(|error| {
             create_error("create_file", &name, error, AppErrorCode::CreateFileFailed)
         })?;
-    created_entry(&base, &path, name, PathKind::File)
+    let metadata = file.metadata().await.ok();
+    created_entry(&base, &path, name, PathKind::File, metadata.as_ref())
 }
 
 #[tauri::command]

@@ -6,9 +6,12 @@
 import { createSignal, type Accessor, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import File from "lucide-solid/icons/file";
+import FilePen from "lucide-solid/icons/file-pen";
+import FileText from "lucide-solid/icons/file-text";
 import type { ReloadFileHandler } from "@/app/AppContext";
 import type { DirectoryEntry } from "@/backend/rusttypes";
-import EditorFolder from "../EditorFolder";
+import EditorFolder, { fileIconForFilename, formatFileSize } from "../EditorFolder";
 
 const invokeMock = vi.hoisted(() => vi.fn());
 const showSpinnerMock = vi.hoisted(() => vi.fn());
@@ -44,8 +47,30 @@ vi.mock("@/app/AppContext", () => ({
 }));
 
 vi.mock("@/i18n/Localization", () => ({
-    useI18N: () => ({ t: (key: string) => key }),
+    useI18N: () => ({
+        t: (key: string, params?: { count?: number }) =>
+            params?.count === undefined ? key : `${key}:${params.count}`,
+        locale: () => "en",
+    }),
 }));
+
+const fileEntry = (name: string, sizeBytes = 0): DirectoryEntry => ({
+    name,
+    filename: `docs/${name}`,
+    kind: "file",
+    sizeBytes,
+    itemCount: null,
+    modifiedAt: Date.UTC(2026, 10, 2, 10, 30),
+});
+
+const directoryEntry = (name: string, itemCount = 0): DirectoryEntry => ({
+    name,
+    filename: `docs/${name}`,
+    kind: "directory",
+    sizeBytes: null,
+    itemCount,
+    modifiedAt: Date.UTC(2026, 10, 2, 10, 30),
+});
 
 describe("EditorFolder", () => {
     let dispose: (() => void) | undefined;
@@ -57,10 +82,10 @@ describe("EditorFolder", () => {
             async (_command: string, args: { showHidden: boolean }): Promise<DirectoryEntry[]> =>
                 args.showHidden
                     ? [
-                          { name: ".hidden.md", filename: "docs/.hidden.md", kind: "file" },
-                          { name: "visible.md", filename: "docs/visible.md", kind: "file" },
+                          fileEntry(".hidden.md"),
+                          fileEntry("visible.md"),
                       ]
-                    : [{ name: "visible.md", filename: "docs/visible.md", kind: "file" }]
+                    : [fileEntry("visible.md")]
         );
     });
 
@@ -105,7 +130,7 @@ describe("EditorFolder", () => {
 
     it("registers a context reload handler and removes it on cleanup", async () => {
         let entries: DirectoryEntry[] = [
-            { name: "first.md", filename: "docs/first.md", kind: "file" },
+            fileEntry("first.md"),
         ];
         invokeMock.mockImplementation(async (): Promise<DirectoryEntry[]> => entries);
 
@@ -118,7 +143,7 @@ describe("EditorFolder", () => {
             expect(reloadFile).not.toBeNull();
         });
 
-        entries = [{ name: "external.md", filename: "docs/external.md", kind: "file" }];
+        entries = [fileEntry("external.md")];
         await reloadFile?.();
 
         await vi.waitFor(() => {
@@ -154,12 +179,12 @@ describe("EditorFolder", () => {
         invokeMock.mockImplementation(async (command: string) => {
             if (command === "list_directory") {
                 return [
-                    { name: "folder", filename: "docs/folder", kind: "directory" },
-                    { name: "old.md", filename: "docs/old.md", kind: "file" },
+                    directoryEntry("folder"),
+                    fileEntry("old.md"),
                 ];
             }
             if (command === "create_file") {
-                return { name: "new.md", filename: "docs/new.md", kind: "file" };
+                return fileEntry("new.md");
             }
             throw new Error(`Unexpected command: ${command}`);
         });
@@ -199,5 +224,39 @@ describe("EditorFolder", () => {
         expect(showSpinnerMock).toHaveBeenCalled();
         expect(hideSpinnerMock).toHaveBeenCalled();
         await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" }));
+    });
+
+    it("uses distinct icons for Markdown, plain text and other files", () => {
+        expect(fileIconForFilename("notes.md")).toBe(FilePen);
+        expect(fileIconForFilename("notes.MARKDOWN")).toBe(FilePen);
+        expect(fileIconForFilename("notes.txt")).toBe(FileText);
+        expect(fileIconForFilename("server.log")).toBe(FileText);
+        expect(fileIconForFilename("photo.png")).toBe(File);
+        expect(fileIconForFilename("script.ts")).toBe(File);
+    });
+
+    it("formats file sizes using the most appropriate unit", () => {
+        expect(formatFileSize(0, "en")).toBe("0 KB");
+        expect(formatFileSize(1536, "en")).toBe("1.5 KB");
+        expect(formatFileSize(5 * 1024 ** 2, "en")).toBe("5 MB");
+        expect(formatFileSize(2 * 1024 ** 3, "en")).toBe("2 GB");
+    });
+
+    it("shows entry metadata on a second line", async () => {
+        invokeMock.mockResolvedValue([
+            directoryEntry("assets", 3),
+            fileEntry("notes.md", 1536),
+        ]);
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+
+        await vi.waitFor(() => expect(root.textContent).toContain("notes.md"));
+        const entries = root.querySelectorAll<HTMLElement>('[data-testid="folder-entry"]');
+        expect(entries[0]?.querySelector(".lucide-folder")).not.toBeNull();
+        expect(entries[0]?.textContent).toContain("folder.itemsCount:3");
+        expect(entries[1]?.querySelector(".lucide-file-pen")).not.toBeNull();
+        expect(entries[1]?.textContent).toContain("1.5 KB");
+        expect(entries[1]?.textContent).toContain("Nov 2, 2026");
     });
 });

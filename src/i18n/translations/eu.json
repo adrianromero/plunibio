@@ -47,6 +47,10 @@
         "fileName": "Fitxategiaren izena",
         "creatingFolder": "{{ name }} karpeta sortzen...",
         "creatingFile": "{{ name }} fitxategia sortzen...",
+        "itemCount": "Elementu {{ count }}",
+        "itemsCount": "{{ count }} elementu",
+        "itemsUnavailable": "Elementuak ez daude erabilgarri",
+        "dateUnavailable": "Data ez dago erabilgarri",
         "hiddenFiles": "Ezkutuko fitxategiak",
         "show": "Erakutsi",
         "hide": "Ezkutatu"

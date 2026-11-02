@@ -12,11 +12,23 @@ export type InitialConfig = {
 
 export type PathKind = "file" | "directory" | "other";
 
-export type DirectoryEntry = {
+type DirectoryEntryBase = {
     name: string;
     filename: string;
-    kind: "directory" | "file";
+    modifiedAt: number | null;
 };
+
+export type DirectoryEntry =
+    | (DirectoryEntryBase & {
+          kind: "directory";
+          sizeBytes: null;
+          itemCount: number | null;
+      })
+    | (DirectoryEntryBase & {
+          kind: "file";
+          sizeBytes: number;
+          itemCount: null;
+      });
 
 export type DirectoryBrowserEntry = {
     name: string;

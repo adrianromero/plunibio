@@ -47,6 +47,10 @@
         "fileName": "Nombre del archivo",
         "creatingFolder": "Creando la carpeta {{ name }}...",
         "creatingFile": "Creando el archivo {{ name }}...",
+        "itemCount": "{{ count }} elemento",
+        "itemsCount": "{{ count }} elementos",
+        "itemsUnavailable": "Elementos no disponibles",
+        "dateUnavailable": "Fecha no disponible",
         "hiddenFiles": "Archivos ocultos",
         "show": "Mostrar",
         "hide": "Ocultar"

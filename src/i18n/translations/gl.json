@@ -47,6 +47,10 @@
         "fileName": "Nome do ficheiro",
         "creatingFolder": "Creando o cartafol {{ name }}...",
         "creatingFile": "Creando o ficheiro {{ name }}...",
+        "itemCount": "{{ count }} elemento",
+        "itemsCount": "{{ count }} elementos",
+        "itemsUnavailable": "Elementos non dispoñibles",
+        "dateUnavailable": "Data non dispoñible",
         "hiddenFiles": "Ficheiros ocultos",
         "show": "Mostrar",
         "hide": "Ocultar"

@@ -47,6 +47,10 @@
         "fileName": "Nom del fitxer",
         "creatingFolder": "S'està creant la carpeta {{ name }}...",
         "creatingFile": "S'està creant el fitxer {{ name }}...",
+        "itemCount": "{{ count }} element",
+        "itemsCount": "{{ count }} elements",
+        "itemsUnavailable": "Elements no disponibles",
+        "dateUnavailable": "Data no disponible",
         "hiddenFiles": "Fitxers ocults",
         "show": "Mostra",
         "hide": "Amaga"

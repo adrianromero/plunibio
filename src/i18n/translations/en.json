@@ -47,6 +47,10 @@
         "fileName": "File name",
         "creatingFolder": "Creating folder {{ name }}...",
         "creatingFile": "Creating file {{ name }}...",
+        "itemCount": "{{ count }} item",
+        "itemsCount": "{{ count }} items",
+        "itemsUnavailable": "Items unavailable",
+        "dateUnavailable": "Date unavailable",
         "hiddenFiles": "Hidden files",
         "show": "Show",
         "hide": "Hide"

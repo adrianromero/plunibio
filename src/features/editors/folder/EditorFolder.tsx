@@ -20,6 +20,7 @@ import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
 import Plus from "lucide-solid/icons/plus";
+import { LanguageDescription } from "@codemirror/language";
 import { useAppContext } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
 import { useI18N } from "@/i18n/Localization";
@@ -29,13 +30,46 @@ import { Dynamic } from "solid-js/web";
 import Menu from "@/shared/ui/menu/Menu";
 import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
 import MessageView from "@/shared/errors/MessageView";
+import { CODE_LANGUAGES } from "@/features/editors/text/CodeLanguages";
 
 type DirectoryResult =
     | { entries: DirectoryEntry[]; error?: never }
     | { entries?: never; error: string };
 
+const FILE_SIZE_UNITS = [
+    { minimum: 1024 ** 3, divisor: 1024 ** 3, label: "GB" },
+    { minimum: 1024 ** 2, divisor: 1024 ** 2, label: "MB" },
+    { minimum: 0, divisor: 1024, label: "KB" },
+] as const;
+
+export function fileIconForFilename(filename: string): typeof File {
+    const language = LanguageDescription.matchFilename(CODE_LANGUAGES, filename.toLowerCase());
+    if (language?.name === "Markdown") return FilePen;
+    if (language?.name === "Text") return FileText;
+    return File;
+}
+
+export function formatFileSize(sizeBytes: number, locale: string): string {
+    const unit = FILE_SIZE_UNITS.find(({ minimum }) => sizeBytes >= minimum)!;
+    const value = Math.max(0, sizeBytes) / unit.divisor;
+    const amount = new Intl.NumberFormat(locale, {
+        maximumFractionDigits: value > 0 && value < 10 ? 1 : 0,
+    }).format(value);
+    return `${amount} ${unit.label}`;
+}
+
+function formatModifiedAt(modifiedAt: number | null, locale: string): string | null {
+    if (modifiedAt === null) return null;
+    const date = new Date(modifiedAt);
+    if (Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date);
+}
+
 export function EditorFolder(): JSX.Element {
-    const { t } = useI18N();
+    const { t, locale } = useI18N();
     const {
         main: { basepath, filename, loadFilename, showAppMessage },
         spinner: { showSpinner, hideSpinner, setSpinnerParams },
@@ -44,6 +78,19 @@ export function EditorFolder(): JSX.Element {
     const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
     const [pendingScrollPath, setPendingScrollPath] = createSignal<string | null>(null);
     let scrollingView: HTMLDivElement | undefined;
+
+    const entryDetails = (entry: DirectoryEntry): string => {
+        const size =
+            entry.kind === "directory"
+                ? entry.itemCount === null
+                    ? t("folder.itemsUnavailable")
+                    : entry.itemCount === 1
+                      ? t("folder.itemCount", { count: entry.itemCount })
+                      : t("folder.itemsCount", { count: entry.itemCount })
+                : formatFileSize(entry.sizeBytes, locale());
+        const modified = formatModifiedAt(entry.modifiedAt, locale()) ?? t("folder.dateUnavailable");
+        return `${size} · ${modified}`;
+    };
     const [directoryResult, { mutate, refetch }] = createResource(
         () => ({ basepath: basepath(), filename: filename(), showHidden: showHiddenFiles() }),
         async (path): Promise<DirectoryResult> => {
@@ -214,11 +261,18 @@ export function EditorFolder(): JSX.Element {
                                                             component={
                                                                 entry.kind === "directory"
                                                                     ? Folder
-                                                                    : File
+                                                                    : fileIconForFilename(
+                                                                          entry.name
+                                                                      )
                                                             }
                                                         />
-                                                        <span class={styles.entryName}>
-                                                            {entry.name}
+                                                        <span class={styles.entryContent}>
+                                                            <span class={styles.entryName}>
+                                                                {entry.name}
+                                                            </span>
+                                                            <span class={styles.entryDetails}>
+                                                                {entryDetails(entry)}
+                                                            </span>
                                                         </span>
                                                     </button>
                                                 </li>

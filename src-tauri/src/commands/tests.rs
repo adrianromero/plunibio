@@ -20,6 +20,9 @@ fn creates_empty_files_and_directories_without_overwriting() {
                 .await
                 .unwrap();
         assert_eq!(directory.name, "notes");
+        assert_eq!(directory.item_count, Some(0));
+        assert_eq!(directory.size_bytes, None);
+        assert!(directory.modified_at.is_some());
         assert_eq!(
             directory.filename,
             std::path::Path::new("docs").join("notes").to_string_lossy()
@@ -30,6 +33,9 @@ fn creates_empty_files_and_directories_without_overwriting() {
             .await
             .unwrap();
         assert_eq!(file.name, "new.md");
+        assert_eq!(file.size_bytes, Some(0));
+        assert_eq!(file.item_count, None);
+        assert!(file.modified_at.is_some());
         assert_eq!(
             std::fs::read(base.join("docs/new.md")).unwrap(),
             Vec::<u8>::new()
@@ -42,6 +48,51 @@ fn creates_empty_files_and_directories_without_overwriting() {
         let value = serde_json::to_value(duplicate).unwrap();
         assert_eq!(value["code"], "path_already_exists");
         assert_eq!(value["path"], "new.md");
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn list_directory_reports_file_metadata_and_visible_child_counts() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-list-metadata-{unique}"));
+        std::fs::create_dir_all(base.join("folder/nested")).unwrap();
+        std::fs::write(base.join("folder/visible.txt"), "hello").unwrap();
+        std::fs::write(base.join("folder/.hidden.txt"), "hidden").unwrap();
+        std::fs::write(base.join("document.md"), "content").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let visible_entries = super::list_directory(basepath.clone(), String::new(), false)
+            .await
+            .unwrap();
+        let folder = visible_entries
+            .iter()
+            .find(|entry| entry.name == "folder")
+            .unwrap();
+        let file = visible_entries
+            .iter()
+            .find(|entry| entry.name == "document.md")
+            .unwrap();
+        assert_eq!(folder.item_count, Some(2));
+        assert_eq!(folder.size_bytes, None);
+        assert!(folder.modified_at.is_some());
+        assert_eq!(file.size_bytes, Some(7));
+        assert_eq!(file.item_count, None);
+        assert!(file.modified_at.is_some());
+
+        let all_entries = super::list_directory(basepath, String::new(), true)
+            .await
+            .unwrap();
+        let folder = all_entries
+            .iter()
+            .find(|entry| entry.name == "folder")
+            .unwrap();
+        assert_eq!(folder.item_count, Some(3));
 
         std::fs::remove_dir_all(base).unwrap();
     });
