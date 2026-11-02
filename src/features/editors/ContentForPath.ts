@@ -6,12 +6,12 @@
 import type { LanguageSupport } from "@codemirror/language";
 import type { Component } from "solid-js";
 import type { PathKind } from "@/backend/rusttypes";
-import EditorExternalFile from "./external/EditorExternalFile";
 import EditorFolder from "./folder/EditorFolder";
 import EditorImage from "./image/EditorImage";
 import EditorMarkdown from "./markdown/EditorMarkdown";
 import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
 import EditorText from "./text/EditorText";
+import { editorForFilename } from "./EditorForFilename";
 
 export type PathResult = { kind: PathKind; error?: never } | { kind: "error"; error: string };
 
@@ -42,41 +42,31 @@ const noToolbarSections: readonly ContextualToolbarSection[] = [];
 
 function contentForFile(filename: string): ContentSelection {
     const normalizedFilename = filename.toLowerCase();
-    const extensionIndex = normalizedFilename.lastIndexOf(".");
-    const extension = extensionIndex >= 0 ? normalizedFilename.slice(extensionIndex) : "";
+    const editor = editorForFilename(normalizedFilename);
 
-    switch (extension) {
-        case ".md":
-        case ".markdown":
-        case ".mdown":
-        case ".mkd":
-            return {
-                kind: "content",
-                component: EditorMarkdown,
-                props: {},
-                toolbarSections: ["markdown"],
-            };
-        case ".avif":
-        case ".bmp":
-        case ".gif":
-        case ".ico":
-        case ".jpeg":
-        case ".jpg":
-        case ".png":
-        case ".webp":
-            return {
-                kind: "content",
-                component: EditorImage,
-                props: {},
-                toolbarSections: noToolbarSections,
-            };
+    if (editor === EditorMarkdown) {
+        return {
+            kind: "content",
+            component: editor,
+            props: {},
+            toolbarSections: ["markdown"],
+        };
+    }
+
+    if (editor === EditorImage) {
+        return {
+            kind: "content",
+            component: editor,
+            props: {},
+            toolbarSections: noToolbarSections,
+        };
     }
 
     const editorTextExtensions = editorTextExtensionsForFilename(normalizedFilename);
-    if (editorTextExtensions) {
+    if (editor === EditorText && editorTextExtensions) {
         return {
             kind: "content",
-            component: EditorText,
+            component: editor,
             props: { extensions: editorTextExtensions },
             toolbarSections: noToolbarSections,
         };
@@ -84,7 +74,7 @@ function contentForFile(filename: string): ContentSelection {
 
     return {
         kind: "content",
-        component: EditorExternalFile,
+        component: editor,
         props: {},
         toolbarSections: noToolbarSections,
     };

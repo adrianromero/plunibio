@@ -6,11 +6,11 @@
 import { createResource, createSignal, For, JSX, Match, onCleanup, Show, Switch } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
+import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
 import Plus from "lucide-solid/icons/plus";
-import { LanguageDescription } from "@codemirror/language";
 import { useAppContext } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
 import { useI18N } from "@/i18n/Localization";
@@ -20,7 +20,10 @@ import { Dynamic } from "solid-js/web";
 import Menu from "@/shared/ui/menu/Menu";
 import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
 import MessageView from "@/shared/errors/MessageView";
-import { CODE_LANGUAGES } from "@/features/editors/text/CodeLanguages";
+import EditorImage from "@/features/editors/image/EditorImage";
+import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
+import { editorForFilename } from "@/features/editors/EditorForFilename";
+import EditorText from "@/features/editors/text/EditorText";
 
 type DirectoryResult =
     | { entries: DirectoryEntry[]; error?: never }
@@ -33,9 +36,10 @@ const FILE_SIZE_UNITS = [
 ] as const;
 
 export function fileIconForFilename(filename: string): typeof File {
-    const language = LanguageDescription.matchFilename(CODE_LANGUAGES, filename.toLowerCase());
-    if (language?.name === "Markdown") return FilePen;
-    if (language?.name === "Text") return FileText;
+    const editor = editorForFilename(filename);
+    if (editor === EditorMarkdown) return FilePen;
+    if (editor === EditorText) return FileText;
+    if (editor === EditorImage) return FileImage;
     return File;
 }
 

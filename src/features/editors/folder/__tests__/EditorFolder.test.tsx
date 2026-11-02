@@ -7,6 +7,7 @@ import { createSignal, type Accessor, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import File from "lucide-solid/icons/file";
+import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import type { CreateEntryHandler, ReloadFileHandler } from "@/app/AppContext";
@@ -265,8 +266,9 @@ describe("EditorFolder", () => {
         expect(fileIconForFilename("notes.MARKDOWN")).toBe(FilePen);
         expect(fileIconForFilename("notes.txt")).toBe(FileText);
         expect(fileIconForFilename("server.log")).toBe(FileText);
-        expect(fileIconForFilename("photo.png")).toBe(File);
-        expect(fileIconForFilename("script.ts")).toBe(File);
+        expect(fileIconForFilename("photo.png")).toBe(FileImage);
+        expect(fileIconForFilename("script.ts")).toBe(FileText);
+        expect(fileIconForFilename("archive.bin")).toBe(File);
     });
 
     it("formats file sizes using the most appropriate unit", () => {
