@@ -577,7 +577,7 @@ body {
     background-color: var(--color-view-background);
 }
 
-.scrollingView.errorView {
+.scrollingView.messageView {
     display: none;
 }
 

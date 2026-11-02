@@ -36,6 +36,17 @@
         "root": "Inici",
         "loading": "S'està carregant {{ path }}...",
         "empty": "Aquesta carpeta és buida",
+        "new": "Nou",
+        "directory": "Carpeta",
+        "markdown": "Markdown",
+        "text": "Text",
+        "other": "Un altre",
+        "createFolder": "Crea una carpeta",
+        "createFile": "Crea un fitxer",
+        "folderName": "Nom de la carpeta",
+        "fileName": "Nom del fitxer",
+        "creatingFolder": "S'està creant la carpeta {{ name }}...",
+        "creatingFile": "S'està creant el fitxer {{ name }}...",
         "hiddenFiles": "Fitxers ocults",
         "show": "Mostra",
         "hide": "Amaga"
@@ -205,6 +216,9 @@
         "read_directory_failed": "No s'ha pogut obrir la carpeta {{ path }}.",
         "read_file_failed": "No s'ha pogut llegir el fitxer {{ path }}.",
         "open_file_failed": "No s'ha pogut obrir el fitxer {{ path }} amb l'aplicació predeterminada.",
-        "write_file_failed": "No s'ha pogut desar el fitxer {{ path }}. Comproveu que es pot modificar."
+        "write_file_failed": "No s'ha pogut desar el fitxer {{ path }}. Comproveu que es pot modificar.",
+        "path_already_exists": "Ja existeix un fitxer o una carpeta amb el nom {{ path }}.",
+        "create_directory_failed": "No s'ha pogut crear la carpeta {{ path }}.",
+        "create_file_failed": "No s'ha pogut crear el fitxer {{ path }}."
     }
 }

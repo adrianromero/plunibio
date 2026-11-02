@@ -6,11 +6,19 @@
 import ChevronRight from "lucide-solid/icons/chevron-right";
 import EllipsisVertical from "lucide-solid/icons/ellipsis-vertical";
 import type { LucideIcon } from "lucide-solid";
-import { createMemo, createUniqueId, For, Show, type Accessor, type JSX } from "solid-js";
+import {
+    createMemo,
+    createUniqueId,
+    For,
+    onCleanup,
+    Show,
+    type Accessor,
+    type JSX,
+} from "solid-js";
 import { Dynamic } from "solid-js/web";
-import styles from "./ToolbarMenu.module.css";
+import styles from "./Menu.module.css";
 
-export type ToolbarMenuActionItem = {
+export type MenuActionItem = {
     kind: "action";
     id: string;
     label: string;
@@ -20,42 +28,46 @@ export type ToolbarMenuActionItem = {
     disabled?: boolean | Accessor<boolean>;
 };
 
-export type ToolbarMenuChoiceOption<Value extends string = string> = {
+export type MenuChoiceOption<Value extends string = string> = {
     value: Value;
     label: string;
     description?: string;
     icon?: LucideIcon;
 };
 
-export type ToolbarMenuChoiceItem<Value extends string = string> = {
+export type MenuChoiceItem<Value extends string = string> = {
     kind: "choice";
     id: string;
     label: string;
     currentIcon?: LucideIcon;
     value: Accessor<Value>;
-    options: readonly ToolbarMenuChoiceOption<Value>[];
+    options: readonly MenuChoiceOption<Value>[];
     onChange(value: Value): void;
     disabled?: boolean | Accessor<boolean>;
 };
 
-export type ToolbarMenuItem = ToolbarMenuActionItem | ToolbarMenuChoiceItem;
+export type MenuItem = MenuActionItem | MenuChoiceItem;
 
-export type ToolbarMenuSection = {
+export type MenuSection = {
     kind: "section";
     id: string;
     label?: string;
-    items: readonly ToolbarMenuItem[];
+    items: readonly MenuItem[];
 };
 
-export type ToolbarMenuBlock = ToolbarMenuItem | ToolbarMenuSection;
+export type MenuBlock = MenuItem | MenuSection;
 
-type ToolbarMenuProps = {
+export type MenuProps = {
     label: string;
-    blocks: readonly ToolbarMenuBlock[];
+    blocks: readonly MenuBlock[];
+    triggerIcon?: LucideIcon;
+    triggerText?: string;
+    triggerClass?: string;
+    align?: "start" | "end";
 };
 
-type ToolbarMenuChoiceProps = {
-    item: ToolbarMenuChoiceItem;
+type MenuChoiceProps = {
+    item: MenuChoiceItem;
     closeParent: () => void;
 };
 
@@ -78,7 +90,7 @@ function isDisabled(disabled: boolean | Accessor<boolean> | undefined): boolean 
     return typeof disabled === "function" ? disabled() : Boolean(disabled);
 }
 
-function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
+function MenuChoice(props: MenuChoiceProps): JSX.Element {
     const id = `toolbar-choice-${createUniqueId()}`;
     const anchorName = `--${id}-anchor`;
     let trigger: HTMLButtonElement | undefined;
@@ -270,10 +282,10 @@ function ToolbarMenuChoice(props: ToolbarMenuChoiceProps): JSX.Element {
     );
 }
 
-function ToolbarMenuEntry(props: { item: ToolbarMenuItem; closeParent: () => void }): JSX.Element {
+function MenuEntry(props: { item: MenuItem; closeParent: () => void }): JSX.Element {
     const item = props.item;
     if (item.kind === "choice") {
-        return <ToolbarMenuChoice item={item} closeParent={props.closeParent} />;
+        return <MenuChoice item={item} closeParent={props.closeParent} />;
     }
 
     return (
@@ -302,9 +314,8 @@ function ToolbarMenuEntry(props: { item: ToolbarMenuItem; closeParent: () => voi
     );
 }
 
-export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
+export function Menu(props: MenuProps): JSX.Element {
     const id = `toolbar-menu-${createUniqueId()}`;
-    const anchorName = `--${id}-anchor`;
     let trigger: HTMLButtonElement | undefined;
     let menu: HTMLDivElement | undefined;
     let focusFirstItemOnOpen = false;
@@ -320,25 +331,45 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
 
     const closeMenu = (): void => hidePopover(menu);
 
-    const positionFallback = (): void => {
-        if (!menu || !trigger || supportsAnchorPositioning()) return;
-
+    const positionMenu = (): void => {
+        if (!menu || !trigger) return;
         const triggerRect = trigger.getBoundingClientRect();
-        menu.style.setProperty("--toolbar-menu-top", `${triggerRect.bottom + 6}px`);
-        menu.style.setProperty(
-            "--toolbar-menu-right",
-            `${Math.max(0, window.innerWidth - triggerRect.right)}px`
+        const edgeGap = 8;
+        const desiredLeft =
+            props.align === "start" ? triggerRect.left : triggerRect.right - menu.offsetWidth;
+        const left = Math.min(
+            Math.max(edgeGap, desiredLeft),
+            Math.max(edgeGap, window.innerWidth - menu.offsetWidth - edgeGap)
         );
+        const desiredTop = triggerRect.bottom + 6;
+        const top =
+            desiredTop + menu.offsetHeight <= window.innerHeight - edgeGap
+                ? desiredTop
+                : Math.max(edgeGap, triggerRect.top - menu.offsetHeight - 6);
+        menu.style.setProperty("--toolbar-menu-top", `${top}px`);
+        menu.style.setProperty("--toolbar-menu-left", `${left}px`);
+    };
+
+    const removePositionListeners = (): void => {
+        window.removeEventListener("scroll", positionMenu, true);
+        window.removeEventListener("resize", positionMenu);
     };
 
     const handleToggle = (event: ToggleEvent): void => {
-        if (event.newState !== "open") return;
-        positionFallback();
+        if (event.newState !== "open") {
+            removePositionListeners();
+            return;
+        }
+        positionMenu();
+        window.addEventListener("scroll", positionMenu, { capture: true, passive: true });
+        window.addEventListener("resize", positionMenu);
         if (focusFirstItemOnOpen) {
             focusAt(enabledItems(), 0);
         }
         focusFirstItemOnOpen = false;
     };
+
+    onCleanup(removePositionListeners);
 
     const handleKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = (event) => {
         const items = enabledItems();
@@ -371,9 +402,8 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
         <>
             <button
                 ref={trigger}
-                class="stdButton mainbar"
+                class={props.triggerClass ?? "stdButton mainbar"}
                 data-testid="toolbar-menu-trigger"
-                style={{ "anchor-name": anchorName }}
                 type="button"
                 aria-label={props.label}
                 aria-haspopup="menu"
@@ -393,13 +423,13 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                     }
                 }}
             >
-                <EllipsisVertical aria-hidden="true" />
+                <Dynamic component={props.triggerIcon ?? EllipsisVertical} aria-hidden="true" />
+                <Show when={props.triggerText}>{(text) => <span>{text()}</span>}</Show>
             </button>
             <div
                 ref={menu}
                 id={id}
-                class={styles.menu}
-                style={{ "position-anchor": anchorName }}
+                class={`${styles.menu} ${props.align === "start" ? styles.alignStart : ""}`}
                 popover="auto"
                 role="menu"
                 data-testid="toolbar-menu"
@@ -410,7 +440,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                 <For each={props.blocks}>
                     {(block) => {
                         if (block.kind !== "section") {
-                            return <ToolbarMenuEntry item={block} closeParent={closeMenu} />;
+                            return <MenuEntry item={block} closeParent={closeMenu} />;
                         }
 
                         const labelId = `${id}-section-${block.id}`;
@@ -430,7 +460,7 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
                                 </Show>
                                 <For each={block.items}>
                                     {(item) => (
-                                        <ToolbarMenuEntry item={item} closeParent={closeMenu} />
+                                        <MenuEntry item={item} closeParent={closeMenu} />
                                     )}
                                 </For>
                             </div>
@@ -442,4 +472,5 @@ export function ToolbarMenu(props: ToolbarMenuProps): JSX.Element {
     );
 }
 
-export default ToolbarMenu;
+export default Menu;
+

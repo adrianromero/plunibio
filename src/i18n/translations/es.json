@@ -36,6 +36,17 @@
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
         "empty": "Esta carpeta está vacía",
+        "new": "Nuevo",
+        "directory": "Carpeta",
+        "markdown": "Markdown",
+        "text": "Texto",
+        "other": "Otro",
+        "createFolder": "Crear carpeta",
+        "createFile": "Crear archivo",
+        "folderName": "Nombre de la carpeta",
+        "fileName": "Nombre del archivo",
+        "creatingFolder": "Creando la carpeta {{ name }}...",
+        "creatingFile": "Creando el archivo {{ name }}...",
         "hiddenFiles": "Archivos ocultos",
         "show": "Mostrar",
         "hide": "Ocultar"
@@ -205,6 +216,9 @@
         "read_directory_failed": "No se ha podido abrir la carpeta {{ path }}.",
         "read_file_failed": "No se ha podido leer el archivo {{ path }}.",
         "open_file_failed": "No se ha podido abrir el archivo {{ path }} con su aplicación predeterminada.",
-        "write_file_failed": "No se ha podido guardar el archivo {{ path }}. Comprueba que se puede modificar."
+        "write_file_failed": "No se ha podido guardar el archivo {{ path }}. Comprueba que se puede modificar.",
+        "path_already_exists": "Ya existe un archivo o una carpeta llamado {{ path }}.",
+        "create_directory_failed": "No se ha podido crear la carpeta {{ path }}.",
+        "create_file_failed": "No se ha podido crear el archivo {{ path }}."
     }
 }

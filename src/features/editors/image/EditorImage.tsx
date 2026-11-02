@@ -16,7 +16,7 @@ import AppSidebar from "@/app/sidebar/AppSidebar";
 import Control from "@/shared/ui/Control";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
-import ErrorView from "@/shared/errors/ErrorView";
+import MessageView from "@/shared/errors/MessageView";
 import styles from "./EditorImage.module.css";
 import CircleDot from "lucide-solid/icons/circle-dot";
 import Maximize2 from "lucide-solid/icons/maximize-2";
@@ -311,7 +311,7 @@ export function EditorImage(): JSX.Element {
     return (
         <section class={styles.studio} data-testid="image-view">
             <Show when={error()}>
-                <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
+                <MessageView>{error() ?? t("errors.unknown")}</MessageView>
             </Show>
             <div
                 ref={viewportRef}

@@ -4,17 +4,17 @@
  */
 
 import { JSX } from "solid-js";
-import styles from "./ErrorView.module.css";
+import styles from "./MessageView.module.css";
 import { Dynamic } from "solid-js/web";
 import { messagesinfo, type MessageInfoKind, type MessageInfo } from "./messagesinfo";
 import { useI18N } from "@/i18n/Localization";
 
-type ErrorViewProps = {
+type MessageViewProps = {
     children: JSX.Element;
     info?: MessageInfoKind;
 };
 
-export function ErrorView(props: ErrorViewProps): JSX.Element {
+export function MessageView(props: MessageViewProps): JSX.Element {
     const { t } = useI18N();
 
     const kind = (): MessageInfoKind => props.info ?? "error";
@@ -22,11 +22,11 @@ export function ErrorView(props: ErrorViewProps): JSX.Element {
 
     return (
         <section
-            class={`${styles.errorView} ${styles[info().class]}`}
-            data-testid="error-view"
+            class={`${styles.messageView} ${styles[info().class]}`}
+            data-testid="message-view"
             data-message-kind={kind()}
         >
-            <div class={styles.errorContent}>
+            <div class={styles.messageContent}>
                 <Dynamic component={info().icon} class={styles.icon} aria-hidden="true" />
                 <div class={styles.title}>{t(info().literal)}</div>
                 <div class={styles.message}>{props.children}</div>
@@ -35,4 +35,5 @@ export function ErrorView(props: ErrorViewProps): JSX.Element {
     );
 }
 
-export default ErrorView;
+export default MessageView;
+

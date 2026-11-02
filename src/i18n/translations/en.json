@@ -36,6 +36,17 @@
         "root": "Home",
         "loading": "Loading {{ path }}...",
         "empty": "This folder is empty",
+        "new": "New",
+        "directory": "Folder",
+        "markdown": "Markdown",
+        "text": "Text",
+        "other": "Other",
+        "createFolder": "Create folder",
+        "createFile": "Create file",
+        "folderName": "Folder name",
+        "fileName": "File name",
+        "creatingFolder": "Creating folder {{ name }}...",
+        "creatingFile": "Creating file {{ name }}...",
         "hiddenFiles": "Hidden files",
         "show": "Show",
         "hide": "Hide"
@@ -205,6 +216,9 @@
         "read_directory_failed": "The folder {{ path }} could not be opened.",
         "read_file_failed": "The file {{ path }} could not be read.",
         "open_file_failed": "The file {{ path }} could not be opened with its default application.",
-        "write_file_failed": "The file {{ path }} could not be saved. Check that it is writable."
+        "write_file_failed": "The file {{ path }} could not be saved. Check that it is writable.",
+        "path_already_exists": "A file or folder named {{ path }} already exists.",
+        "create_directory_failed": "The folder {{ path }} could not be created.",
+        "create_file_failed": "The file {{ path }} could not be created."
     }
 }

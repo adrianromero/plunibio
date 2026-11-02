@@ -5,6 +5,72 @@ use super::{read_file, write_file};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[test]
+fn creates_empty_files_and_directories_without_overwriting() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-create-entry-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let directory =
+            super::create_directory(basepath.clone(), "docs".to_owned(), "notes".to_owned())
+                .await
+                .unwrap();
+        assert_eq!(directory.name, "notes");
+        assert_eq!(
+            directory.filename,
+            std::path::Path::new("docs").join("notes").to_string_lossy()
+        );
+        assert!(base.join("docs/notes").is_dir());
+
+        let file = super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
+            .await
+            .unwrap();
+        assert_eq!(file.name, "new.md");
+        assert_eq!(
+            std::fs::read(base.join("docs/new.md")).unwrap(),
+            Vec::<u8>::new()
+        );
+
+        let duplicate =
+            super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
+                .await
+                .unwrap_err();
+        let value = serde_json::to_value(duplicate).unwrap();
+        assert_eq!(value["code"], "path_already_exists");
+        assert_eq!(value["path"], "new.md");
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn create_entry_rejects_paths_instead_of_names() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-create-name-{unique}"));
+        std::fs::create_dir(&base).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        for name in ["", "   ", ".", "..", "nested/file.md", "nested\\file.md"] {
+            let error = super::create_file(basepath.clone(), String::new(), name.to_owned())
+                .await
+                .unwrap_err();
+            let value = serde_json::to_value(error).unwrap();
+            assert_eq!(value["code"], "invalid_path");
+        }
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
 fn missing_file_is_unsaved_until_written() {
     tauri::async_runtime::block_on(async {
         let unique = SystemTime::now()

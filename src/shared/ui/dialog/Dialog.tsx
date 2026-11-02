@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createEffect, createUniqueId, JSX } from "solid-js";
+import { createUniqueId, JSX } from "solid-js";
 import styles from "./Dialog.module.css";
 import { Dynamic } from "solid-js/web";
 import { messagesinfo, type MessageInfo, type MessageInfoKind } from "@/shared/errors/messagesinfo";
 import { useI18N } from "@/i18n/Localization";
-import { dismissDialogOnBackdropClick } from "./DialogDismiss";
+import ModalDialog from "./ModalDialog";
 
 type DialogProps = {
     open: boolean;
@@ -23,36 +23,20 @@ type DialogProps = {
 
 export function Dialog(props: DialogProps): JSX.Element {
     const { t } = useI18N();
-    let dialogRef!: HTMLDialogElement;
     const titleId = createUniqueId();
     const kind = (): MessageInfoKind => props.info ?? (props.confirmLabel ? "question" : "error");
     const info = (): MessageInfo => messagesinfo[kind()];
     const cancel = (): void => props.onCancel();
 
-    createEffect(() => {
-        if (props.open && !dialogRef.open) {
-            dialogRef.showModal();
-        } else if (!props.open && dialogRef.open) {
-            dialogRef.close();
-        }
-    });
-
     return (
-        <dialog
-            ref={dialogRef}
-            class={`${styles.dialog} ${styles[info().class]}`}
-            data-testid="message-dialog"
-            data-message-kind={kind()}
-            aria-labelledby={titleId}
-            tabIndex={-1}
-            onCancel={(e) => {
-                e.preventDefault();
-                cancel();
-            }}
-            onClick={(event) => dismissDialogOnBackdropClick(event, cancel)}
-            onClose={() => {
-                props.onClose?.();
-            }}
+        <ModalDialog
+            open={props.open}
+            class={styles[info().class]}
+            testId="message-dialog"
+            messageKind={kind()}
+            labelledBy={titleId}
+            onCancel={cancel}
+            onClose={props.onClose}
         >
             <div class={styles.iconRow}>
                 <Dynamic component={info().icon} class={styles.icon} aria-hidden="true" />
@@ -79,7 +63,7 @@ export function Dialog(props: DialogProps): JSX.Element {
                     </button>
                 ) : null}
             </div>
-        </dialog>
+        </ModalDialog>
     );
 }
 

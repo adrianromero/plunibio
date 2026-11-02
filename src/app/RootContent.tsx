@@ -6,7 +6,7 @@
 import { JSX, Match, Show, Switch } from "solid-js";
 import type { ContentSelection } from "@/features/editors/ContentForPath";
 import { useI18N } from "@/i18n/Localization";
-import ErrorView from "@/shared/errors/ErrorView";
+import MessageView from "@/shared/errors/MessageView";
 import { useAppContext } from "./AppContext";
 import { Dynamic } from "solid-js/web";
 
@@ -34,16 +34,16 @@ export function RootContent(props: RootContentProps): JSX.Element {
                     )}
                 </Match>
                 <Match when={props.selection?.kind === "unsupported"}>
-                    <ErrorView info="status">
+                    <MessageView info="status">
                         {t("errors.unsupportedPathType", { filename: filename() })}
-                    </ErrorView>
+                    </MessageView>
                 </Match>
                 <Match when={props.selection?.kind === "error"}>
-                    <ErrorView>
+                    <MessageView>
                         {props.selection?.kind === "error"
                             ? props.selection.error
                             : t("errors.unknown")}
-                    </ErrorView>
+                    </MessageView>
                 </Match>
             </Switch>
         </Show>

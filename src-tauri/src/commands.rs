@@ -66,7 +66,7 @@ pub(crate) struct InitialConfig {
     filename: String,
 }
 
-#[derive(serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum PathKind {
     File,
@@ -84,12 +84,64 @@ impl PathKind {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct DirectoryEntry {
     name: String,
     filename: String,
     kind: PathKind,
+}
+
+fn validate_entry_name(name: &str) -> Result<(), AppError> {
+    if name.trim().is_empty()
+        || matches!(name, "." | "..")
+        || name.contains(['/', '\\'])
+        || name.contains('\0')
+    {
+        return Err(AppError::invalid_path(
+            name,
+            "entry name must be a single non-empty name",
+        ));
+    }
+    Ok(())
+}
+
+fn created_entry(
+    base: &Path,
+    path: &Path,
+    name: String,
+    kind: PathKind,
+) -> Result<DirectoryEntry, AppError> {
+    let filename = path
+        .strip_prefix(base)
+        .map_err(|error| {
+            AppError::internal(
+                AppErrorCode::InvalidPath,
+                "make_created_entry_relative",
+                &name,
+                &error.to_string(),
+            )
+        })?
+        .to_string_lossy()
+        .into_owned();
+    Ok(DirectoryEntry {
+        name,
+        filename,
+        kind,
+    })
+}
+
+fn create_error(
+    operation: &str,
+    filename: &str,
+    error: std::io::Error,
+    fallback: AppErrorCode,
+) -> AppError {
+    if error.kind() == std::io::ErrorKind::AlreadyExists {
+        AppError::new(AppErrorCode::PathAlreadyExists, filename)
+    } else {
+        AppError::io(operation, filename, error, fallback)
+    }
 }
 
 #[derive(serde::Serialize)]
@@ -510,6 +562,46 @@ pub(crate) async fn list_directory(
             .then_with(|| left.name.cmp(&right.name))
     });
     Ok(entries)
+}
+
+#[tauri::command]
+pub(crate) async fn create_directory(
+    basepath: String,
+    filename: String,
+    name: String,
+) -> Result<DirectoryEntry, AppError> {
+    validate_entry_name(&name)?;
+    let (base, parent) = resolve_existing_path(&basepath, &filename).await?;
+    let path = parent.join(&name);
+    tokio::fs::create_dir(&path).await.map_err(|error| {
+        create_error(
+            "create_directory",
+            &name,
+            error,
+            AppErrorCode::CreateDirectoryFailed,
+        )
+    })?;
+    created_entry(&base, &path, name, PathKind::Directory)
+}
+
+#[tauri::command]
+pub(crate) async fn create_file(
+    basepath: String,
+    filename: String,
+    name: String,
+) -> Result<DirectoryEntry, AppError> {
+    validate_entry_name(&name)?;
+    let (base, parent) = resolve_existing_path(&basepath, &filename).await?;
+    let path = parent.join(&name);
+    tokio::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&path)
+        .await
+        .map_err(|error| {
+            create_error("create_file", &name, error, AppErrorCode::CreateFileFailed)
+        })?;
+    created_entry(&base, &path, name, PathKind::File)
 }
 
 #[tauri::command]

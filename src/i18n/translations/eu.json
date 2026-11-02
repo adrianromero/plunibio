@@ -36,6 +36,17 @@
         "root": "Hasiera",
         "loading": "{{ path }} kargatzen...",
         "empty": "Karpeta hau hutsik dago",
+        "new": "Berria",
+        "directory": "Karpeta",
+        "markdown": "Markdown",
+        "text": "Testua",
+        "other": "Bestelakoa",
+        "createFolder": "Sortu karpeta",
+        "createFile": "Sortu fitxategia",
+        "folderName": "Karpetaren izena",
+        "fileName": "Fitxategiaren izena",
+        "creatingFolder": "{{ name }} karpeta sortzen...",
+        "creatingFile": "{{ name }} fitxategia sortzen...",
         "hiddenFiles": "Ezkutuko fitxategiak",
         "show": "Erakutsi",
         "hide": "Ezkutatu"
@@ -205,6 +216,9 @@
         "read_directory_failed": "Ezin izan da {{ path }} karpeta ireki.",
         "read_file_failed": "Ezin izan da {{ path }} fitxategia irakurri.",
         "open_file_failed": "Ezin izan da {{ path }} fitxategia aplikazio lehenetsiarekin ireki.",
-        "write_file_failed": "Ezin izan da {{ path }} fitxategia gorde. Egiaztatu alda daitekeela."
+        "write_file_failed": "Ezin izan da {{ path }} fitxategia gorde. Egiaztatu alda daitekeela.",
+        "path_already_exists": "{{ path }} izeneko fitxategi edo karpeta bat badago lehendik.",
+        "create_directory_failed": "Ezin izan da {{ path }} karpeta sortu.",
+        "create_file_failed": "Ezin izan da {{ path }} fitxategia sortu."
     }
 }

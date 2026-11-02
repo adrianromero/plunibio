@@ -5,7 +5,7 @@
 
 .menu {
     position: fixed;
-    inset: var(--toolbar-menu-top, 4rem) var(--toolbar-menu-right, 1.5rem) auto auto;
+    inset: var(--toolbar-menu-top, 4rem) auto auto var(--toolbar-menu-left, 1.5rem);
     box-sizing: border-box;
     min-width: 16rem;
     margin: 0;
@@ -155,13 +155,6 @@
 }
 
 @supports (top: anchor(bottom)) {
-    .menu {
-        position: absolute;
-        inset: auto;
-        top: calc(anchor(bottom) + 0.4rem);
-        right: anchor(right);
-    }
-
     .submenu {
         inset: auto;
         top: anchor(bottom);
@@ -176,6 +169,10 @@
         transform-origin: top right;
     }
 
+    .menu.alignStart:popover-open {
+        transform-origin: top left;
+    }
+
     .submenu:popover-open {
         transform-origin: top right;
     }
@@ -187,3 +184,4 @@
         transform: translateY(-0.2rem) scale(0.98);
     }
 }
+

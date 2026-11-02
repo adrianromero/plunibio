@@ -58,6 +58,24 @@ vi.stubGlobal("matchMedia", () => ({
     dispatchEvent: (): boolean => false,
 }));
 
+if (typeof HTMLDialogElement.prototype.showModal !== "function") {
+    Object.defineProperties(HTMLDialogElement.prototype, {
+        showModal: {
+            configurable: true,
+            value(this: HTMLDialogElement): void {
+                this.open = true;
+            },
+        },
+        close: {
+            configurable: true,
+            value(this: HTMLDialogElement): void {
+                this.open = false;
+                this.dispatchEvent(new Event("close"));
+            },
+        },
+    });
+}
+
 Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
     configurable: true,
     value: (): void => {},

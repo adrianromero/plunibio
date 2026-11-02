@@ -22,7 +22,7 @@ import {
 import { useI18N } from "@/i18n/Localization";
 import { ProseMirrorSearchController } from "@/features/search/ProseMirrorSearchController";
 import type { SearchController } from "@/features/search/SearchController";
-import ErrorView from "@/shared/errors/ErrorView";
+import MessageView from "@/shared/errors/MessageView";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
 import { Ctx } from "@milkdown/kit/ctx";
@@ -512,9 +512,9 @@ export function EditorMarkdown(): JSX.Element {
     return (
         <section class={styles.studio} data-testid="markdown-view">
             <Show when={error()}>
-                <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
+                <MessageView>{error() ?? t("errors.unknown")}</MessageView>
             </Show>
-            <div class={`scrollingView ${error() ? "errorView" : ""}`}>
+            <div class={`scrollingView ${error() ? "messageView" : ""}`}>
                 <div
                     class={`contentView ${styles.frontmatterPanel}`}
                     data-testid="frontmatter-panel"

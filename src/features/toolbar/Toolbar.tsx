@@ -18,7 +18,7 @@ import type { AppTypography } from "@/preferences/TypographyPreferences";
 import type { ContextualToolbarSection } from "@/features/editors/ContentForPath";
 import FileBreadcrumb from "@/features/navigation/FileBreadcrumb";
 import FileNavigation from "@/features/navigation/FileNavigation";
-import ToolbarMenu, { type ToolbarMenuChoiceItem } from "./ToolbarMenu";
+import Menu, { type MenuChoiceItem } from "@/shared/ui/menu/Menu";
 import styles from "./Toolbar.module.css";
 
 type ToolbarProps = {
@@ -79,7 +79,7 @@ export function Toolbar(props: ToolbarProps) {
                         <PanelRight aria-hidden="true" />
                     </button>
                 </Show>
-                <ToolbarMenu
+                <Menu
                     label={t("toolbar.moreOptions")}
                     blocks={[
                         {
@@ -134,7 +134,7 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (nextTheme): void => {
                                         setTheme(nextTheme);
                                     },
-                                } satisfies ToolbarMenuChoiceItem<AppTheme>,
+                                } satisfies MenuChoiceItem<AppTheme>,
                                 {
                                     kind: "choice",
                                     id: "language",
@@ -171,7 +171,7 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (nextLocale): void => {
                                         setLocale(nextLocale);
                                     },
-                                } satisfies ToolbarMenuChoiceItem<Locale>,
+                                } satisfies MenuChoiceItem<Locale>,
                                 {
                                     kind: "choice",
                                     id: "hidden-files",
@@ -192,7 +192,7 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (visibility): void => {
                                         setShowHiddenFiles(visibility === "show");
                                     },
-                                } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
+                                } satisfies MenuChoiceItem<HiddenFilesVisibility>,
                             ],
                         },
                         ...(props.contextualSections.includes("markdown")
@@ -241,7 +241,7 @@ export function Toolbar(props: ToolbarProps) {
                                             onChange: (nextTypography): void => {
                                                 setTypography(nextTypography);
                                             },
-                                        } satisfies ToolbarMenuChoiceItem<AppTypography>,
+                                        } satisfies MenuChoiceItem<AppTypography>,
                                       ],
                                   } as const,
                               ]

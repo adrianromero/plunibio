@@ -36,6 +36,17 @@
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
         "empty": "Este cartafol está baleiro",
+        "new": "Novo",
+        "directory": "Cartafol",
+        "markdown": "Markdown",
+        "text": "Texto",
+        "other": "Outro",
+        "createFolder": "Crear cartafol",
+        "createFile": "Crear ficheiro",
+        "folderName": "Nome do cartafol",
+        "fileName": "Nome do ficheiro",
+        "creatingFolder": "Creando o cartafol {{ name }}...",
+        "creatingFile": "Creando o ficheiro {{ name }}...",
         "hiddenFiles": "Ficheiros ocultos",
         "show": "Mostrar",
         "hide": "Ocultar"
@@ -205,6 +216,9 @@
         "read_directory_failed": "Non se puido abrir o cartafol {{ path }}.",
         "read_file_failed": "Non se puido ler o ficheiro {{ path }}.",
         "open_file_failed": "Non se puido abrir o ficheiro {{ path }} coa súa aplicación predeterminada.",
-        "write_file_failed": "Non se puido gardar o ficheiro {{ path }}. Comproba que se pode modificar."
+        "write_file_failed": "Non se puido gardar o ficheiro {{ path }}. Comproba que se pode modificar.",
+        "path_already_exists": "Xa existe un ficheiro ou cartafol chamado {{ path }}.",
+        "create_directory_failed": "Non se puido crear o cartafol {{ path }}.",
+        "create_file_failed": "Non se puido crear o ficheiro {{ path }}."
     }
 }
