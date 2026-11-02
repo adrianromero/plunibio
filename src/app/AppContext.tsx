@@ -43,6 +43,8 @@ export type ReloadFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
 export type NavigateFileHandler = () => Promise<void>;
 export type RenameEntryHandler = () => void | Promise<void>;
+export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
+export type CreateEntryHandler = (kind: CreateEntryKind) => void;
 export type ToggleSidebarHandler = () => void;
 export type ToggleThemeHandler = () => void;
 export type OnunloadHandler = () => Promise<void>;
@@ -59,6 +61,8 @@ export type AppContextValues = {
         loadFilenameAfterMutation: (filename: string) => Promise<void>;
         renameEntry: Accessor<RenameEntryHandler | null>;
         setRenameEntry: (handler: RenameEntryHandler | null) => void;
+        createEntry: Accessor<CreateEntryHandler | null>;
+        setCreateEntry: (handler: CreateEntryHandler | null) => void;
         navigateBack: Accessor<NavigateFileHandler | null>;
         setNavigateBack: (handler: NavigateFileHandler | null) => void;
         navigateForward: Accessor<NavigateFileHandler | null>;
@@ -134,6 +138,7 @@ export function AppProvider(props: {
     const [navigateForward, setNavigateForwardSignal] =
         createSignal<NavigateFileHandler | null>(null);
     const [renameEntry, setRenameEntrySignal] = createSignal<RenameEntryHandler | null>(null);
+    const [createEntry, setCreateEntrySignal] = createSignal<CreateEntryHandler | null>(null);
     const [sidebarVisible, setSidebarVisibleSignal] = createSignal(loadSidebarVisible());
     const [showHiddenFiles, setShowHiddenFilesSignal] = createSignal(loadShowHiddenFiles());
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
@@ -177,6 +182,9 @@ export function AppProvider(props: {
     };
     const setRenameEntry = (handler: RenameEntryHandler | null) => {
         setRenameEntrySignal(() => handler);
+    };
+    const setCreateEntry = (handler: CreateEntryHandler | null) => {
+        setCreateEntrySignal(() => handler);
     };
     const setToggleSidebar = (handler: ToggleSidebarHandler | null) => {
         setToggleSidebarSignal(() => handler);
@@ -231,6 +239,36 @@ export function AppProvider(props: {
             primary: false,
             phase: "capture",
             getHandler: renameEntry,
+        },
+        {
+            id: "new-directory",
+            key: "n",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("directory") : null;
+            },
+        },
+        {
+            id: "new-markdown",
+            key: "m",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("markdown") : null;
+            },
+        },
+        {
+            id: "new-text",
+            key: "t",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("text") : null;
+            },
         },
         {
             id: "open-workspace",
@@ -453,6 +491,8 @@ export function AppProvider(props: {
                     loadFilenameAfterMutation,
                     renameEntry,
                     setRenameEntry,
+                    createEntry,
+                    setCreateEntry,
                     navigateBack,
                     setNavigateBack,
                     navigateForward,

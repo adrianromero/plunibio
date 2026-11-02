@@ -124,6 +124,41 @@ describe("AppProvider workspace changes", () => {
         expect(renameEntry).toHaveBeenCalledOnce();
     });
 
+    it("routes Mod+Shift creation shortcuts to the active folder handler", () => {
+        const context = renderProvider();
+        const createEntry = vi.fn();
+        context.main.setCreateEntry(createEntry);
+
+        for (const key of ["n", "m", "t"]) {
+            document.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    bubbles: true,
+                    cancelable: true,
+                })
+            );
+        }
+
+        expect(createEntry.mock.calls).toEqual([
+            ["directory"],
+            ["markdown"],
+            ["text"],
+        ]);
+
+        context.main.setCreateEntry(null);
+        const unavailableEvent = new KeyboardEvent("keydown", {
+            key: "n",
+            ctrlKey: true,
+            shiftKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(unavailableEvent);
+        expect(unavailableEvent.defaultPrevented).toBe(false);
+    });
+
     it("opens and closes the About dialog through the application context", () => {
         const context = renderProvider();
         const closeButton = document.querySelector<HTMLButtonElement>(

@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import File from "lucide-solid/icons/file";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
-import type { ReloadFileHandler } from "@/app/AppContext";
+import type { CreateEntryHandler, ReloadFileHandler } from "@/app/AppContext";
 import type { DirectoryEntry } from "@/backend/rusttypes";
 import EditorFolder, { fileIconForFilename, formatFileSize } from "../EditorFolder";
 
@@ -20,6 +20,7 @@ const setSpinnerParamsMock = vi.hoisted(() => vi.fn());
 const showAppMessageMock = vi.hoisted(() => vi.fn(async () => undefined));
 const loadFilenameMock = vi.hoisted(() => vi.fn(async () => undefined));
 let reloadFile: ReloadFileHandler | null;
+let createEntryShortcut: CreateEntryHandler | null;
 let showHiddenFiles: Accessor<boolean>;
 let setShowHiddenFiles: Setter<boolean>;
 
@@ -32,6 +33,9 @@ vi.mock("@/app/AppContext", () => ({
             filename: () => "docs",
             loadFilename: loadFilenameMock,
             showAppMessage: showAppMessageMock,
+            setCreateEntry: (handler: CreateEntryHandler | null) => {
+                createEntryShortcut = handler;
+            },
         },
         spinner: {
             showSpinner: showSpinnerMock,
@@ -78,6 +82,7 @@ describe("EditorFolder", () => {
 
     beforeEach(() => {
         reloadFile = null;
+        createEntryShortcut = null;
         [showHiddenFiles, setShowHiddenFiles] = createSignal(false);
         invokeMock.mockImplementation(
             async (_command: string, args: { showHidden: boolean }): Promise<DirectoryEntry[]> =>
@@ -156,6 +161,32 @@ describe("EditorFolder", () => {
         dispose();
         dispose = undefined;
         expect(reloadFile).toBeNull();
+        expect(createEntryShortcut).toBeNull();
+    });
+
+    it("registers contextual creation shortcuts and shows them in the menu", async () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+        await vi.waitFor(() => expect(createEntryShortcut).not.toBeNull());
+
+        const shortcuts = Array.from(
+            root.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]")
+        ).map((entry) => entry.textContent);
+        expect(shortcuts).toEqual(
+            expect.arrayContaining([
+                expect.stringContaining("CTRL+SHIFT+N"),
+                expect.stringContaining("CTRL+SHIFT+M"),
+                expect.stringContaining("CTRL+SHIFT+T"),
+            ])
+        );
+
+        createEntryShortcut?.("text");
+        await vi.waitFor(() =>
+            expect(
+                root.querySelector<HTMLInputElement>('[data-testid="create-entry-name"]')?.value
+            ).toBe(".txt")
+        );
     });
 
     it("shows an empty folder as a status message", async () => {

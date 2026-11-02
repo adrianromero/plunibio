@@ -14,6 +14,7 @@ type ShortcutDefinitionBase = {
     shift?: boolean;
     alt?: boolean;
     phase?: ShortcutPhase;
+    preventDefaultWhenUnavailable?: boolean;
     getHandler: Accessor<ShortcutHandler | null>;
 };
 
@@ -86,10 +87,11 @@ export function AppShortcuts(props: AppShortcutsProps): JSX.Element {
         );
         if (!shortcut) return;
 
+        const handler = shortcut.getHandler();
+        if (!handler && shortcut.preventDefaultWhenUnavailable === false) return;
+
         event.preventDefault();
         if (phase === "capture") event.stopPropagation();
-
-        const handler = shortcut.getHandler();
 
         if (!handler || props.interactionsBlocked() || event.repeat) {
             return;

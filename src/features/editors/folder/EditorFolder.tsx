@@ -61,11 +61,15 @@ function formatModifiedAt(modifiedAt: number | null, locale: string): string | n
 export function EditorFolder(): JSX.Element {
     const { t, locale } = useI18N();
     const {
-        main: { basepath, filename, loadFilename, showAppMessage },
+        main: { basepath, filename, loadFilename, showAppMessage, setCreateEntry },
         spinner: { showSpinner, hideSpinner, setSpinnerParams },
         editor: { setReloadFile, showHiddenFiles },
     } = useAppContext();
     const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
+    const openCreateDialog = (kind: CreateEntryKind): void => {
+        setCreateKind(kind);
+    };
+    setCreateEntry(openCreateDialog);
 
     const entryDetails = (entry: DirectoryEntry): string => {
         const size =
@@ -132,6 +136,7 @@ export function EditorFolder(): JSX.Element {
 
     onCleanup(() => {
         setReloadFile(null);
+        setCreateEntry(null);
     });
 
     return (
@@ -150,7 +155,8 @@ export function EditorFolder(): JSX.Element {
                                 id: "new-directory",
                                 label: t("folder.directory"),
                                 icon: Folder,
-                                onSelect: () => setCreateKind("directory"),
+                                shortcut: "CTRL+SHIFT+N",
+                                onSelect: () => openCreateDialog("directory"),
                             },
                             {
                                 kind: "section",
@@ -161,21 +167,23 @@ export function EditorFolder(): JSX.Element {
                                         id: "new-markdown",
                                         label: t("folder.markdown"),
                                         icon: FilePen,
-                                        onSelect: () => setCreateKind("markdown"),
+                                        shortcut: "CTRL+SHIFT+M",
+                                        onSelect: () => openCreateDialog("markdown"),
                                     },
                                     {
                                         kind: "action",
                                         id: "new-text",
                                         label: t("folder.text"),
                                         icon: FileText,
-                                        onSelect: () => setCreateKind("text"),
+                                        shortcut: "CTRL+SHIFT+T",
+                                        onSelect: () => openCreateDialog("text"),
                                     },
                                     {
                                         kind: "action",
                                         id: "new-other",
                                         label: t("folder.other"),
                                         icon: File,
-                                        onSelect: () => setCreateKind("other"),
+                                        onSelect: () => openCreateDialog("other"),
                                     },
                                 ],
                             },

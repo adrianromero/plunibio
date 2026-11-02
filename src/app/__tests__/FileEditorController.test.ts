@@ -81,6 +81,8 @@ describe("createFileEditorController", () => {
                 loadFilenameAfterMutation: vi.fn(() => Promise.resolve()),
                 renameEntry: () => null,
                 setRenameEntry: vi.fn(),
+                createEntry: () => null,
+                setCreateEntry: vi.fn(),
                 navigateBack: () => null,
                 setNavigateBack: vi.fn(),
                 navigateForward: () => null,

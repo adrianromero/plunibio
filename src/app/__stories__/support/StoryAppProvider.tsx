@@ -93,6 +93,8 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             },
             renameEntry,
             setRenameEntry,
+            createEntry: () => null,
+            setCreateEntry: () => undefined,
             navigateBack: () => null,
             setNavigateBack: () => undefined,
             navigateForward: () => null,
