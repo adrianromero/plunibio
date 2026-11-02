@@ -221,7 +221,6 @@ export function FileBreadcrumb(): JSX.Element {
                     data-testid="breadcrumb-segment"
                     data-path=""
                     aria-label={formatPathForDisplay(basepath())}
-                    title={formatPathForDisplay(basepath())}
                     disabled={segments().length === 0}
                     onClick={() => void loadFilename("")}
                 >
