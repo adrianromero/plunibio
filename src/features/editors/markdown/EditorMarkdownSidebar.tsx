@@ -128,6 +128,7 @@ const EMPTY_INLINE_STYLE_STATE: InlineStyleState = {
 };
 
 type SidebarButtonProps = {
+    layout?: "action" | "compact";
     getEditor: () => Editor | null;
     selected?: boolean;
     focusEditorAfterRun?: boolean;
@@ -142,7 +143,7 @@ function SidebarButton(props: SidebarButtonProps): JSX.Element {
 
     return (
         <button
-            class={`stdButton toolbar ${selected() ? "selected" : ""}`}
+            class={`stdButton toolbar ${props.layout === "compact" ? "" : "sidebarAction"} ${selected() ? "selected" : ""}`}
             type="button"
             aria-label={props.label}
             title={props.label}
@@ -163,7 +164,9 @@ function SidebarButton(props: SidebarButtonProps): JSX.Element {
             }}
         >
             <Dynamic component={props.icon} aria-hidden="true" />
-            {props.label}
+            <span class={props.layout === "compact" ? undefined : "sidebarActionLabel"}>
+                {props.label}
+            </span>
         </button>
     );
 }
@@ -693,12 +696,14 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                         <div class="sidebarButtonGrid sidebarButtonGrid--2">
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={Quote}
                                 label={t("markdownToolbar.quote")}
                                 onRun={toggleBlockquote}
                             />
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={Minus}
                                 label={t("markdownToolbar.divider")}
                                 onRun={(ctx) => {
@@ -799,12 +804,14 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                         <div class="sidebarButtonGrid sidebarButtonGrid--2">
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={IndentIncrease}
                                 label={t("markdownToolbar.increaseIndent")}
                                 onRun={(ctx) => ctx.get(commandsCtx).call(sinkListItemCommand.key)}
                             />
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={IndentDecrease}
                                 label={t("markdownToolbar.decreaseIndent")}
                                 onRun={(ctx) => ctx.get(commandsCtx).call(liftListItemCommand.key)}

@@ -19,7 +19,6 @@ import { useI18N } from "@/i18n/Localization";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
 import type { FolderSort, FolderSortAttribute } from "@/preferences/FolderSortPreferences";
-import styles from "./EditorFolder.module.css";
 import type { CreateEntryKind } from "./CreateEntryDialog";
 
 type EditorFolderSidebarProps = {
@@ -60,7 +59,7 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.createFolder")}</h2>
                         <button
-                            class="stdButton toolbar"
+                            class="stdButton toolbar sidebarAction"
                             type="button"
                             data-create-kind="directory"
                             title={`${t("folder.newFolder")} (CTRL+SHIFT+N)`}
@@ -68,14 +67,14 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                             onClick={() => props.onCreate("directory")}
                         >
                             <Folder aria-hidden="true" />
-                            <span class={styles.actionLabel}>{t("folder.newFolder")}</span>
-                            <span class={styles.shortcut}>Ctrl+Shift+N</span>
+                            <span class="sidebarActionLabel">{t("folder.newFolder")}</span>
+                            <span class="sidebarActionShortcut">Ctrl+Shift+N</span>
                         </button>
                     </section>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.createFile")}</h2>
                         <button
-                            class="stdButton toolbar"
+                            class="stdButton toolbar sidebarAction"
                             type="button"
                             data-create-kind="markdown"
                             title={`${t("folder.newMarkdown")} (CTRL+SHIFT+M)`}
@@ -83,11 +82,11 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                             onClick={() => props.onCreate("markdown")}
                         >
                             <FilePen aria-hidden="true" />
-                            <span class={styles.actionLabel}>{t("folder.newMarkdown")}</span>
-                            <span class={styles.shortcut}>Ctrl+Shift+M</span>
+                            <span class="sidebarActionLabel">{t("folder.newMarkdown")}</span>
+                            <span class="sidebarActionShortcut">Ctrl+Shift+M</span>
                         </button>
                         <button
-                            class="stdButton toolbar"
+                            class="stdButton toolbar sidebarAction"
                             type="button"
                             data-create-kind="text"
                             title={`${t("folder.newText")} (CTRL+SHIFT+T)`}
@@ -95,18 +94,18 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                             onClick={() => props.onCreate("text")}
                         >
                             <FileText aria-hidden="true" />
-                            <span class={styles.actionLabel}>{t("folder.newText")}</span>
-                            <span class={styles.shortcut}>Ctrl+Shift+T</span>
+                            <span class="sidebarActionLabel">{t("folder.newText")}</span>
+                            <span class="sidebarActionShortcut">Ctrl+Shift+T</span>
                         </button>
                         <button
-                            class="stdButton toolbar"
+                            class="stdButton toolbar sidebarAction"
                             type="button"
                             data-create-kind="other"
                             disabled={props.disabled}
                             onClick={() => props.onCreate("other")}
                         >
                             <File aria-hidden="true" />
-                            <span class={styles.actionLabel}>{t("folder.newOther")}</span>
+                            <span class="sidebarActionLabel">{t("folder.newOther")}</span>
                         </button>
                     </section>
                     <section class="sidebarSection">
@@ -114,7 +113,7 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                         <For each={attributes}>
                             {(attribute) => (
                                 <button
-                                    class="stdButton toolbar"
+                                    class="stdButton toolbar sidebarAction"
                                     type="button"
                                     data-sort-attribute={attribute}
                                     data-sort-direction={
@@ -129,7 +128,7 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                                     onClick={() => props.onSort(attribute)}
                                 >
                                     <Dynamic component={icons[attribute]} aria-hidden="true" />
-                                    <span class={styles.actionLabel}>{t(labels[attribute])}</span>
+                                    <span class="sidebarActionLabel">{t(labels[attribute])}</span>
                                     <Show when={props.sort.attribute === attribute}>
                                         <Dynamic
                                             component={
