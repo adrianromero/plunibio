@@ -126,7 +126,9 @@ describe("Toolbar", () => {
 
         setFileModified(true);
         expect(saveEntry?.disabled).toBe(false);
-        expect(root.querySelector('[aria-label="toolbar.unsavedChanges"]')).not.toBeNull();
+        expect(
+            root.querySelector('[aria-label="toolbar.unsavedChanges"] .lucide-square-pen')
+        ).not.toBeNull();
 
         saveEntry?.click();
         expect(save).toHaveBeenCalledOnce();

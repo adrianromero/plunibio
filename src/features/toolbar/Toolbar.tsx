@@ -11,6 +11,7 @@ import Languages from "lucide-solid/icons/languages";
 import TypeIcon from "lucide-solid/icons/type";
 import Eye from "lucide-solid/icons/eye";
 import EyeOff from "lucide-solid/icons/eye-off";
+import SquarePen from "lucide-solid/icons/square-pen";
 import { useAppContext } from "@/app/AppContext";
 import { useI18N, type Locale } from "@/i18n/Localization";
 import type { AppTheme } from "@/preferences/ThemePreferences";
@@ -59,7 +60,7 @@ export function Toolbar(props: ToolbarProps) {
                         aria-label={t("toolbar.unsavedChanges")}
                         title={t("toolbar.unsavedChanges")}
                     >
-                        •
+                        <SquarePen aria-hidden="true" />
                     </span>
                 </Show>
             </div>
