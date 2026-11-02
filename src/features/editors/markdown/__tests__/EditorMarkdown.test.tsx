@@ -146,6 +146,25 @@ describe("EditorMarkdown", () => {
         });
     });
 
+    it("focuses the editor after loading the file", async () => {
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        await vi.waitFor(() => {
+            expect(document.activeElement).toBe(root?.querySelector(".ProseMirror"));
+        });
+    });
+
     it("imports an image exposed by the clipboard as a local file URI", async () => {
         markdownContent = "Start";
         root = document.createElement("div");

@@ -70,6 +70,7 @@ export function EditorText(props: EditorTextProps): JSX.Element {
             currentSearchController = new CodeMirrorSearchController(editorView);
             setSearchController(currentSearchController);
         },
+        focus: () => editorView?.focus(),
         destroy: () => {
             currentSearchController?.destroy();
             currentSearchController = null;

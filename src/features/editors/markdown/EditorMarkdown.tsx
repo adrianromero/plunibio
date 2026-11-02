@@ -392,7 +392,6 @@ export function EditorMarkdown(): JSX.Element {
             let editorView!: MilkdownEditorView;
             nextCrepe.editor.action((ctx) => {
                 editorView = ctx.get(editorViewCtx);
-                editorView.focus();
             });
             const unlisten = await getCurrentWebview().onDragDropEvent((event) => {
                 const payload = event.payload;
@@ -445,6 +444,12 @@ export function EditorMarkdown(): JSX.Element {
                 setSearchController(currentSearchController);
             });
             setEditorReady(true);
+        },
+        focus: () => {
+            crepeInstance?.editor.action((ctx) => {
+                const editorView = ctx.get(editorViewCtx);
+                if (editorView.dom.isConnected) editorView.focus();
+            });
         },
         destroy: async () => {
             setEditorReady(false);

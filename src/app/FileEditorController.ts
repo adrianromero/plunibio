@@ -14,6 +14,7 @@ import { useAppContext } from "./AppContext";
 export type FileEditorAdapter<Content = string> = {
     getContent: () => Promise<Content | null>;
     replaceContent: (content: Content, filename: string, onModified: () => void) => Promise<void>;
+    focus?: () => void | Promise<void>;
     destroy: () => void | Promise<void>;
 };
 
@@ -95,6 +96,15 @@ export function createFileEditorController<Content = string>(
         setSaveFile(saveCurrentFile);
         setReloadFile(reloadCurrentFile);
         setOnunload(componentOnUnload);
+        requestAnimationFrame(() => {
+            if (loadId !== activeLoad || state().status !== "ready") return;
+
+            void Promise.resolve()
+                .then(() => adapter.focus?.())
+                .catch((err: unknown) => {
+                    console.error(`Error focusing editor in ${editorName}:`, err);
+                });
+        });
     };
 
     const enterErrorState = (loadId: number, err: unknown): void => {

@@ -128,6 +128,38 @@ describe("createFileEditorController", () => {
         localizationState.revision = null;
     });
 
+    it("focuses the editor after the initial load and a reload", async () => {
+        const focus = vi.fn();
+        const adapter: FileEditorAdapter = {
+            getContent: vi.fn(() => Promise.resolve("content")),
+            replaceContent: vi.fn(() => Promise.resolve()),
+            focus,
+            destroy: vi.fn(),
+        };
+        const storage: FileEditorStorage<string> = {
+            read: vi.fn(() => Promise.resolve({ content: "loaded", isNew: false })),
+            write: vi.fn(() => Promise.resolve()),
+        };
+        let controller!: FileEditorController;
+
+        createRoot((rootDispose) => {
+            dispose = rootDispose;
+            controller = createFileEditorController("TestEditor", adapter, storage);
+        });
+
+        await vi.waitFor(() => {
+            expect(controller.state().status).toBe("ready");
+            expect(focus).toHaveBeenCalledTimes(1);
+        });
+
+        await reloadFile?.();
+
+        await vi.waitFor(() => {
+            expect(controller.state().status).toBe("ready");
+            expect(focus).toHaveBeenCalledTimes(2);
+        });
+    });
+
     it("does not reload the file when the translation locale changes", async () => {
         const adapter: FileEditorAdapter = {
             getContent: vi.fn(() => Promise.resolve("edited content")),

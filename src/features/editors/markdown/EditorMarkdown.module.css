@@ -63,6 +63,12 @@
     background: transparent;
 }
 
+/* Crepe's virtual cursor keeps its border when ProseMirror loses focus. */
+.editorMarkdown
+    :global(.ProseMirror:not(.ProseMirror-focused) .prosemirror-virtual-cursor) {
+    display: none;
+}
+
 @media (max-width: 650px) {
     .studio {
         flex-direction: column;
