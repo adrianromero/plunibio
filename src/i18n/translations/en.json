@@ -53,7 +53,15 @@
         "dateUnavailable": "Date unavailable",
         "hiddenFiles": "Hidden files",
         "show": "Show",
-        "hide": "Hide"
+        "hide": "Hide",
+        "entryActions": "File or folder actions",
+        "rename": "Rename",
+        "delete": "Delete",
+        "renameFolder": "Rename folder",
+        "renameFile": "Rename file",
+        "inspectingEntry": "Checking {{ name }}...",
+        "renaming": "Renaming {{ name }}...",
+        "deleting": "Deleting {{ name }}..."
     },
     "search": {
         "title": "Search",
@@ -181,7 +189,10 @@
         "reloadFile": "Reload the file from disk?",
         "reloadDiscardChanges": "Reload the file and discard your unsaved changes?",
         "navigationSaveFailed": "{{ error }} If you continue, your data might be lost.",
-        "closeSaveFailed": "{{ error }} If you quit, your data might be lost."
+        "closeSaveFailed": "{{ error }} If you quit, your data might be lost.",
+        "renameExtensionWarning": "Changing the extension of \"{{ name }}\" may cause Plunibio to open it with a different editor. Do you want to continue?",
+        "deleteFileWarning": "\"{{ name }}\" will be permanently deleted. This action cannot be undone.",
+        "deleteFolderWarning": "\"{{ name }}\" and all its contents will be permanently deleted. This action cannot be undone."
     },
     "about": {
         "title": "About {{ appName }}",
@@ -223,6 +234,8 @@
         "write_file_failed": "The file {{ path }} could not be saved. Check that it is writable.",
         "path_already_exists": "A file or folder named {{ path }} already exists.",
         "create_directory_failed": "The folder {{ path }} could not be created.",
-        "create_file_failed": "The file {{ path }} could not be created."
+        "create_file_failed": "The file {{ path }} could not be created.",
+        "rename_entry_failed": "{{ path }} could not be renamed.",
+        "delete_entry_failed": "{{ path }} could not be deleted."
     }
 }

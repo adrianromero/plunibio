@@ -168,6 +168,54 @@ fn create_error(
     }
 }
 
+async fn resolve_entry_path(
+    basepath: &str,
+    filename: &str,
+) -> Result<(PathBuf, PathBuf), AppError> {
+    let relative = validate_relative_filename(filename)?;
+    if relative.as_os_str().is_empty() {
+        return Err(AppError::invalid_path(
+            filename,
+            "the workspace root cannot be modified",
+        ));
+    }
+
+    let base = canonical_basepath(basepath, filename).await?;
+    let requested_path = base.join(relative);
+    let parent = requested_path
+        .parent()
+        .ok_or_else(|| AppError::invalid_path(filename, "entry has no parent"))?;
+    let canonical_parent = tokio::fs::canonicalize(parent).await.map_err(|error| {
+        AppError::io(
+            "resolve_entry_parent",
+            filename,
+            error,
+            AppErrorCode::InspectPathFailed,
+        )
+    })?;
+    if !canonical_parent.starts_with(&base) {
+        return Err(AppError::path_outside_workspace(
+            filename,
+            &canonical_parent,
+            &base,
+        ));
+    }
+
+    let name = requested_path
+        .file_name()
+        .ok_or_else(|| AppError::invalid_path(filename, "entry has no name"))?;
+    let path = canonical_parent.join(name);
+    tokio::fs::symlink_metadata(&path).await.map_err(|error| {
+        AppError::io(
+            "inspect_entry",
+            filename,
+            error,
+            AppErrorCode::InspectPathFailed,
+        )
+    })?;
+    Ok((base, path))
+}
+
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct DirectoryBrowserEntry {
@@ -662,6 +710,103 @@ pub(crate) async fn create_file(
         })?;
     let metadata = file.metadata().await.ok();
     created_entry(&base, &path, name, PathKind::File, metadata.as_ref())
+}
+
+#[tauri::command]
+pub(crate) async fn rename_entry(
+    basepath: String,
+    filename: String,
+    new_name: String,
+) -> Result<String, AppError> {
+    validate_entry_name(&new_name)?;
+    let (base, path) = resolve_entry_path(&basepath, &filename).await?;
+    let parent = path
+        .parent()
+        .ok_or_else(|| AppError::invalid_path(&filename, "entry has no parent"))?;
+    let destination = parent.join(&new_name);
+
+    if destination == path {
+        return Ok(filename);
+    }
+
+    #[cfg(windows)]
+    let destination_is_source = destination
+        .to_string_lossy()
+        .eq_ignore_ascii_case(&path.to_string_lossy());
+    #[cfg(not(windows))]
+    let destination_is_source = false;
+
+    match tokio::fs::symlink_metadata(&destination).await {
+        Ok(_) if !destination_is_source => {
+            return Err(AppError::new(AppErrorCode::PathAlreadyExists, &new_name));
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => {
+            return Err(AppError::io(
+                "inspect_rename_destination",
+                &new_name,
+                error,
+                AppErrorCode::RenameEntryFailed,
+            ));
+        }
+    }
+
+    tokio::fs::rename(&path, &destination)
+        .await
+        .map_err(|error| {
+            AppError::io(
+                "rename_entry",
+                &filename,
+                error,
+                AppErrorCode::RenameEntryFailed,
+            )
+        })?;
+
+    destination
+        .strip_prefix(base)
+        .map(|relative| relative.to_string_lossy().into_owned())
+        .map_err(|error| {
+            AppError::internal(
+                AppErrorCode::RenameEntryFailed,
+                "make_renamed_entry_relative",
+                &new_name,
+                &error.to_string(),
+            )
+        })
+}
+
+#[tauri::command]
+pub(crate) async fn delete_entry(basepath: String, filename: String) -> Result<(), AppError> {
+    let (_, path) = resolve_entry_path(&basepath, &filename).await?;
+    let metadata = tokio::fs::symlink_metadata(&path).await.map_err(|error| {
+        AppError::io(
+            "inspect_delete_entry",
+            &filename,
+            error,
+            AppErrorCode::DeleteEntryFailed,
+        )
+    })?;
+
+    let result = if metadata.file_type().is_symlink() || metadata.is_file() {
+        tokio::fs::remove_file(&path).await
+    } else if metadata.is_dir() {
+        tokio::fs::remove_dir_all(&path).await
+    } else {
+        return Err(AppError::invalid_path(
+            &filename,
+            "entry is neither a file nor a directory",
+        ));
+    };
+
+    result.map_err(|error| {
+        AppError::io(
+            "delete_entry",
+            &filename,
+            error,
+            AppErrorCode::DeleteEntryFailed,
+        )
+    })
 }
 
 #[tauri::command]

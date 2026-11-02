@@ -53,7 +53,15 @@
         "dateUnavailable": "Data ez dago erabilgarri",
         "hiddenFiles": "Ezkutuko fitxategiak",
         "show": "Erakutsi",
-        "hide": "Ezkutatu"
+        "hide": "Ezkutatu",
+        "entryActions": "Fitxategiaren edo karpetaren ekintzak",
+        "rename": "Aldatu izena",
+        "delete": "Ezabatu",
+        "renameFolder": "Aldatu karpetaren izena",
+        "renameFile": "Aldatu fitxategiaren izena",
+        "inspectingEntry": "{{ name }} egiaztatzen...",
+        "renaming": "{{ name }} izenez aldatzen...",
+        "deleting": "{{ name }} ezabatzen..."
     },
     "search": {
         "title": "Bilatu",
@@ -181,7 +189,10 @@
         "reloadFile": "Fitxategia diskotik birkargatu?",
         "reloadDiscardChanges": "Fitxategia birkargatu eta gorde gabeko aldaketak baztertu?",
         "navigationSaveFailed": "{{ error }} Jarraitzen baduzu, datuak gal ditzakezu.",
-        "closeSaveFailed": "{{ error }} Irteten bazara, datuak gal ditzakezu."
+        "closeSaveFailed": "{{ error }} Irteten bazara, datuak gal ditzakezu.",
+        "renameExtensionWarning": "\"{{ name }}\" fitxategiaren luzapena aldatuz gero, Plunibiok beste editore batekin ireki dezake. Jarraitu nahi duzu?",
+        "deleteFileWarning": "\"{{ name }}\" betiko ezabatuko da. Ekintza hau ezin da desegin.",
+        "deleteFolderWarning": "\"{{ name }}\" eta bere eduki guztia betiko ezabatuko dira. Ekintza hau ezin da desegin."
     },
     "about": {
         "title": "{{ appName }} aplikazioari buruz",
@@ -223,6 +234,8 @@
         "write_file_failed": "Ezin izan da {{ path }} fitxategia gorde. Egiaztatu alda daitekeela.",
         "path_already_exists": "{{ path }} izeneko fitxategi edo karpeta bat badago lehendik.",
         "create_directory_failed": "Ezin izan da {{ path }} karpeta sortu.",
-        "create_file_failed": "Ezin izan da {{ path }} fitxategia sortu."
+        "create_file_failed": "Ezin izan da {{ path }} fitxategia sortu.",
+        "rename_entry_failed": "Ezin izan da {{ path }} izenez aldatu.",
+        "delete_entry_failed": "Ezin izan da {{ path }} ezabatu."
     }
 }

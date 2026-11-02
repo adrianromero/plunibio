@@ -53,7 +53,15 @@
         "dateUnavailable": "Fecha no disponible",
         "hiddenFiles": "Archivos ocultos",
         "show": "Mostrar",
-        "hide": "Ocultar"
+        "hide": "Ocultar",
+        "entryActions": "Acciones del archivo o carpeta",
+        "rename": "Renombrar",
+        "delete": "Eliminar",
+        "renameFolder": "Renombrar carpeta",
+        "renameFile": "Renombrar archivo",
+        "inspectingEntry": "Comprobando {{ name }}...",
+        "renaming": "Renombrando {{ name }}...",
+        "deleting": "Eliminando {{ name }}..."
     },
     "search": {
         "title": "Buscar",
@@ -181,7 +189,10 @@
         "reloadFile": "¿Recargar el archivo desde el disco?",
         "reloadDiscardChanges": "¿Recargar el archivo y descartar los cambios sin guardar?",
         "navigationSaveFailed": "{{ error }} Si continúas, podrías perder tus datos.",
-        "closeSaveFailed": "{{ error }} Si sales, podrías perder tus datos."
+        "closeSaveFailed": "{{ error }} Si sales, podrías perder tus datos.",
+        "renameExtensionWarning": "Al cambiar la extensión de \"{{ name }}\", Plunibio podría abrir el archivo con otro editor. ¿Quieres continuar?",
+        "deleteFileWarning": "\"{{ name }}\" se eliminará permanentemente. Esta acción no se puede deshacer.",
+        "deleteFolderWarning": "\"{{ name }}\" y todo su contenido se eliminará permanentemente. Esta acción no se puede deshacer."
     },
     "about": {
         "title": "Acerca de {{ appName }}",
@@ -223,6 +234,8 @@
         "write_file_failed": "No se ha podido guardar el archivo {{ path }}. Comprueba que se puede modificar.",
         "path_already_exists": "Ya existe un archivo o una carpeta llamado {{ path }}.",
         "create_directory_failed": "No se ha podido crear la carpeta {{ path }}.",
-        "create_file_failed": "No se ha podido crear el archivo {{ path }}."
+        "create_file_failed": "No se ha podido crear el archivo {{ path }}.",
+        "rename_entry_failed": "No se ha podido renombrar {{ path }}.",
+        "delete_entry_failed": "No se ha podido eliminar {{ path }}."
     }
 }

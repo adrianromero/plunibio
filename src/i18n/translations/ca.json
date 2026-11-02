@@ -53,7 +53,15 @@
         "dateUnavailable": "Data no disponible",
         "hiddenFiles": "Fitxers ocults",
         "show": "Mostra",
-        "hide": "Amaga"
+        "hide": "Amaga",
+        "entryActions": "Accions del fitxer o carpeta",
+        "rename": "Canvia el nom",
+        "delete": "Elimina",
+        "renameFolder": "Canvia el nom de la carpeta",
+        "renameFile": "Canvia el nom del fitxer",
+        "inspectingEntry": "S'està comprovant {{ name }}...",
+        "renaming": "S'està canviant el nom de {{ name }}...",
+        "deleting": "S'està eliminant {{ name }}..."
     },
     "search": {
         "title": "Cerca",
@@ -181,7 +189,10 @@
         "reloadFile": "Voleu tornar a carregar el fitxer des del disc?",
         "reloadDiscardChanges": "Voleu tornar a carregar el fitxer i descartar els canvis sense desar?",
         "navigationSaveFailed": "{{ error }} Si continueu, podríeu perdre les dades.",
-        "closeSaveFailed": "{{ error }} Si sortiu, podríeu perdre les dades."
+        "closeSaveFailed": "{{ error }} Si sortiu, podríeu perdre les dades.",
+        "renameExtensionWarning": "En canviar l'extensió de \"{{ name }}\", Plunibio podria obrir el fitxer amb un altre editor. Voleu continuar?",
+        "deleteFileWarning": "\"{{ name }}\" s'eliminarà permanentment. Aquesta acció no es pot desfer.",
+        "deleteFolderWarning": "\"{{ name }}\" i tot el seu contingut s'eliminaran permanentment. Aquesta acció no es pot desfer."
     },
     "about": {
         "title": "Quant a {{ appName }}",
@@ -223,6 +234,8 @@
         "write_file_failed": "No s'ha pogut desar el fitxer {{ path }}. Comproveu que es pot modificar.",
         "path_already_exists": "Ja existeix un fitxer o una carpeta amb el nom {{ path }}.",
         "create_directory_failed": "No s'ha pogut crear la carpeta {{ path }}.",
-        "create_file_failed": "No s'ha pogut crear el fitxer {{ path }}."
+        "create_file_failed": "No s'ha pogut crear el fitxer {{ path }}.",
+        "rename_entry_failed": "No s'ha pogut canviar el nom de {{ path }}.",
+        "delete_entry_failed": "No s'ha pogut eliminar {{ path }}."
     }
 }

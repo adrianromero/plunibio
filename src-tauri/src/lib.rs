@@ -252,6 +252,8 @@ fn run_with_configuration(
             commands::list_directory,
             commands::create_directory,
             commands::create_file,
+            commands::rename_entry,
+            commands::delete_entry,
             commands::read_file,
             commands::read_binary_file,
             commands::read_linked_binary_file,

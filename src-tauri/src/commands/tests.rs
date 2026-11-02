@@ -4,6 +4,123 @@
 use super::{read_file, write_file};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+fn unique_temp_dir(label: &str) -> std::path::PathBuf {
+    let unique = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    std::env::temp_dir().join(format!("plunibio-{label}-{unique}"))
+}
+
+#[test]
+fn renames_files_and_non_empty_directories_without_overwriting() {
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("rename-entry");
+        std::fs::create_dir_all(base.join("docs/folder/nested")).unwrap();
+        std::fs::write(base.join("docs/note.md"), "content").unwrap();
+        std::fs::write(base.join("docs/folder/nested/child.txt"), "child").unwrap();
+        std::fs::write(base.join("docs/existing.md"), "existing").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let renamed = super::rename_entry(
+            basepath.clone(),
+            "docs/note.md".to_owned(),
+            "renamed.md".to_owned(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            renamed,
+            std::path::Path::new("docs/renamed.md").to_string_lossy()
+        );
+        assert_eq!(
+            std::fs::read_to_string(base.join(&renamed)).unwrap(),
+            "content"
+        );
+        assert!(!base.join("docs/note.md").exists());
+
+        let renamed_directory = super::rename_entry(
+            basepath.clone(),
+            "docs/folder".to_owned(),
+            "archive".to_owned(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            std::fs::read_to_string(base.join(&renamed_directory).join("nested/child.txt"))
+                .unwrap(),
+            "child"
+        );
+
+        let duplicate = super::rename_entry(basepath, renamed, "existing.md".to_owned())
+            .await
+            .unwrap_err();
+        assert_eq!(
+            serde_json::to_value(duplicate).unwrap()["code"],
+            "path_already_exists"
+        );
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn deletes_files_and_directory_trees_but_never_the_workspace_root() {
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("delete-entry");
+        std::fs::create_dir_all(base.join("folder/nested")).unwrap();
+        std::fs::write(base.join("file.md"), "content").unwrap();
+        std::fs::write(base.join("folder/nested/child.txt"), "child").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        super::delete_entry(basepath.clone(), "file.md".to_owned())
+            .await
+            .unwrap();
+        assert!(!base.join("file.md").exists());
+
+        super::delete_entry(basepath.clone(), "folder".to_owned())
+            .await
+            .unwrap();
+        assert!(!base.join("folder").exists());
+
+        let root_error = super::delete_entry(basepath, String::new())
+            .await
+            .unwrap_err();
+        assert_eq!(
+            serde_json::to_value(root_error).unwrap()["code"],
+            "invalid_path"
+        );
+        assert!(base.is_dir());
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[cfg(unix)]
+#[test]
+fn deleting_a_directory_symlink_does_not_delete_its_target() {
+    use std::os::unix::fs::symlink;
+
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("delete-symlink");
+        std::fs::create_dir_all(base.join("target/nested")).unwrap();
+        std::fs::write(base.join("target/nested/child.txt"), "child").unwrap();
+        symlink(base.join("target"), base.join("link")).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        super::delete_entry(basepath, "link".to_owned())
+            .await
+            .unwrap();
+
+        assert!(!base.join("link").exists());
+        assert_eq!(
+            std::fs::read_to_string(base.join("target/nested/child.txt")).unwrap(),
+            "child"
+        );
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
 #[test]
 fn creates_empty_files_and_directories_without_overwriting() {
     tauri::async_runtime::block_on(async {

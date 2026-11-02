@@ -20,6 +20,8 @@ pub(crate) enum AppErrorCode {
     PathAlreadyExists,
     CreateDirectoryFailed,
     CreateFileFailed,
+    RenameEntryFailed,
+    DeleteEntryFailed,
 }
 
 #[derive(Debug, serde::Serialize)]

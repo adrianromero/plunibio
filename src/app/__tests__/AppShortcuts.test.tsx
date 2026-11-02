@@ -17,6 +17,7 @@ describe("AppShortcuts", () => {
     let navigateBack: ReturnType<typeof vi.fn<() => void | Promise<void>>>;
     let toggleSidebar: ReturnType<typeof vi.fn<() => void>>;
     let openWorkspace: ReturnType<typeof vi.fn<() => void>>;
+    let renameEntry: ReturnType<typeof vi.fn<() => void>>;
     let setSaveAvailable: (available: boolean) => void;
     let setReloadAvailable: (available: boolean) => void;
     let setSearchAvailable: (available: boolean) => void;
@@ -31,6 +32,7 @@ describe("AppShortcuts", () => {
         navigateBack = vi.fn();
         toggleSidebar = vi.fn();
         openWorkspace = vi.fn();
+        renameEntry = vi.fn();
         const [saveAvailable, setSaveAvailableSignal] = createSignal(false);
         const [reloadAvailable, setReloadAvailableSignal] = createSignal(false);
         const [searchAvailable, setSearchAvailableSignal] = createSignal(false);
@@ -55,6 +57,13 @@ describe("AppShortcuts", () => {
             () => (
                 <AppShortcuts
                     shortcuts={[
+                        {
+                            id: "rename-entry",
+                            key: "F2",
+                            primary: false,
+                            phase: "capture",
+                            getHandler: () => renameEntry,
+                        },
                         {
                             id: "open-workspace",
                             key: "o",
@@ -160,6 +169,15 @@ describe("AppShortcuts", () => {
 
         expect(event.defaultPrevented).toBe(true);
         expect(customAction).toHaveBeenCalledOnce();
+    });
+
+    it("supports F2 without Ctrl or Meta for rename", () => {
+        const renameEvent = press("F2", { ctrlKey: false });
+        const modifiedEvent = press("F2");
+
+        expect(renameEvent.defaultPrevented).toBe(true);
+        expect(modifiedEvent.defaultPrevented).toBe(false);
+        expect(renameEntry).toHaveBeenCalledOnce();
     });
 
     it("matches primary-plus-alt shortcuts by physical key with Ctrl or Meta", () => {

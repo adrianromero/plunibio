@@ -11,6 +11,12 @@
     margin: 0;
     padding: 0.3rem;
     color: var(--color-text);
+    font-family: var(--font-interface);
+    font-size: 0.8rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: normal;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-medium);
@@ -44,9 +50,12 @@
     justify-content: flex-start;
     padding: 0.5rem 0.65rem;
     color: inherit;
-    font: inherit;
+    font-family: var(--font-interface);
     font-size: 0.8rem;
+    font-style: normal;
+    font-weight: 400;
     line-height: 1.25;
+    letter-spacing: normal;
     text-align: left;
     background: transparent;
     border: 0;
@@ -151,7 +160,7 @@
 
 .menuItem:disabled .shortcut {
     color: var(--color-menu-disabled);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 @supports (top: anchor(bottom)) {

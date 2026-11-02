@@ -3,6 +3,7 @@ import {
     AppContext,
     type AppContextValues,
     type OnunloadHandler,
+    type RenameEntryHandler,
     type ReloadFileHandler,
     type SaveFileHandler,
     type SearchFileHandler,
@@ -28,6 +29,7 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
     const [basepath, setBasepath] = createSignal(props.basepath ?? "/home/adrian/documents");
     const [filename, setFilename] = createSignal(props.filename ?? "notes/example.md");
     const [onunload, setOnunloadSignal] = createSignal<OnunloadHandler | null>(null);
+    const [renameEntry, setRenameEntrySignal] = createSignal<RenameEntryHandler | null>(null);
     const [fileModified, setFileModified] = createSignal(props.modified ?? false);
 
     const defaultSaveFile: SaveFileHandler = async () => {
@@ -58,6 +60,9 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
     const setOnunload = (handler: OnunloadHandler | null): void => {
         setOnunloadSignal(() => handler);
     };
+    const setRenameEntry = (handler: RenameEntryHandler | null): void => {
+        setRenameEntrySignal(() => handler);
+    };
     const setSaveFile = (handler: SaveFileHandler | null): void => {
         setSaveFileSignal(() => handler);
     };
@@ -82,6 +87,12 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             loadFilename: async (nextFilename) => {
                 setFilename(nextFilename);
             },
+            loadFilenameAfterMutation: async (nextFilename) => {
+                setOnunload(null);
+                setFilename(nextFilename);
+            },
+            renameEntry,
+            setRenameEntry,
             navigateBack: () => null,
             setNavigateBack: () => undefined,
             navigateForward: () => null,

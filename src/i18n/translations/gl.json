@@ -53,7 +53,15 @@
         "dateUnavailable": "Data non dispoñible",
         "hiddenFiles": "Ficheiros ocultos",
         "show": "Mostrar",
-        "hide": "Ocultar"
+        "hide": "Ocultar",
+        "entryActions": "Accións do ficheiro ou cartafol",
+        "rename": "Renomear",
+        "delete": "Eliminar",
+        "renameFolder": "Renomear cartafol",
+        "renameFile": "Renomear ficheiro",
+        "inspectingEntry": "Comprobando {{ name }}...",
+        "renaming": "Renomeando {{ name }}...",
+        "deleting": "Eliminando {{ name }}..."
     },
     "search": {
         "title": "Buscar",
@@ -181,7 +189,10 @@
         "reloadFile": "Recargar o ficheiro desde o disco?",
         "reloadDiscardChanges": "Recargar o ficheiro e descartar os cambios sen gardar?",
         "navigationSaveFailed": "{{ error }} Se continúas, poderías perder os datos.",
-        "closeSaveFailed": "{{ error }} Se saes, poderías perder os datos."
+        "closeSaveFailed": "{{ error }} Se saes, poderías perder os datos.",
+        "renameExtensionWarning": "Ao cambiar a extensión de \"{{ name }}\", Plunibio podería abrir o ficheiro con outro editor. Queres continuar?",
+        "deleteFileWarning": "\"{{ name }}\" eliminarase permanentemente. Esta acción non se pode desfacer.",
+        "deleteFolderWarning": "\"{{ name }}\" e todo o seu contido eliminaranse permanentemente. Esta acción non se pode desfacer."
     },
     "about": {
         "title": "Acerca de {{ appName }}",
@@ -223,6 +234,8 @@
         "write_file_failed": "Non se puido gardar o ficheiro {{ path }}. Comproba que se pode modificar.",
         "path_already_exists": "Xa existe un ficheiro ou cartafol chamado {{ path }}.",
         "create_directory_failed": "Non se puido crear o cartafol {{ path }}.",
-        "create_file_failed": "Non se puido crear o ficheiro {{ path }}."
+        "create_file_failed": "Non se puido crear o ficheiro {{ path }}.",
+        "rename_entry_failed": "Non se puido renomear {{ path }}.",
+        "delete_entry_failed": "Non se puido eliminar {{ path }}."
     }
 }

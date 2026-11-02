@@ -42,6 +42,7 @@ export type SaveFileHandler = () => Promise<void>;
 export type ReloadFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
 export type NavigateFileHandler = () => Promise<void>;
+export type RenameEntryHandler = () => void | Promise<void>;
 export type ToggleSidebarHandler = () => void;
 export type ToggleThemeHandler = () => void;
 export type OnunloadHandler = () => Promise<void>;
@@ -55,6 +56,9 @@ export type AppContextValues = {
         filename: Accessor<string>;
         setFilename: Setter<string>;
         loadFilename: (filename: string) => Promise<void>;
+        loadFilenameAfterMutation: (filename: string) => Promise<void>;
+        renameEntry: Accessor<RenameEntryHandler | null>;
+        setRenameEntry: (handler: RenameEntryHandler | null) => void;
         navigateBack: Accessor<NavigateFileHandler | null>;
         setNavigateBack: (handler: NavigateFileHandler | null) => void;
         navigateForward: Accessor<NavigateFileHandler | null>;
@@ -129,6 +133,7 @@ export function AppProvider(props: {
     const [navigateBack, setNavigateBackSignal] = createSignal<NavigateFileHandler | null>(null);
     const [navigateForward, setNavigateForwardSignal] =
         createSignal<NavigateFileHandler | null>(null);
+    const [renameEntry, setRenameEntrySignal] = createSignal<RenameEntryHandler | null>(null);
     const [sidebarVisible, setSidebarVisibleSignal] = createSignal(loadSidebarVisible());
     const [showHiddenFiles, setShowHiddenFilesSignal] = createSignal(loadShowHiddenFiles());
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
@@ -169,6 +174,9 @@ export function AppProvider(props: {
     };
     const setNavigateForward = (handler: NavigateFileHandler | null) => {
         setNavigateForwardSignal(() => handler);
+    };
+    const setRenameEntry = (handler: RenameEntryHandler | null) => {
+        setRenameEntrySignal(() => handler);
     };
     const setToggleSidebar = (handler: ToggleSidebarHandler | null) => {
         setToggleSidebarSignal(() => handler);
@@ -217,6 +225,13 @@ export function AppProvider(props: {
         }
     };
     const shortcuts = [
+        {
+            id: "rename-entry",
+            key: "F2",
+            primary: false,
+            phase: "capture",
+            getHandler: renameEntry,
+        },
         {
             id: "open-workspace",
             key: "o",
@@ -349,6 +364,15 @@ export function AppProvider(props: {
         }
     };
 
+    const commitFilename = async (nextFilename: string): Promise<void> => {
+        setFilename(nextFilename);
+        try {
+            await invoke("set_current_filename", { filename: nextFilename });
+        } catch (error: unknown) {
+            console.error("Unable to update the current filename:", error);
+        }
+    };
+
     const loadFilename = async (nextFilename: string): Promise<void> => {
         try {
             await onunload()?.();
@@ -365,12 +389,12 @@ export function AppProvider(props: {
             }
             setOnunload(null);
         }
-        setFilename(nextFilename);
-        try {
-            await invoke("set_current_filename", { filename: nextFilename });
-        } catch (error: unknown) {
-            console.error("Unable to update the current filename:", error);
-        }
+        await commitFilename(nextFilename);
+    };
+
+    const loadFilenameAfterMutation = async (nextFilename: string): Promise<void> => {
+        setOnunload(null);
+        await commitFilename(nextFilename);
     };
 
     let unlistenCloseRequested: (() => void) | undefined;
@@ -426,6 +450,9 @@ export function AppProvider(props: {
                     filename,
                     setFilename,
                     loadFilename,
+                    loadFilenameAfterMutation,
+                    renameEntry,
+                    setRenameEntry,
                     navigateBack,
                     setNavigateBack,
                     navigateForward,

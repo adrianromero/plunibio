@@ -10,6 +10,7 @@ export type ShortcutPhase = "capture" | "bubble";
 
 type ShortcutDefinitionBase = {
     id: string;
+    primary?: boolean;
     shift?: boolean;
     alt?: boolean;
     phase?: ShortcutPhase;
@@ -34,9 +35,14 @@ function matchesShortcut(event: KeyboardEvent, shortcut: ShortcutDefinition): bo
         : shortcut.key !== undefined &&
           event.key.toLowerCase() === shortcut.key.toLowerCase();
 
+    const matchesPrimary =
+        shortcut.primary === false
+            ? !event.ctrlKey && !event.metaKey
+            : isPrimaryModifier(event);
+
     return (
         matchesKey &&
-        isPrimaryModifier(event) &&
+        matchesPrimary &&
         event.shiftKey === Boolean(shortcut.shift) &&
         event.altKey === Boolean(shortcut.alt)
     );

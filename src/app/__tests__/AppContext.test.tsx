@@ -108,6 +108,22 @@ describe("AppProvider workspace changes", () => {
         expect(toggleSidebar).toHaveBeenCalledOnce();
     });
 
+    it("routes F2 to the registered rename action without a primary modifier", () => {
+        const context = renderProvider();
+        const renameEntry = vi.fn();
+        context.main.setRenameEntry(renameEntry);
+
+        const event = new KeyboardEvent("keydown", {
+            key: "F2",
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(event);
+
+        expect(event.defaultPrevented).toBe(true);
+        expect(renameEntry).toHaveBeenCalledOnce();
+    });
+
     it("opens and closes the About dialog through the application context", () => {
         const context = renderProvider();
         const closeButton = document.querySelector<HTMLButtonElement>(
@@ -211,5 +227,20 @@ describe("AppProvider workspace changes", () => {
         );
         expect(context?.main.filename()).toBe("");
         expect(calls).toEqual(["save", "backend"]);
+    });
+
+    it("navigates after a filesystem mutation without unloading the old filename", async () => {
+        const context = renderProvider();
+        const unload = vi.fn(async () => undefined);
+        context.main.setOnunload(unload);
+
+        await context.main.loadFilenameAfterMutation("renamed.md");
+
+        expect(unload).not.toHaveBeenCalled();
+        expect(context.main.onunload()).toBeNull();
+        expect(context.main.filename()).toBe("renamed.md");
+        expect(invoke).toHaveBeenCalledWith("set_current_filename", {
+            filename: "renamed.md",
+        });
     });
 });
