@@ -33,6 +33,10 @@
         "pathNavigation": "Ruta do ficheiro actual"
     },
     "folder": {
+        "newFolder": "Novo cartafol",
+        "newMarkdown": "Novo ficheiro Markdown",
+        "newText": "Novo ficheiro de texto",
+        "newOther": "Outro ficheiro novo",
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
         "empty": "Este cartafol está baleiro",

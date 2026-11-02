@@ -33,6 +33,10 @@
         "pathNavigation": "Uneko fitxategiaren bide-izena"
     },
     "folder": {
+        "newFolder": "Karpeta berria",
+        "newMarkdown": "Markdown fitxategi berria",
+        "newText": "Testu-fitxategi berria",
+        "newOther": "Bestelako fitxategi berria",
         "root": "Hasiera",
         "loading": "{{ path }} kargatzen...",
         "empty": "Karpeta hau hutsik dago",

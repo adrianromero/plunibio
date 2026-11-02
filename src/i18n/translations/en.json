@@ -33,6 +33,10 @@
         "pathNavigation": "Current file path"
     },
     "folder": {
+        "newFolder": "New folder",
+        "newMarkdown": "New Markdown file",
+        "newText": "New text file",
+        "newOther": "Other new file",
         "root": "Home",
         "loading": "Loading {{ path }}...",
         "empty": "This folder is empty",

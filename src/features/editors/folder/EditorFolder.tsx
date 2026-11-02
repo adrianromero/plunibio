@@ -10,14 +10,13 @@ import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
-import Plus from "lucide-solid/icons/plus";
 import { useAppContext } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
 import { useI18N } from "@/i18n/Localization";
 import type { DirectoryEntry } from "@/backend/rusttypes";
 import styles from "./EditorFolder.module.css";
 import { Dynamic } from "solid-js/web";
-import Menu from "@/shared/ui/menu/Menu";
+import EditorFolderSidebar from "./EditorFolderSidebar";
 import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
 import MessageView from "@/shared/errors/MessageView";
 import EditorImage from "@/features/editors/image/EditorImage";
@@ -71,6 +70,7 @@ export function EditorFolder(): JSX.Element {
     } = useAppContext();
     const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
     const openCreateDialog = (kind: CreateEntryKind): void => {
+        if (!directoryResult()?.entries || directoryResult.loading) return;
         setCreateKind(kind);
     };
     setCreateEntry(openCreateDialog);
@@ -146,54 +146,6 @@ export function EditorFolder(): JSX.Element {
     return (
         <section class={styles.studio} data-testid="folder-view">
             <div class="scrollingView">
-                <div class={styles.newAction}>
-                    <Menu
-                        label={t("folder.new")}
-                        triggerText={t("folder.new")}
-                        triggerIcon={Plus}
-                        triggerClass={`stdButton secondary ${styles.newButton}`}
-                        align="start"
-                        blocks={[
-                            {
-                                kind: "action",
-                                id: "new-directory",
-                                label: t("folder.directory"),
-                                icon: Folder,
-                                shortcut: "CTRL+SHIFT+N",
-                                onSelect: () => openCreateDialog("directory"),
-                            },
-                            {
-                                kind: "section",
-                                id: "new-files",
-                                items: [
-                                    {
-                                        kind: "action",
-                                        id: "new-markdown",
-                                        label: t("folder.markdown"),
-                                        icon: FilePen,
-                                        shortcut: "CTRL+SHIFT+M",
-                                        onSelect: () => openCreateDialog("markdown"),
-                                    },
-                                    {
-                                        kind: "action",
-                                        id: "new-text",
-                                        label: t("folder.text"),
-                                        icon: FileText,
-                                        shortcut: "CTRL+SHIFT+T",
-                                        onSelect: () => openCreateDialog("text"),
-                                    },
-                                    {
-                                        kind: "action",
-                                        id: "new-other",
-                                        label: t("folder.other"),
-                                        icon: File,
-                                        onSelect: () => openCreateDialog("other"),
-                                    },
-                                ],
-                            },
-                        ]}
-                    />
-                </div>
                 <Show when={!directoryResult.loading}>
                     <Switch>
                         <Match when={directoryResult()?.error}>
@@ -254,6 +206,10 @@ export function EditorFolder(): JSX.Element {
                     </Switch>
                 </Show>
             </div>
+            <EditorFolderSidebar
+                disabled={directoryResult.loading || !directoryResult()?.entries}
+                onCreate={openCreateDialog}
+            />
             <CreateEntryDialog
                 open={createKind() !== null}
                 kind={createKind() ?? "other"}

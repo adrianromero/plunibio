@@ -33,6 +33,10 @@
         "pathNavigation": "Ruta del fitxer actual"
     },
     "folder": {
+        "newFolder": "Carpeta nova",
+        "newMarkdown": "Fitxer Markdown nou",
+        "newText": "Fitxer de text nou",
+        "newOther": "Un altre fitxer nou",
         "root": "Inici",
         "loading": "S'està carregant {{ path }}...",
         "empty": "Aquesta carpeta és buida",

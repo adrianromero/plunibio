@@ -44,6 +44,9 @@ vi.mock("@/app/AppContext", () => ({
             setSpinnerParams: setSpinnerParamsMock,
         },
         editor: {
+            sidebarVisible: () => true,
+            setSidebarVisible: vi.fn(),
+            setToggleSidebar: vi.fn(),
             setReloadFile: (handler: ReloadFileHandler | null) => {
                 reloadFile = handler;
             },
@@ -123,7 +126,7 @@ describe("EditorFolder", () => {
             showHidden: false,
         });
 
-        expect(root.querySelector("aside")).toBeNull();
+        expect(root.querySelector('[data-testid="app-sidebar"]')).not.toBeNull();
         setShowHiddenFiles(true);
 
         await vi.waitFor(() => {
@@ -165,15 +168,16 @@ describe("EditorFolder", () => {
         expect(createEntryShortcut).toBeNull();
     });
 
-    it("registers contextual creation shortcuts and shows them in the menu", async () => {
+    it("registers contextual creation shortcuts and shows them in sidebar tooltips", async () => {
         const root = document.createElement("div");
         document.body.append(root);
         dispose = render(() => <EditorFolder />, root);
-        await vi.waitFor(() => expect(createEntryShortcut).not.toBeNull());
+        await vi.waitFor(() => expect(root.textContent).toContain("visible.md"));
+        expect(createEntryShortcut).not.toBeNull();
 
         const shortcuts = Array.from(
-            root.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]")
-        ).map((entry) => entry.textContent);
+            root.querySelectorAll<HTMLElement>("[data-create-kind]")
+        ).map((entry) => entry.title);
         expect(shortcuts).toEqual(
             expect.arrayContaining([
                 expect.stringContaining("CTRL+SHIFT+N"),
@@ -204,6 +208,40 @@ describe("EditorFolder", () => {
         expect(message?.textContent).toContain("folder.empty");
     });
 
+    it.each([
+        ["directory", ""],
+        ["markdown", ".md"],
+        ["text", ".txt"],
+        ["other", ""],
+    ])("opens the creation dialog for the %s sidebar action", async (kind, initialName) => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+        await vi.waitFor(() => expect(root.textContent).toContain("visible.md"));
+
+        root.querySelector<HTMLButtonElement>(`[data-create-kind="${kind}"]`)?.click();
+        await vi.waitFor(() => {
+            expect(root.querySelector<HTMLDialogElement>('[data-testid="create-entry-dialog"]')?.open)
+                .toBe(true);
+            expect(root.querySelector<HTMLInputElement>('[data-testid="create-entry-name"]')?.value)
+                .toBe(initialName);
+        });
+    });
+
+    it("disables creation while the folder is loading", async () => {
+        invokeMock.mockReturnValue(new Promise<DirectoryEntry[]>(() => undefined));
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+
+        const buttons = root.querySelectorAll<HTMLButtonElement>("[data-create-kind]");
+        expect(buttons).toHaveLength(4);
+        expect(Array.from(buttons).every((button) => button.disabled)).toBe(true);
+        createEntryShortcut?.("markdown");
+        expect(root.querySelector<HTMLDialogElement>('[data-testid="create-entry-dialog"]')?.open)
+            .toBe(false);
+    });
+
     it("creates a Markdown file and navigates directly to it", async () => {
         invokeMock.mockImplementation(async (command: string) => {
             if (command === "list_directory") {
@@ -223,19 +261,13 @@ describe("EditorFolder", () => {
         dispose = render(() => <EditorFolder />, root);
         await vi.waitFor(() => expect(root.textContent).toContain("old.md"));
 
-        const fileSection = root.querySelector<HTMLElement>(
-            '[data-toolbar-menu-section="new-files"]'
-        );
-        expect(fileSection?.previousElementSibling?.getAttribute("data-toolbar-menu-entry")).toBe(
-            "new-directory"
-        );
         expect(
             root
-                .querySelector('[data-toolbar-menu-entry="new-markdown"]')
+                .querySelector('[data-create-kind="markdown"]')
                 ?.querySelector(".lucide-file-pen")
         ).not.toBeNull();
 
-        root.querySelector<HTMLButtonElement>('[data-toolbar-menu-entry="new-markdown"]')?.click();
+        root.querySelector<HTMLButtonElement>('[data-create-kind="markdown"]')?.click();
         const input = root.querySelector<HTMLInputElement>('[data-testid="create-entry-name"]')!;
         await vi.waitFor(() => expect(input.value).toBe(".md"));
         expect(input.value).toBe(".md");
