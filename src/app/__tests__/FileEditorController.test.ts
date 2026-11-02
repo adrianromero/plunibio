@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { DEFAULT_FOLDER_SORT, type FolderSort } from "@/preferences/FolderSortPreferences";
 import { createRoot, createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -52,6 +53,7 @@ describe("createFileEditorController", () => {
         const [filename, setFilename] = createSignal("notes.md");
         const [fileModified, setFileModified] = createSignal(false);
         const [sidebarVisible, setSidebarVisible] = createSignal(true);
+        const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
         const [showHiddenFiles, setShowHiddenFiles] = createSignal(false);
         const [theme, setTheme] = createSignal<"light" | "dark">("light");
         const [typography, setTypography] = createSignal<
@@ -112,6 +114,8 @@ describe("createFileEditorController", () => {
                 setSearchFile: vi.fn(),
                 sidebarVisible,
                 setSidebarVisible,
+                folderSort,
+                setFolderSort,
                 showHiddenFiles,
                 setShowHiddenFiles,
                 toggleSidebar: () => null,

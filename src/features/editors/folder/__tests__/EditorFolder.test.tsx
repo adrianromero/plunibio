@@ -11,6 +11,7 @@ import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import type { CreateEntryHandler, ReloadFileHandler } from "@/app/AppContext";
+import { loadFolderSort, saveFolderSort, type FolderSort } from "@/preferences/FolderSortPreferences";
 import type { DirectoryEntry } from "@/backend/rusttypes";
 import EditorFolder, { fileIconForFilename, formatFileSize } from "../EditorFolder";
 
@@ -22,6 +23,8 @@ const showAppMessageMock = vi.hoisted(() => vi.fn(async () => undefined));
 const loadFilenameMock = vi.hoisted(() => vi.fn(async () => undefined));
 let reloadFile: ReloadFileHandler | null;
 let createEntryShortcut: CreateEntryHandler | null;
+let folderSort: Accessor<FolderSort>;
+let setFolderSort: Setter<FolderSort>;
 let showHiddenFiles: Accessor<boolean>;
 let setShowHiddenFiles: Setter<boolean>;
 
@@ -49,6 +52,12 @@ vi.mock("@/app/AppContext", () => ({
             setToggleSidebar: vi.fn(),
             setReloadFile: (handler: ReloadFileHandler | null) => {
                 reloadFile = handler;
+            },
+            folderSort,
+            setFolderSort: (value: FolderSort | ((previous: FolderSort) => FolderSort)) => {
+                const next = setFolderSort(value);
+                saveFolderSort(next);
+                return next;
             },
             showHiddenFiles,
         },
@@ -87,6 +96,8 @@ describe("EditorFolder", () => {
     beforeEach(() => {
         reloadFile = null;
         createEntryShortcut = null;
+        window.localStorage.removeItem("plunibio.folderSort");
+        [folderSort, setFolderSort] = createSignal<FolderSort>(loadFolderSort());
         [showHiddenFiles, setShowHiddenFiles] = createSignal(false);
         invokeMock.mockImplementation(
             async (_command: string, args: { showHidden: boolean }): Promise<DirectoryEntry[]> =>
@@ -109,6 +120,45 @@ describe("EditorFolder", () => {
         showAppMessageMock.mockClear();
         loadFilenameMock.mockClear();
         document.body.replaceChildren();
+        window.localStorage.removeItem("plunibio.folderSort");
+    });
+
+    it("sorts immediately, toggles exclusively, and restores the saved order on remount", async () => {
+        invokeMock.mockResolvedValue([
+            fileEntry("b.md", 2), fileEntry("a.md", 10),
+            directoryEntry("folder-b", 1), directoryEntry("folder-a", 5),
+        ]);
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+        const names = () => Array.from(root.querySelectorAll<HTMLElement>("[data-path]"))
+            .map((entry) => entry.dataset.path?.replace("docs/", ""));
+        const sortButton = (attribute: string) => {
+            const button = root.querySelector<HTMLButtonElement>(`[data-sort-attribute="${attribute}"]`);
+            if (!button) throw new Error("Missing sort button");
+            return button;
+        };
+        await vi.waitFor(() => expect(names()).toEqual(["folder-a", "folder-b", "a.md", "b.md"]));
+        expect(sortButton("name").getAttribute("data-sort-direction")).toBe("asc");
+        sortButton("name").click();
+        expect(names()).toEqual(["folder-b", "folder-a", "b.md", "a.md"]);
+        sortButton("size").click();
+        expect(names()).toEqual(["folder-b", "folder-a", "b.md", "a.md"]);
+        expect(sortButton("size").getAttribute("data-sort-direction")).toBe("asc");
+        expect(sortButton("name").getAttribute("data-sort-direction")).toBe("none");
+        expect(root.querySelectorAll('[data-sort-attribute][aria-pressed="true"]')).toHaveLength(1);
+        sortButton("size").click();
+        expect(names()).toEqual(["folder-a", "folder-b", "a.md", "b.md"]);
+        sortButton("size").click();
+        expect(sortButton("size").getAttribute("data-sort-direction")).toBe("asc");
+        sortButton("size").click();
+        expect(loadFolderSort()).toEqual({ attribute: "size", direction: "desc" });
+        expect(invokeMock).toHaveBeenCalledTimes(1);
+        dispose();
+        [folderSort, setFolderSort] = createSignal<FolderSort>(loadFolderSort());
+        dispose = render(() => <EditorFolder />, root);
+        await vi.waitFor(() => expect(names()).toEqual(["folder-a", "folder-b", "a.md", "b.md"]));
+        expect(sortButton("size").getAttribute("data-sort-direction")).toBe("desc");
     });
 
     it("reloads the directory when the hidden files preference changes", async () => {

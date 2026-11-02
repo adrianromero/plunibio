@@ -46,6 +46,7 @@ describe("AppProvider workspace changes", () => {
         dispose = undefined;
         document.body.replaceChildren();
         vi.mocked(invoke).mockReset();
+        window.localStorage.removeItem("plunibio.folderSort");
     });
 
     const pressShortcut = (key: string, code: string): KeyboardEvent => {
@@ -83,6 +84,18 @@ describe("AppProvider workspace changes", () => {
         if (!context) throw new Error("App context was not initialized");
         return context;
     };
+
+    it("persists folder sorting and restores it when the app provider is recreated", () => {
+        window.localStorage.removeItem("plunibio.folderSort");
+        const context = renderProvider();
+        expect(context.editor.folderSort()).toEqual({ attribute: "name", direction: "asc" });
+        context.editor.setFolderSort({ attribute: "size", direction: "desc" });
+        expect(JSON.parse(window.localStorage.getItem("plunibio.folderSort") ?? "null"))
+            .toEqual({ attribute: "size", direction: "desc" });
+        dispose?.();
+        const restored = renderProvider();
+        expect(restored.editor.folderSort()).toEqual({ attribute: "size", direction: "desc" });
+    });
 
     it("routes navigation and sidebar shortcuts only to registered handlers", () => {
         const context = renderProvider();

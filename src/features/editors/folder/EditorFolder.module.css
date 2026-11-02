@@ -119,3 +119,17 @@
         flex-direction: column;
     }
 }
+
+.actionLabel {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.shortcut {
+    flex: 0 0 auto;
+    margin-left: auto;
+    color: var(--color-text-subtle);
+    font-size: 0.7rem;
+    white-space: nowrap;
+}

@@ -8,6 +8,7 @@ import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AppContextValues, ReloadFileHandler, SaveFileHandler } from "@/app/AppContext";
 import type { Locale } from "@/i18n/Localization";
+import { DEFAULT_FOLDER_SORT, type FolderSort } from "@/preferences/FolderSortPreferences";
 import type { AppTheme } from "@/preferences/ThemePreferences";
 import type { AppTypography } from "@/preferences/TypographyPreferences";
 import type { ContextualToolbarSection } from "@/features/editors/ContentForPath";
@@ -68,7 +69,10 @@ describe("Toolbar", () => {
         setFileModified = setFileModifiedSignal;
         setTheme = setThemeSignal;
 
+        const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
         editorContext = {
+            folderSort,
+            setFolderSort,
             saveFile,
             setSaveFile,
             reloadFile,

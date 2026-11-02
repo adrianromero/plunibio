@@ -1,3 +1,4 @@
+import { DEFAULT_FOLDER_SORT, type FolderSort } from "@/preferences/FolderSortPreferences";
 import { createEffect, createSignal, type JSX } from "solid-js";
 import {
     AppContext,
@@ -44,6 +45,7 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
     );
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
     const [sidebarVisible, setSidebarVisible] = createSignal(true);
+    const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
     const [showHiddenFiles, setShowHiddenFiles] = createSignal(false);
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
     const initialTheme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
@@ -118,6 +120,8 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             setSearchFile,
             sidebarVisible,
             setSidebarVisible,
+            folderSort,
+            setFolderSort,
             showHiddenFiles,
             setShowHiddenFiles,
             toggleSidebar,

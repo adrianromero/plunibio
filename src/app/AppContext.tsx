@@ -36,6 +36,7 @@ import {
     saveTypography,
     type AppTypography,
 } from "@/preferences/TypographyPreferences";
+import { loadFolderSort, saveFolderSort, type FolderSort } from "@/preferences/FolderSortPreferences";
 import AppShortcuts, { type ShortcutDefinition } from "./AppShortcuts";
 
 export type SaveFileHandler = () => Promise<void>;
@@ -90,6 +91,8 @@ export type AppContextValues = {
         setSearchFile: (handler: SearchFileHandler | null) => void;
         sidebarVisible: Accessor<boolean>;
         setSidebarVisible: Setter<boolean>;
+        folderSort: Accessor<FolderSort>;
+        setFolderSort: Setter<FolderSort>;
         showHiddenFiles: Accessor<boolean>;
         setShowHiddenFiles: Setter<boolean>;
         toggleSidebar: Accessor<ToggleSidebarHandler | null>;
@@ -140,6 +143,12 @@ export function AppProvider(props: {
     const [renameEntry, setRenameEntrySignal] = createSignal<RenameEntryHandler | null>(null);
     const [createEntry, setCreateEntrySignal] = createSignal<CreateEntryHandler | null>(null);
     const [sidebarVisible, setSidebarVisibleSignal] = createSignal(loadSidebarVisible());
+    const [folderSort, setFolderSortSignal] = createSignal<FolderSort>(loadFolderSort());
+    const setFolderSort: Setter<FolderSort> = (value) => {
+        const next = setFolderSortSignal(value);
+        saveFolderSort(next);
+        return next;
+    };
     const [showHiddenFiles, setShowHiddenFilesSignal] = createSignal(loadShowHiddenFiles());
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
     const initialTheme = loadTheme();
@@ -516,6 +525,8 @@ export function AppProvider(props: {
                     setSearchFile,
                     sidebarVisible,
                     setSidebarVisible,
+                    folderSort,
+                    setFolderSort,
                     showHiddenFiles,
                     setShowHiddenFiles,
                     toggleSidebar,

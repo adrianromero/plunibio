@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createResource, createSignal, For, JSX, Match, onCleanup, Show, Switch } from "solid-js";
+import {
+    createMemo, createResource, createSignal, For, JSX, Match, onCleanup, Show, Switch,
+} from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
 import FileImage from "lucide-solid/icons/file-image";
@@ -16,6 +18,8 @@ import { useI18N } from "@/i18n/Localization";
 import type { DirectoryEntry } from "@/backend/rusttypes";
 import styles from "./EditorFolder.module.css";
 import { Dynamic } from "solid-js/web";
+import { sortFolderEntries } from "./FolderSorting";
+import { nextFolderSort } from "@/preferences/FolderSortPreferences";
 import EditorFolderSidebar from "./EditorFolderSidebar";
 import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
 import MessageView from "@/shared/errors/MessageView";
@@ -66,7 +70,7 @@ export function EditorFolder(): JSX.Element {
     const {
         main: { basepath, filename, loadFilename, showAppMessage, setCreateEntry },
         spinner: { showSpinner, hideSpinner, setSpinnerParams },
-        editor: { setReloadFile, showHiddenFiles },
+        editor: { setReloadFile, showHiddenFiles, folderSort, setFolderSort },
     } = useAppContext();
     const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
     const openCreateDialog = (kind: CreateEntryKind): void => {
@@ -102,6 +106,10 @@ export function EditorFolder(): JSX.Element {
                 hideSpinner();
             }
         }
+    );
+
+    const sortedEntries = createMemo(() =>
+        sortFolderEntries(directoryResult()?.entries ?? [], folderSort(), locale())
     );
 
     const createEntry = async (kind: CreateEntryKind, name: string): Promise<void> => {
@@ -160,7 +168,7 @@ export function EditorFolder(): JSX.Element {
                             >
                                 <div class="contentView">
                                     <ul class={styles.entryList}>
-                                        <For each={directoryResult()?.entries}>
+                                        <For each={sortedEntries()}>
                                             {(entry) => (
                                                 <li>
                                                     <button
@@ -209,6 +217,8 @@ export function EditorFolder(): JSX.Element {
             <EditorFolderSidebar
                 disabled={directoryResult.loading || !directoryResult()?.entries}
                 onCreate={openCreateDialog}
+                sort={folderSort()}
+                onSort={(attribute) => setFolderSort((current) => nextFolderSort(current, attribute))}
             />
             <CreateEntryDialog
                 open={createKind() !== null}
