@@ -18,6 +18,7 @@ const showSpinnerMock = vi.hoisted(() => vi.fn());
 const hideSpinnerMock = vi.hoisted(() => vi.fn());
 const setSpinnerParamsMock = vi.hoisted(() => vi.fn());
 const showAppMessageMock = vi.hoisted(() => vi.fn(async () => undefined));
+const loadFilenameMock = vi.hoisted(() => vi.fn(async () => undefined));
 let reloadFile: ReloadFileHandler | null;
 let showHiddenFiles: Accessor<boolean>;
 let setShowHiddenFiles: Setter<boolean>;
@@ -29,7 +30,7 @@ vi.mock("@/app/AppContext", () => ({
         main: {
             basepath: () => "/notes",
             filename: () => "docs",
-            loadFilename: vi.fn(),
+            loadFilename: loadFilenameMock,
             showAppMessage: showAppMessageMock,
         },
         spinner: {
@@ -97,6 +98,7 @@ describe("EditorFolder", () => {
         hideSpinnerMock.mockReset();
         setSpinnerParamsMock.mockReset();
         showAppMessageMock.mockClear();
+        loadFilenameMock.mockClear();
         document.body.replaceChildren();
     });
 
@@ -170,12 +172,7 @@ describe("EditorFolder", () => {
         expect(message?.textContent).toContain("folder.empty");
     });
 
-    it("creates a Markdown file, inserts it without reloading and scrolls it into view", async () => {
-        const scrollIntoView = vi.fn();
-        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-            configurable: true,
-            value: scrollIntoView,
-        });
+    it("creates a Markdown file and navigates directly to it", async () => {
         invokeMock.mockImplementation(async (command: string) => {
             if (command === "list_directory") {
                 return [
@@ -214,7 +211,7 @@ describe("EditorFolder", () => {
         input.dispatchEvent(new InputEvent("input", { bubbles: true }));
         root.querySelector<HTMLButtonElement>('[data-testid="create-entry-dialog"] button[type="submit"]')?.click();
 
-        await vi.waitFor(() => expect(root.textContent).toContain("new.md"));
+        await vi.waitFor(() => expect(loadFilenameMock).toHaveBeenCalledWith("docs/new.md"));
         expect(invokeMock).toHaveBeenCalledWith("create_file", {
             basepath: "/notes",
             filename: "docs",
@@ -223,7 +220,13 @@ describe("EditorFolder", () => {
         expect(invokeMock.mock.calls.filter(([command]) => command === "list_directory")).toHaveLength(1);
         expect(showSpinnerMock).toHaveBeenCalled();
         expect(hideSpinnerMock).toHaveBeenCalled();
-        await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({ block: "nearest" }));
+        const lastHideCall =
+            hideSpinnerMock.mock.invocationCallOrder[
+                hideSpinnerMock.mock.invocationCallOrder.length - 1
+            ]!;
+        expect(lastHideCall).toBeLessThan(
+            loadFilenameMock.mock.invocationCallOrder[0]!
+        );
     });
 
     it("uses distinct icons for Markdown, plain text and other files", () => {

@@ -3,17 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import {
-    createEffect,
-    createResource,
-    createSignal,
-    For,
-    JSX,
-    Match,
-    onCleanup,
-    Show,
-    Switch,
-} from "solid-js";
+import { createResource, createSignal, For, JSX, Match, onCleanup, Show, Switch } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
 import FilePen from "lucide-solid/icons/file-pen";
@@ -76,8 +66,6 @@ export function EditorFolder(): JSX.Element {
         editor: { setReloadFile, showHiddenFiles },
     } = useAppContext();
     const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
-    const [pendingScrollPath, setPendingScrollPath] = createSignal<string | null>(null);
-    let scrollingView: HTMLDivElement | undefined;
 
     const entryDetails = (entry: DirectoryEntry): string => {
         const size =
@@ -91,7 +79,7 @@ export function EditorFolder(): JSX.Element {
         const modified = formatModifiedAt(entry.modifiedAt, locale()) ?? t("folder.dateUnavailable");
         return `${size} · ${modified}`;
     };
-    const [directoryResult, { mutate, refetch }] = createResource(
+    const [directoryResult, { refetch }] = createResource(
         () => ({ basepath: basepath(), filename: filename(), showHidden: showHiddenFiles() }),
         async (path): Promise<DirectoryResult> => {
             setSpinnerParams(t("folder.loading", { path: path.filename }));
@@ -108,20 +96,6 @@ export function EditorFolder(): JSX.Element {
         }
     );
 
-    const insertCreatedEntry = (
-        entries: readonly DirectoryEntry[],
-        created: DirectoryEntry
-    ): DirectoryEntry[] => {
-        const next = [...entries];
-        if (created.kind === "directory") {
-            const firstFile = next.findIndex((entry) => entry.kind === "file");
-            next.splice(firstFile < 0 ? next.length : firstFile, 0, created);
-        } else {
-            next.push(created);
-        }
-        return next;
-    };
-
     const createEntry = async (kind: CreateEntryKind, name: string): Promise<void> => {
         const currentBasepath = basepath();
         const currentFilename = filename();
@@ -133,18 +107,14 @@ export function EditorFolder(): JSX.Element {
         );
         showSpinner();
         let errorMessage: string | null = null;
+        let createdFilename: string | null = null;
         try {
             const entry = await invoke<DirectoryEntry>(
                 kind === "directory" ? "create_directory" : "create_file",
                 { basepath: currentBasepath, filename: currentFilename, name }
             );
             if (basepath() !== currentBasepath || filename() !== currentFilename) return;
-            mutate((current) =>
-                current?.entries
-                    ? { entries: insertCreatedEntry(current.entries, entry) }
-                    : current
-            );
-            setPendingScrollPath(entry.filename);
+            createdFilename = entry.filename;
         } catch (error: unknown) {
             console.error("Unable to create directory entry:", error);
             errorMessage = translateAppError(error, t);
@@ -152,21 +122,8 @@ export function EditorFolder(): JSX.Element {
             hideSpinner();
         }
         if (errorMessage) await showAppMessage(errorMessage, "error");
+        else if (createdFilename) await loadFilename(createdFilename);
     };
-
-    createEffect(() => {
-        directoryResult();
-        const path = pendingScrollPath();
-        if (!path) return;
-        queueMicrotask(() => {
-            const entry = Array.from(
-                scrollingView?.querySelectorAll<HTMLElement>("[data-path]") ?? []
-            ).find((element) => element.dataset.path === path);
-            if (!entry) return;
-            entry.scrollIntoView({ block: "nearest" });
-            setPendingScrollPath(null);
-        });
-    });
 
     const reloadDirectory = async (): Promise<void> => {
         await refetch();
@@ -179,7 +136,7 @@ export function EditorFolder(): JSX.Element {
 
     return (
         <section class={styles.studio} data-testid="folder-view">
-            <div ref={scrollingView} class="scrollingView">
+            <div class="scrollingView">
                 <div class={styles.newAction}>
                     <Menu
                         label={t("folder.new")}
@@ -203,7 +160,7 @@ export function EditorFolder(): JSX.Element {
                                         kind: "action",
                                         id: "new-markdown",
                                         label: t("folder.markdown"),
-                                icon: FilePen,
+                                        icon: FilePen,
                                         onSelect: () => setCreateKind("markdown"),
                                     },
                                     {
