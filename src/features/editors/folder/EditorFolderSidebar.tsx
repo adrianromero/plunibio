@@ -10,7 +10,7 @@ import Folder from "lucide-solid/icons/folder";
 import ArrowUp from "lucide-solid/icons/arrow-up";
 import ArrowDown from "lucide-solid/icons/arrow-down";
 import ALargeSmall from "lucide-solid/icons/a-large-small";
-import Ruler from "lucide-solid/icons/ruler";
+import Weight from "lucide-solid/icons/weight";
 import CalendarClock from "lucide-solid/icons/calendar-clock";
 import { Dynamic } from "solid-js/web";
 import { For, Show, type JSX } from "solid-js";
@@ -32,7 +32,7 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
     const { t } = useI18N();
 
     const attributes = ["name", "size", "modified"] as const;
-    const icons = { name: ALargeSmall, size: Ruler, modified: CalendarClock };
+    const icons = { name: ALargeSmall, size: Weight, modified: CalendarClock };
     const labels = {
         name: "folder.sortName",
         size: "folder.sortSize",
