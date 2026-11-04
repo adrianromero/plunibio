@@ -13,6 +13,8 @@
         "release:check": "node scripts/check-release-version.mjs",
         "automation:build": "VITE_PLUNIBIO_AUTOMATION=1 npm run tauri build -- --debug --no-bundle --features automation --config src-tauri/tauri.automation.conf.json",
         "automation:run": "tsx automation/run.ts",
+    "automation:check": "tsc --noEmit -p automation/tsconfig.json",
+    "automation:test": "node --import tsx automation/__tests__/workspace.test.ts",
         "docs:images:optimize": "node scripts/optimize-doc-images.mjs",
         "docs:images:manifest": "node scripts/generate-doc-image-manifest.mjs",
         "docs:images:regression": "node scripts/verify-doc-capture-flows.mjs",

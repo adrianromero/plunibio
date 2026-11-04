@@ -6,10 +6,10 @@ section: docs
 docs_key: workspaces-files
 title: Workspaces and files
 permalink: /en/docs/workspaces-and-files/
-description: Navigate local folders and files, save changes, and reload from disk.
+description: Create, sort, rename, and delete files and folders; save changes and reload from disk.
 ---
 
-A workspace limits the local folder tree that Plunibio can browse. This chapter explains how to change that root, navigate without losing changes, recognize how each file type opens, and reread content changed outside the application.
+A workspace limits the local folder tree that Plunibio can browse. This chapter explains how to create and organize its contents, rename and delete items, save changes, and reread files changed outside the application.
 
 ## Open or switch workspaces
 
@@ -27,7 +27,11 @@ If you cancel, you remain in the current workspace. Plunibio remembers the selec
 
 ## Browse folders and files
 
-The workspace root and each folder list folders first and files second. Within each group, names are sorted alphabetically, initially ignoring letter case.
+The workspace root and each folder list folders first and files second. Each item includes an icon identifying its editor type and details to help you recognize it:
+
+- Files show their size and modification date.
+- Folders show the number of visible files and folders they contain directly, and their modification date. The count excludes the contents of subfolders and does not represent a size in bytes.
+- If Plunibio cannot obtain a value, it displays **Items unavailable** or **Date unavailable**, as appropriate.
 
 1. Select a folder to display its contents.
 2. Select a file to open the editor or action for its format.
@@ -43,6 +47,56 @@ To include hidden items, open **More options**, open **Hidden files**, and selec
 {% endcapture %}
 {% include docs-callout.html type="note" content=hidden_note %}
 
+## Sort the listing
+
+Your chosen sort order applies to workspace folder listings and persists between sessions. It does not change the order in the **Open workspace** picker.
+
+1. Open a folder and select **Show sidebar** if needed.
+2. In **Actions**, find **Sort by** and select **Name**, **Size**, or **Modified**.
+3. Select the same criterion again to alternate between ascending and descending order. The arrow indicates the active direction.
+{: .docs-steps}
+
+{% include docs-figure.html id="en-workspaces-and-files-folder-sorting" %}
+
+| Criterion | Ascending order |
+| --- | --- |
+| Name | Alphabetical order adapted to the interface language, with numbers in natural order: `note2` comes before `note10`. |
+| Size | Files from fewer to more bytes; folders from fewer to more immediate visible items. |
+| Modified | Oldest to newest modification date. |
+
+Folders remain before files in both directions. Unavailable size or date values appear at the end of their group. Showing hidden files also changes the count used to sort folders by size.
+
+## Create folders and files
+
+Creation actions are available while viewing a folder. To create beside an open file, first select its folder in the path at the top.
+
+1. Open the destination folder. Select **Show sidebar** if needed.
+2. In **Actions**, choose one of the options in the following table.
+3. Enter the **Folder name** or **File name**. For Markdown and text, the field already contains `.md` or `.txt`; type the name before the extension.
+4. Select **OK**. Plunibio immediately creates the item on disk and opens the resulting folder or file. **Cancel** closes the form without creating it.
+{: .docs-steps}
+
+{% include docs-figure.html id="en-workspaces-and-files-create-folder" %}
+
+| Action | Result |
+| --- | --- |
+| New folder | Creates an empty folder and enters it. |
+| New Markdown file | Suggests `.md` and opens the empty document in the Markdown editor if you keep that extension. |
+| New text file | Suggests `.txt` and opens the empty document in the text editor if you keep that extension. |
+| Other new file | Lets you enter the complete name, including an extension, such as `data.json`. The extension determines how it opens. |
+
+New files are empty: **Other new file** does not generate a template or convert content into another format. Graphical creation places the file on disk even before you type anything or use **Save**.
+
+Use a single name, without `/` or `\`; do not enter a path or use `.` or `..`. To create several levels, create a folder, enter it, and repeat. The name must be valid on your operating system. If an item with that name already exists or you lack permission, Plunibio displays an error and does not overwrite the existing item.
+
+Creation shortcuts only act while a folder is displayed:
+
+| Action | Windows and Linux | macOS |
+| --- | --- | --- |
+| New folder | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> | <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> |
+| New Markdown file | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> | <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> |
+| New text file | <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> | <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> |
+
 ## Use the file path and history
 
 The file path shows **Home**, intermediate folders, and the current item. Select a folder in the path to return to it. In deep locations, only the last four segments appear; an ellipsis represents the earlier segments.
@@ -57,6 +111,46 @@ The file path shows **Home**, intermediate folders, and the current item. Select
 | Forward | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd> | <kbd>⌘</kbd> + <kbd>⌥</kbd> + <kbd>.</kbd> |
 
 The buttons are disabled when there is no destination in that direction. Switching workspaces clears the previous history.
+
+## Rename the current file or folder
+
+The menu beside the current item's name offers **Rename** and **Delete**. To act on a folder, enter it first. The **Home** root does not offer these actions.
+
+{% include docs-figure.html id="en-workspaces-and-files-item-menu" %}
+
+1. Open the file or folder that you want to rename.
+2. Select the arrow beside its name in the path and choose **Rename**. You can also press <kbd>F2</kbd>.
+3. In **Rename file** or **Rename folder**, enter the new name. For a file, the name without the extension is initially selected so you can keep the extension.
+4. Select **OK**. If the editor has pending changes, Plunibio attempts to save them before renaming. If saving fails, the operation is canceled and an error appears.
+{: .docs-steps}
+
+{% include docs-figure.html id="en-workspaces-and-files-rename-entry" %}
+
+The same naming rules apply as when creating an item. The item stays in its folder; you cannot move it by entering a path. If the destination name already exists, Plunibio displays an error and keeps both items.
+
+Changing a file's extension displays an additional confirmation. Select **Continue** to accept or **Cancel** to keep the previous name. The new extension determines which editor opens; for example, changing `.md` to `.txt` displays the Markdown content as text.
+
+{% include docs-figure.html id="en-workspaces-and-files-rename-extension" %}
+
+{% capture rename_warning %}
+Changing the extension does not convert the content's format. Renaming does not update links or image paths that used the previous name. After renaming a file or folder, review affected references in your documents.
+{% endcapture %}
+{% include docs-callout.html type="warning" content=rename_warning %}
+
+## Delete a file or folder
+
+{% capture delete_warning %}
+Deletion is permanent: it does not move the item to the trash and cannot be undone in Plunibio. Deleting a folder removes all its contents, including subfolders and hidden files. Deleting an open file also discards the editor's changes without saving them first. Keep a copy of anything you need before continuing.
+{% endcapture %}
+{% include docs-callout.html type="warning" content=delete_warning %}
+
+1. Open the file or enter the folder that you want to delete. Check its name and location in the path.
+2. Select the arrow beside the current item's name and choose **Delete**.
+3. Review the name in the confirmation. Select **Cancel** to keep it or **Delete** to remove it permanently.
+4. After deleting it, Plunibio displays its parent folder. If deletion fails, an error appears.
+{: .docs-steps}
+
+{% include docs-figure.html id="en-workspaces-and-files-delete-folder" %}
 
 ## Recognize how a file opens
 
@@ -76,11 +170,11 @@ When you select **Open with the default application**, Plunibio hands the file t
 
 ## Save changes explicitly
 
-A dot beside the filename indicates unsaved changes. To write them to disk:
+A **square icon with a pencil** beside the filename, described as **Unsaved changes**, indicates pending changes. To write them to disk:
 
 1. Press <kbd>Ctrl</kbd> + <kbd>S</kbd> on Windows and Linux or <kbd>⌘</kbd> + <kbd>S</kbd> on macOS. You can also open **More options** and select **Save**.
 2. Wait for the save operation to finish.
-3. Check that the dot disappears. If Plunibio cannot write the file, it displays an error and keeps the change indicator visible.
+3. Check that the indicator disappears. If Plunibio cannot write the file, it displays an error and keeps the change indicator visible.
 {: .docs-steps}
 
 {% include docs-figure.html id="en-workspaces-and-files-unsaved-indicator" %}
@@ -121,11 +215,11 @@ After you confirm, Plunibio cannot recover the unsaved changes. **Reload** does 
 {% endcapture %}
 {% include docs-callout.html type="warning" content=reload_warning %}
 
-If the file no longer exists, reloading opens an empty document marked as new. You can save it to create the file again or navigate to another item.
+If a text or Markdown file no longer exists, reloading opens an empty document marked as new. You can save it to create the file again or navigate to another item.
 
 ## Create a file named on the command line
 
-Plunibio does not provide a graphical action for creating files or folders. However, you can start it with the relative name of a text or Markdown file that does not yet exist; the editor opens it empty and displays the change indicator.
+Alongside graphical creation, you can start Plunibio with the relative name of a text or Markdown file that does not yet exist. In this case, the editor opens it empty and displays the change indicator, but creation on disk is deferred until you save it.
 
 - **Save** creates the file, even if it is still empty.
 - If you close or navigate without typing anything and without using **Save**, the file is not created.

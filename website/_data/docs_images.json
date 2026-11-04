@@ -199,6 +199,48 @@
       "alt": "Block quote created with the Markdown greater-than typing rule."
     },
     {
+      "id": "en-getting-started-create-document",
+      "language": "en",
+      "chapter": "getting-started",
+      "capture": "create-document",
+      "path": "/assets/images/docs/en/getting-started/create-document.webp",
+      "flow": "automation/flows/docs-en-getting-started.json",
+      "step": 17,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 3886,
+      "alt": "Create file dialog with my-first-note.md entered as the name of the new Markdown document."
+    },
+    {
+      "id": "en-getting-started-first-document-unsaved",
+      "language": "en",
+      "chapter": "getting-started",
+      "capture": "first-document-unsaved",
+      "path": "/assets/images/docs/en/getting-started/first-document-unsaved.webp",
+      "flow": "automation/flows/docs-en-getting-started.json",
+      "step": 25,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 14666,
+      "alt": "New Markdown note with its first sentence and the square-pencil Unsaved changes indicator beside the filename."
+    },
+    {
+      "id": "en-getting-started-folder-actions",
+      "language": "en",
+      "chapter": "getting-started",
+      "capture": "folder-actions",
+      "path": "/assets/images/docs/en/getting-started/folder-actions.webp",
+      "flow": "automation/flows/docs-en-getting-started.json",
+      "step": 13,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 15518,
+      "alt": "Workspace folder with file sizes and modification dates, and the Actions panel for creating files and folders."
+    },
+    {
       "id": "en-getting-started-general-menu",
       "language": "en",
       "chapter": "getting-started",
@@ -207,9 +249,9 @@
       "flow": "automation/flows/docs-en-getting-started.json",
       "step": 7,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 82078,
+      "width": 1024,
+      "height": 768,
+      "bytes": 46996,
       "alt": "General options menu with theme, language, hidden-file, and Markdown typography settings."
     },
     {
@@ -221,9 +263,9 @@
       "flow": "automation/flows/docs-en-getting-started.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 68114,
+      "width": 1024,
+      "height": 768,
+      "bytes": 39264,
       "alt": "Plunibio with Atlas of Lúmina open in the Markdown editor and the formatting sidebar visible."
     },
     {
@@ -633,6 +675,62 @@
       "alt": "Error explaining that an edited BMP can be viewed but only PNG, JPEG, and WebP can be saved."
     },
     {
+      "id": "en-workspaces-and-files-create-folder",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "create-folder",
+      "path": "/assets/images/docs/en/workspaces-and-files/create-folder.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 14,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 3624,
+      "alt": "Create folder dialog with drafts entered as the new folder name."
+    },
+    {
+      "id": "en-workspaces-and-files-delete-folder",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "delete-folder",
+      "path": "/assets/images/docs/en/workspaces-and-files/delete-folder.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 51,
+      "scope": "element",
+      "width": 400,
+      "height": 245,
+      "bytes": 6794,
+      "alt": "Confirmation that deleting drafts permanently removes the folder and all its contents, with Delete and Cancel options."
+    },
+    {
+      "id": "en-workspaces-and-files-folder-sorting",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "folder-sorting",
+      "path": "/assets/images/docs/en/workspaces-and-files/folder-sorting.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 6,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 15524,
+      "alt": "Folder listing sorted by descending size, with folders first and Size active in the Actions panel."
+    },
+    {
+      "id": "en-workspaces-and-files-item-menu",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "item-menu",
+      "path": "/assets/images/docs/en/workspaces-and-files/item-menu.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 28,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 18950,
+      "alt": "Current file menu in the breadcrumb with Rename and Delete actions for draft.md."
+    },
+    {
       "id": "en-workspaces-and-files-nested-file",
       "language": "en",
       "chapter": "workspaces-and-files",
@@ -641,9 +739,9 @@
       "flow": "automation/flows/docs-en-workspace-navigation.json",
       "step": 10,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 28064,
+      "width": 1024,
+      "height": 768,
+      "bytes": 13770,
       "alt": "Nested Markdown file open with its location shown in the file path."
     },
     {
@@ -655,9 +753,9 @@
       "flow": "automation/flows/docs-en-save-reload.json",
       "step": 14,
       "scope": "element",
-      "width": 640,
-      "height": 444,
-      "bytes": 8862,
+      "width": 320,
+      "height": 222,
+      "bytes": 4784,
       "alt": "Confirmation dialog shown before reloading the current file."
     },
     {
@@ -667,12 +765,40 @@
       "capture": "reload-discard-changes",
       "path": "/assets/images/docs/en/workspaces-and-files/reload-discard-changes.webp",
       "flow": "automation/flows/docs-en-save-reload.json",
-      "step": 23,
+      "step": 24,
       "scope": "element",
-      "width": 799,
-      "height": 444,
-      "bytes": 10972,
+      "width": 399,
+      "height": 222,
+      "bytes": 5680,
       "alt": "Warning that reloading will discard unsaved changes in the current file."
+    },
+    {
+      "id": "en-workspaces-and-files-rename-entry",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "rename-entry",
+      "path": "/assets/images/docs/en/workspaces-and-files/rename-entry.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 32,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 3544,
+      "alt": "Rename file dialog with guide.md entered as the new filename."
+    },
+    {
+      "id": "en-workspaces-and-files-rename-extension",
+      "language": "en",
+      "chapter": "workspaces-and-files",
+      "capture": "rename-extension",
+      "path": "/assets/images/docs/en/workspaces-and-files/rename-extension.webp",
+      "flow": "automation/flows/docs-en-file-management.json",
+      "step": 42,
+      "scope": "element",
+      "width": 400,
+      "height": 268,
+      "bytes": 8030,
+      "alt": "Confirmation warning that changing the filename to guide.txt changes its extension and may affect how it opens."
     },
     {
       "id": "en-workspaces-and-files-unsaved-indicator",
@@ -683,10 +809,10 @@
       "flow": "automation/flows/docs-en-save-reload.json",
       "step": 8,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 50396,
-      "alt": "Dot beside the current filename indicating unsaved changes."
+      "width": 1024,
+      "height": 768,
+      "bytes": 23906,
+      "alt": "Square-pencil icon beside the current filename indicating unsaved changes, with Save enabled in the general menu."
     },
     {
       "id": "en-workspaces-and-files-workspace-root",
@@ -697,10 +823,10 @@
       "flow": "automation/flows/docs-en-workspace-navigation.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 9578,
-      "alt": "Workspace root listing the Atlas of Lúmina folders and files."
+      "width": 1024,
+      "height": 768,
+      "bytes": 7862,
+      "alt": "Workspace root listing Atlas of Lúmina folders and files with item counts, file sizes, and modification dates."
     },
     {
       "id": "en-workspaces-and-files-workspace-selector",
@@ -711,9 +837,9 @@
       "flow": "automation/flows/docs-en-workspace-navigation.json",
       "step": 16,
       "scope": "element",
-      "width": 1216,
-      "height": 1186,
-      "bytes": 15806,
+      "width": 608,
+      "height": 608,
+      "bytes": 7630,
       "alt": "Workspace selection dialog displaying the available computer locations."
     },
     {
@@ -913,6 +1039,48 @@
       "alt": "Cita en bloque creada mediante la regla de escritura Markdown del signo mayor que."
     },
     {
+      "id": "es-getting-started-create-document",
+      "language": "es",
+      "chapter": "getting-started",
+      "capture": "create-document",
+      "path": "/assets/images/docs/es/getting-started/create-document.webp",
+      "flow": "automation/flows/docs-es-getting-started.json",
+      "step": 17,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 4636,
+      "alt": "Diálogo Crear archivo con mi-primera-nota.md como nombre del nuevo documento Markdown."
+    },
+    {
+      "id": "es-getting-started-first-document-unsaved",
+      "language": "es",
+      "chapter": "getting-started",
+      "capture": "first-document-unsaved",
+      "path": "/assets/images/docs/es/getting-started/first-document-unsaved.webp",
+      "flow": "automation/flows/docs-es-getting-started.json",
+      "step": 25,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 15854,
+      "alt": "Nueva nota Markdown con su primera frase y el indicador Cambios sin guardar, un lápiz en un cuadrado junto al nombre del archivo."
+    },
+    {
+      "id": "es-getting-started-folder-actions",
+      "language": "es",
+      "chapter": "getting-started",
+      "capture": "folder-actions",
+      "path": "/assets/images/docs/es/getting-started/folder-actions.webp",
+      "flow": "automation/flows/docs-es-getting-started.json",
+      "step": 13,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 16284,
+      "alt": "Carpeta del espacio con tamaños y fechas de modificación, y el panel Acciones para crear archivos y carpetas."
+    },
+    {
       "id": "es-getting-started-general-menu",
       "language": "es",
       "chapter": "getting-started",
@@ -921,9 +1089,9 @@
       "flow": "automation/flows/docs-es-getting-started.json",
       "step": 7,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 87166,
+      "width": 1024,
+      "height": 768,
+      "bytes": 49206,
       "alt": "Menú de opciones generales con los ajustes de tema, idioma, archivos ocultos y tipografía Markdown."
     },
     {
@@ -935,9 +1103,9 @@
       "flow": "automation/flows/docs-es-getting-started.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 73926,
+      "width": 1024,
+      "height": 768,
+      "bytes": 41726,
       "alt": "Plunibio con Atlas de Lúmina abierto en el editor Markdown y el panel de formato visible."
     },
     {
@@ -1347,6 +1515,62 @@
       "alt": "Error que explica que un BMP editado puede visualizarse, pero solo se pueden guardar PNG, JPEG y WebP."
     },
     {
+      "id": "es-workspaces-and-files-create-folder",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "create-folder",
+      "path": "/assets/images/docs/es/workspaces-and-files/create-folder.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 14,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 4416,
+      "alt": "Diálogo Crear carpeta con borradores como nombre de la nueva carpeta."
+    },
+    {
+      "id": "es-workspaces-and-files-delete-folder",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "delete-folder",
+      "path": "/assets/images/docs/es/workspaces-and-files/delete-folder.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 51,
+      "scope": "element",
+      "width": 400,
+      "height": 268,
+      "bytes": 6960,
+      "alt": "Confirmación de que eliminar borradores borra permanentemente la carpeta y todo su contenido, con las opciones Eliminar y Cancelar."
+    },
+    {
+      "id": "es-workspaces-and-files-folder-sorting",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "folder-sorting",
+      "path": "/assets/images/docs/es/workspaces-and-files/folder-sorting.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 6,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 16348,
+      "alt": "Listado ordenado por tamaño descendente, con carpetas primero y Tamaño activo en el panel Acciones."
+    },
+    {
+      "id": "es-workspaces-and-files-item-menu",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "item-menu",
+      "path": "/assets/images/docs/es/workspaces-and-files/item-menu.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 28,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 20570,
+      "alt": "Menú del archivo actual en la ruta, con las acciones Renombrar y Eliminar para borrador.md."
+    },
+    {
       "id": "es-workspaces-and-files-nested-file",
       "language": "es",
       "chapter": "workspaces-and-files",
@@ -1355,9 +1579,9 @@
       "flow": "automation/flows/docs-es-workspace-navigation.json",
       "step": 10,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 30518,
+      "width": 1024,
+      "height": 768,
+      "bytes": 15332,
       "alt": "Archivo Markdown anidado abierto con su ubicación en la ruta del archivo."
     },
     {
@@ -1369,9 +1593,9 @@
       "flow": "automation/flows/docs-es-save-reload.json",
       "step": 14,
       "scope": "element",
-      "width": 640,
-      "height": 444,
-      "bytes": 9986,
+      "width": 320,
+      "height": 222,
+      "bytes": 5272,
       "alt": "Diálogo de confirmación mostrado antes de recargar el archivo actual."
     },
     {
@@ -1381,12 +1605,40 @@
       "capture": "reload-discard-changes",
       "path": "/assets/images/docs/es/workspaces-and-files/reload-discard-changes.webp",
       "flow": "automation/flows/docs-es-save-reload.json",
-      "step": 23,
+      "step": 24,
       "scope": "element",
-      "width": 800,
-      "height": 490,
-      "bytes": 11248,
+      "width": 400,
+      "height": 245,
+      "bytes": 5994,
       "alt": "Advertencia de que la recarga descartará los cambios sin guardar del archivo actual."
+    },
+    {
+      "id": "es-workspaces-and-files-rename-entry",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "rename-entry",
+      "path": "/assets/images/docs/es/workspaces-and-files/rename-entry.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 32,
+      "scope": "element",
+      "width": 320,
+      "height": 264,
+      "bytes": 4364,
+      "alt": "Diálogo Renombrar archivo con guia.md como nuevo nombre."
+    },
+    {
+      "id": "es-workspaces-and-files-rename-extension",
+      "language": "es",
+      "chapter": "workspaces-and-files",
+      "capture": "rename-extension",
+      "path": "/assets/images/docs/es/workspaces-and-files/rename-extension.webp",
+      "flow": "automation/flows/docs-es-file-management.json",
+      "step": 42,
+      "scope": "element",
+      "width": 400,
+      "height": 268,
+      "bytes": 7690,
+      "alt": "Confirmación que advierte de que renombrar como guia.txt cambia la extensión y puede afectar a cómo se abre."
     },
     {
       "id": "es-workspaces-and-files-unsaved-indicator",
@@ -1397,10 +1649,10 @@
       "flow": "automation/flows/docs-es-save-reload.json",
       "step": 8,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 53048,
-      "alt": "Punto junto al nombre del archivo actual que indica cambios sin guardar."
+      "width": 1024,
+      "height": 768,
+      "bytes": 25622,
+      "alt": "Icono cuadrado con lápiz junto al nombre del archivo que indica cambios sin guardar, con Guardar activo en el menú general."
     },
     {
       "id": "es-workspaces-and-files-workspace-root",
@@ -1411,10 +1663,10 @@
       "flow": "automation/flows/docs-es-workspace-navigation.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 9598,
-      "alt": "Raíz del espacio con las carpetas y archivos de Atlas de Lúmina."
+      "width": 1024,
+      "height": 768,
+      "bytes": 7690,
+      "alt": "Raíz del espacio con carpetas y archivos de Atlas de Lúmina, recuentos de elementos, tamaños y fechas de modificación."
     },
     {
       "id": "es-workspaces-and-files-workspace-selector",
@@ -1425,9 +1677,9 @@
       "flow": "automation/flows/docs-es-workspace-navigation.json",
       "step": 16,
       "scope": "element",
-      "width": 1216,
-      "height": 1186,
-      "bytes": 14608,
+      "width": 608,
+      "height": 608,
+      "bytes": 7090,
       "alt": "Diálogo de selección de espacio con las ubicaciones disponibles del equipo."
     }
   ]

@@ -6,10 +6,10 @@ section: docs
 docs_key: workspaces-files
 title: Espacios y archivos
 permalink: /es/docs/espacios-y-archivos/
-description: Recorre carpetas y archivos locales, guarda cambios y recarga desde el disco.
+description: Crea, ordena, renombra y elimina archivos y carpetas; guarda cambios y recarga desde el disco.
 ---
 
-Un espacio delimita la carpeta local que Plunibio puede recorrer. En este capítulo aprenderás a cambiar esa raíz, navegar sin perder cambios, reconocer cómo se abre cada tipo de archivo y volver a leer contenido modificado fuera de la aplicación.
+Un espacio delimita la carpeta local que Plunibio puede recorrer. Aquí aprenderás a crear y organizar su contenido, renombrar y eliminar elementos, guardar cambios y volver a leer archivos modificados fuera de la aplicación.
 
 ## Abrir o cambiar de espacio
 
@@ -27,7 +27,11 @@ Si cancelas, continúas en el espacio actual. Plunibio recuerda el espacio selec
 
 ## Recorrer carpetas y archivos
 
-La raíz y cada carpeta muestran primero las carpetas y después los archivos. Dentro de cada grupo, los nombres se ordenan alfabéticamente sin distinguir inicialmente entre mayúsculas y minúsculas.
+La raíz y cada carpeta muestran primero las carpetas y después los archivos. Cada elemento incluye un icono que identifica su tipo de editor y datos para reconocerlo:
+
+- Los archivos muestran su tamaño y su fecha de modificación.
+- Las carpetas muestran el número de archivos y carpetas visibles que contienen directamente, y su fecha de modificación. El recuento no incluye el contenido de las subcarpetas ni representa su tamaño en bytes.
+- Si Plunibio no puede obtener un dato, muestra **Elementos no disponibles** o **Fecha no disponible**, según corresponda.
 
 1. Selecciona una carpeta para mostrar su contenido.
 2. Selecciona un archivo para abrir el editor o la acción correspondiente a su formato.
@@ -43,6 +47,56 @@ Para incluir elementos ocultos, abre **Más opciones**, abre **Archivos ocultos*
 {% endcapture %}
 {% include docs-callout.html type="note" content=hidden_note %}
 
+## Ordenar el listado
+
+La ordenación elegida se aplica a los listados de carpetas del espacio y se recuerda entre sesiones. No cambia el orden del selector **Abrir espacio**.
+
+1. Abre una carpeta y, si es necesario, selecciona **Mostrar panel lateral**.
+2. En **Acciones**, busca **Ordenar por** y selecciona **Nombre**, **Tamaño** o **Modificación**.
+3. Selecciona otra vez el mismo criterio para alternar entre ascendente y descendente. La flecha indica el sentido activo.
+{: .docs-steps}
+
+{% include docs-figure.html id="es-workspaces-and-files-folder-sorting" %}
+
+| Criterio | Orden ascendente |
+| --- | --- |
+| Nombre | Orden alfabético adaptado al idioma, con números en orden natural: `nota2` aparece antes de `nota10`. |
+| Tamaño | Archivos de menor a mayor número de bytes; carpetas de menor a mayor número de elementos visibles inmediatos. |
+| Modificación | De la fecha más antigua a la más reciente. |
+
+Las carpetas permanecen antes que los archivos en ambos sentidos. Los datos de tamaño o fecha no disponibles quedan al final de su grupo. Mostrar archivos ocultos también cambia el recuento usado para ordenar las carpetas por tamaño.
+
+## Crear carpetas y archivos
+
+Las acciones de creación están disponibles al ver una carpeta. Para crear junto a un archivo abierto, selecciona primero su carpeta en la ruta superior.
+
+1. Abre la carpeta de destino. Si es necesario, selecciona **Mostrar panel lateral**.
+2. En **Acciones**, elige una de las opciones de la tabla siguiente.
+3. Escribe el **Nombre de la carpeta** o el **Nombre del archivo**. Para Markdown y texto, el campo ya contiene `.md` o `.txt`; escribe el nombre delante de la extensión.
+4. Selecciona **OK**. Plunibio crea el elemento inmediatamente en el disco y abre la carpeta o el archivo resultante. **Cancelar** cierra el formulario sin crearlo.
+{: .docs-steps}
+
+{% include docs-figure.html id="es-workspaces-and-files-create-folder" %}
+
+| Acción | Resultado |
+| --- | --- |
+| Nueva carpeta | Crea una carpeta vacía y entra en ella. |
+| Nuevo archivo Markdown | Propone `.md` y abre el documento vacío en el editor Markdown si conservas esa extensión. |
+| Nuevo archivo de texto | Propone `.txt` y abre el documento vacío en el editor de texto si conservas esa extensión. |
+| Otro archivo nuevo | Permite escribir el nombre completo, incluida la extensión, como `datos.json`. La extensión determina cómo se abre. |
+
+Los archivos nuevos están vacíos: **Otro archivo nuevo** no genera una plantilla ni convierte contenido a otro formato. La creación gráfica ya deja el archivo en el disco, aunque todavía no hayas escrito ni utilizado **Guardar**.
+
+Usa un solo nombre, sin `/` ni `\`; no escribas una ruta ni utilices `.` o `..`. Para crear varios niveles, crea una carpeta, entra en ella y repite la operación. El nombre debe ser válido en tu sistema operativo. Si ya existe un elemento con ese nombre o no tienes permisos, Plunibio muestra un error y no sobrescribe el elemento existente.
+
+Los atajos de creación solo actúan mientras se muestra una carpeta:
+
+| Acción | Windows y Linux | macOS |
+| --- | --- | --- |
+| Nueva carpeta | <kbd>Ctrl</kbd> + <kbd>Mayús</kbd> + <kbd>N</kbd> | <kbd>⌘</kbd> + <kbd>Mayús</kbd> + <kbd>N</kbd> |
+| Nuevo archivo Markdown | <kbd>Ctrl</kbd> + <kbd>Mayús</kbd> + <kbd>M</kbd> | <kbd>⌘</kbd> + <kbd>Mayús</kbd> + <kbd>M</kbd> |
+| Nuevo archivo de texto | <kbd>Ctrl</kbd> + <kbd>Mayús</kbd> + <kbd>T</kbd> | <kbd>⌘</kbd> + <kbd>Mayús</kbd> + <kbd>T</kbd> |
+
 ## Utilizar la ruta y el historial
 
 La ruta del archivo muestra **Inicio**, las carpetas intermedias y el elemento actual. Selecciona una carpeta de la ruta para regresar a ella. En ubicaciones profundas solo se muestran los cuatro últimos segmentos; los anteriores se representan con puntos suspensivos.
@@ -57,6 +111,46 @@ La ruta del archivo muestra **Inicio**, las carpetas intermedias y el elemento a
 | Adelante | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd> | <kbd>⌘</kbd> + <kbd>⌥</kbd> + <kbd>.</kbd> |
 
 Los botones se desactivan cuando no existe un destino en esa dirección. Cambiar de espacio borra el historial anterior.
+
+## Renombrar el archivo o la carpeta actual
+
+El menú junto al nombre del elemento actual ofrece **Renombrar** y **Eliminar**. Para actuar sobre una carpeta, entra primero en ella. La raíz **Inicio** no ofrece estas acciones.
+
+{% include docs-figure.html id="es-workspaces-and-files-item-menu" %}
+
+1. Abre el archivo o la carpeta que quieres renombrar.
+2. Selecciona la flecha junto a su nombre en la ruta y elige **Renombrar**. También puedes pulsar <kbd>F2</kbd>.
+3. En **Renombrar archivo** o **Renombrar carpeta**, escribe el nuevo nombre. En un archivo se selecciona inicialmente el nombre sin la extensión para que puedas conservarla.
+4. Selecciona **OK**. Si hay cambios pendientes en el editor, Plunibio intenta guardarlos antes de renombrar. Si el guardado falla, la operación se cancela y muestra el error.
+{: .docs-steps}
+
+{% include docs-figure.html id="es-workspaces-and-files-rename-entry" %}
+
+Se aplican las mismas reglas de nombres que al crear. El elemento permanece en su carpeta; no puedes moverlo escribiendo una ruta. Si el nombre de destino ya existe, Plunibio muestra un error y conserva los dos elementos.
+
+Si cambias la extensión de un archivo, aparece una confirmación adicional. Selecciona **Continuar** para aceptar o **Cancelar** para conservar el nombre anterior. La nueva extensión determina qué editor se abre; por ejemplo, cambiar `.md` por `.txt` muestra el contenido Markdown como texto.
+
+{% include docs-figure.html id="es-workspaces-and-files-rename-extension" %}
+
+{% capture rename_warning %}
+Cambiar la extensión no convierte el formato del contenido. Renombrar tampoco actualiza los enlaces o las rutas de imágenes que utilizaban el nombre anterior. Después de renombrar un archivo o una carpeta, revisa las referencias afectadas en tus documentos.
+{% endcapture %}
+{% include docs-callout.html type="warning" content=rename_warning %}
+
+## Eliminar un archivo o una carpeta
+
+{% capture delete_warning %}
+La eliminación es permanente: no envía el elemento a la papelera y no se puede deshacer desde Plunibio. Al eliminar una carpeta se borra todo su contenido, incluidas subcarpetas y archivos ocultos. Al eliminar un archivo abierto, también se descartan los cambios del editor sin guardarlos antes. Conserva una copia de lo que necesites antes de continuar.
+{% endcapture %}
+{% include docs-callout.html type="warning" content=delete_warning %}
+
+1. Abre el archivo o entra en la carpeta que quieres eliminar. Comprueba su nombre y su ubicación en la ruta.
+2. Selecciona la flecha junto al nombre del elemento actual y elige **Eliminar**.
+3. Revisa el nombre en la confirmación. Selecciona **Cancelar** para conservarlo o **Eliminar** para borrarlo permanentemente.
+4. Tras eliminarlo, Plunibio muestra la carpeta que lo contenía. Si no puede borrarlo, muestra el error.
+{: .docs-steps}
+
+{% include docs-figure.html id="es-workspaces-and-files-delete-folder" %}
 
 ## Reconocer cómo se abre un archivo
 
@@ -76,11 +170,11 @@ Los capítulos [Editar Markdown]({{ '/es/docs/editar-markdown/' | relative_url }
 
 ## Guardar cambios de forma explícita
 
-Un punto junto al nombre del archivo indica que hay cambios sin guardar. Para escribirlos en el disco:
+Un **icono cuadrado con lápiz** junto al nombre del archivo, con la descripción **Cambios sin guardar**, indica que hay cambios pendientes. Para escribirlos en el disco:
 
 1. Pulsa <kbd>Ctrl</kbd> + <kbd>S</kbd> en Windows y Linux o <kbd>⌘</kbd> + <kbd>S</kbd> en macOS. También puedes abrir **Más opciones** y seleccionar **Guardar**.
 2. Espera a que termine el guardado.
-3. Comprueba que el punto desaparece. Si Plunibio no puede escribir el archivo, muestra un error y conserva el indicador de cambios.
+3. Comprueba que el indicador desaparece. Si Plunibio no puede escribir el archivo, muestra un error y conserva el indicador de cambios.
 {: .docs-steps}
 
 {% include docs-figure.html id="es-workspaces-and-files-unsaved-indicator" %}
@@ -121,11 +215,11 @@ Después de confirmar, los cambios sin guardar no se pueden recuperar desde Plun
 {% endcapture %}
 {% include docs-callout.html type="warning" content=reload_warning %}
 
-Si el archivo ya no existe, la recarga abre un documento vacío marcado como nuevo. Puedes guardarlo para volver a crearlo o navegar a otro elemento.
+Si un archivo de texto o Markdown ya no existe, la recarga abre un documento vacío marcado como nuevo. Puedes guardarlo para volver a crearlo o navegar a otro elemento.
 
 ## Crear un archivo indicado en la línea de comandos
 
-Plunibio no incluye una acción gráfica para crear archivos o carpetas. Sin embargo, puedes iniciarlo con el nombre relativo de un archivo de texto o Markdown que todavía no exista; el editor lo abre vacío y muestra el indicador de cambios.
+Además de la creación gráfica, puedes iniciar Plunibio con el nombre relativo de un archivo de texto o Markdown que todavía no exista. En este caso, el editor lo abre vacío y muestra el indicador de cambios, pero la creación en el disco se aplaza hasta que lo guardes.
 
 - **Guardar** crea el archivo, incluso si continúa vacío.
 - Si cierras o navegas sin haber escrito nada y sin utilizar **Guardar**, el archivo no se crea.

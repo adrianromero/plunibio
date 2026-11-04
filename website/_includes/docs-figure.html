@@ -11,7 +11,7 @@
 {% else %}
   {% assign figure_alt = docs_image.alt | default: "" %}
 {% endif %}
-<figure class="docs-figure">
+<figure class="docs-figure"{% if figure_width %} style="max-width: {{ figure_width }}px"{% endif %}>
   <img
     src="{{ figure_src | relative_url }}"
     alt="{{ figure_alt | escape }}"

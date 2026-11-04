@@ -25,12 +25,12 @@ async function walk(directory) {
     return nested.flat().sort();
 }
 
-async function imageSnapshot() {
-    const files = await walk(imagesRoot);
+async function fileSnapshot(root) {
+    const files = await walk(root);
     const snapshot = {};
     for (const filename of files) {
         const content = await readFile(filename);
-        const key = relative(imagesRoot, filename).split(sep).join("/");
+        const key = relative(root, filename).split(sep).join("/");
         snapshot[key] = createHash("sha256").update(content).digest("hex");
     }
     return snapshot;
@@ -59,37 +59,50 @@ async function runFlow(filename) {
 }
 
 const flowFiles = [];
+const fixtureRoots = new Set();
 let captureCount = 0;
 for (const name of (await readdir(flowsRoot)).filter(
-    (entry) => entry.startsWith("docs-") && entry.endsWith(".json")
+    (entry) => (entry.startsWith("docs-") || entry.startsWith("verify-docs-")) && entry.endsWith(".json")
 ).sort()) {
     const filename = join(flowsRoot, name);
     const flow = JSON.parse(await readFile(filename, "utf8"));
     const captures = flow.steps.filter((step) => step.action === "capture").length;
-    if (captures > 0) {
+    if (captures > 0 || name.startsWith("verify-docs-")) {
         flowFiles.push(filename);
+        fixtureRoots.add(resolve(projectRoot, flow.app.basePath));
         captureCount += captures;
     }
 }
 
-const before = await imageSnapshot();
+const before = await fileSnapshot(imagesRoot);
+const fixturesBefore = await Promise.all([...fixtureRoots].sort().map(async (root) =>
+    [root, await fileSnapshot(root)]
+));
 if (Object.keys(before).some((filename) => extname(filename).toLowerCase() !== ".webp")) {
     throw new Error("The published capture tree must contain only optimized WebP files.");
 }
 
-for (const [index, filename] of flowFiles.entries()) {
-    console.log(
-        `\n[${index + 1}/${flowFiles.length}] Verifying ${relative(projectRoot, filename)} without captures`
-    );
-    await runFlow(filename);
-}
-
-const after = await imageSnapshot();
-if (JSON.stringify(after) !== JSON.stringify(before)) {
-    throw new Error("The capture regression changed the published image tree.");
+try {
+    for (const [index, filename] of flowFiles.entries()) {
+        console.log(
+            `\n[${index + 1}/${flowFiles.length}] Verifying ${relative(projectRoot, filename)} without captures`
+        );
+        await runFlow(filename);
+    }
+} finally {
+    const after = await fileSnapshot(imagesRoot);
+    if (JSON.stringify(after) !== JSON.stringify(before)) {
+        throw new Error("The capture regression changed the published image tree.");
+    }
+    for (const [root, snapshot] of fixturesBefore) {
+        if (JSON.stringify(await fileSnapshot(root)) !== JSON.stringify(snapshot)) {
+            throw new Error(`The capture regression changed the source fixtures in ${relative(projectRoot, root)}.`);
+        }
+    }
+    console.log("Published images and source fixtures remained unchanged (SHA-256 checked).");
 }
 
 console.log(
     `\nVerified ${captureCount} capture checkpoints across ${flowFiles.length} flows; ` +
-        `${Object.keys(after).length} published images remained unchanged.`
+        `${Object.keys(before).length} published images remained unchanged.`
 );

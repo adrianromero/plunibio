@@ -6,10 +6,10 @@ section: docs
 docs_key: getting-started
 title: Getting started
 permalink: /en/docs/getting-started/
-description: Open a workspace, recognize the interface, and make your first change.
+description: Open a workspace, create a Markdown document, and save your first change.
 ---
 
-Plunibio edits local files inside a folder that you choose as a workspace. In this walkthrough, you will open a workspace, locate a Markdown document, make a change, and save it. You do not need the sample content shown in the images; you can follow the same steps with your own folder.
+Plunibio edits local files inside a folder that you choose as a workspace. In this walkthrough, you will open a workspace, create a Markdown document, write a note, and save it. You can follow the steps with your own folder; you do not need to download the sample content shown in the images.
 
 ## Understand workspaces, folders, and files
 
@@ -39,29 +39,46 @@ The top toolbar and sidebar surround the area where you browse a folder or edit 
 {% include docs-figure.html id="en-getting-started-main-interface" %}
 
 - **Back** and **Forward** move through the history of visited files and folders.
-- The **file path** starts at **Home** and shows the current item's location. Select a segment to return to that folder.
+- The **file path** starts at **Home** and shows the current item's location. Select a folder in the path to return to it.
+- The **current item's name**, with an arrow beside it, opens the **Rename** and **Delete** menu. This menu does not appear at the workspace root.
 - **Show sidebar** or **Hide sidebar** changes the visibility of the current editor's tools.
 - **More options** contains workspace selection, **Reload**, **Save**, preferences, and application information.
 - The **content area** displays a folder, an editor, or the action available for an external format.
-- The **sidebar** changes with the file type. For Markdown, it contains **Format** and **Search**.
+- The **sidebar** changes with the content. In a folder, it contains **Actions** for creation and sorting; in Markdown, it contains **Format** and **Search**.
 
 ## Use the general menu
 
-Open **More options** to see the general actions. **Reload** and **Save** are disabled when they cannot be used. **Typography** options only appear while editing Markdown.
+Open **More options** to see the general actions. **Reload** and **Save** are disabled when they cannot be used. **Typography** is available from any view and changes the presentation of Markdown documents.
 
 {% include docs-figure.html id="en-getting-started-general-menu" %}
 
 You can also change the theme, language, and hidden-file visibility from this menu. [Customize Plunibio]({{ '/en/docs/customize-plunibio/' | relative_url }}) explains which options are remembered.
 
-## Open and save your first Markdown document
+## Create your first Markdown document
 
-1. From the workspace root, open any required folders and select a file with the `.md`, `.markdown`, `.mdown`, or `.mkd` extension.
-2. Select a paragraph in the content area and type a change. The dot beside the filename indicates unsaved changes.
-3. Press <kbd>Ctrl</kbd> + <kbd>S</kbd> on Windows and Linux or <kbd>⌘</kbd> + <kbd>S</kbd> on macOS. You can also open **More options** and select **Save**.
-4. Check that the change indicator disappears. The updated file is now stored on disk.
+1. Select **Home** to return to the workspace root or open the folder where you want to create the file.
+2. If the sidebar is hidden, select **Show sidebar**. In the **Actions** tab, select **New Markdown file**.
+3. In **Create file**, the **File name** field already contains `.md`. Type `my-first-note` before the extension to produce `my-first-note.md`.
+4. Select **OK**. Plunibio creates the empty file in that folder and opens it in the Markdown editor.
 {: .docs-steps}
 
-{% include docs-figure.html id="en-workspaces-and-files-unsaved-indicator" %}
+{% include docs-figure.html id="en-getting-started-folder-actions" %}
+
+{% include docs-figure.html id="en-getting-started-create-document" %}
+
+The file already exists on disk, even though it is still empty. If you prefer to edit an existing document, select it in the folder listing. Files ending in `.md`, `.markdown`, `.mdown`, and `.mkd` open in the Markdown editor.
+
+## Write and save your first change
+
+1. Select the editing area and type a sentence, such as `This is my first note in Plunibio.`
+2. Look for the **square icon with a pencil** beside the filename. Its description is **Unsaved changes**, indicating that your text has not yet been saved to disk.
+3. Press <kbd>Ctrl</kbd> + <kbd>S</kbd> on Windows and Linux or <kbd>⌘</kbd> + <kbd>S</kbd> on macOS. You can also open **More options** and select **Save**.
+4. Wait for the indicator to disappear. The file on disk now contains your note.
+{: .docs-steps}
+
+{% include docs-figure.html id="en-getting-started-first-document-unsaved" %}
+
+Plunibio also attempts to save changes when you navigate to another item or close the application. [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}) explains this **saving when navigating or closing**, including the choices available if saving fails.
 
 {% capture reload_warning %}
 **Reload** reads the file from disk again. If you have unsaved changes, Plunibio asks for confirmation before discarding them. Read [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}) before using this action as a recovery method.
@@ -70,4 +87,4 @@ You can also change the theme, language, and hidden-file visibility from this me
 
 ## Continue learning
 
-You can now open a workspace, recognize the interface, and save a change. Continue with [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}) to learn how to browse folders, use history, create files, and handle external changes.
+You can now open a workspace, recognize the interface, create a document, and save your first note. Continue with [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}) to sort contents, use history, rename or delete items, and handle external changes. [Edit Markdown]({{ '/en/docs/edit-markdown/' | relative_url }}) explains how to format the document.

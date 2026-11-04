@@ -37,11 +37,11 @@ chapters:
     en:
       title: Getting started
       url: /en/docs/getting-started/
-      description: Open a workspace, recognize the interface, and make your first change.
+      description: Open a workspace, create a Markdown document, and save your first change.
     es:
       title: Primeros pasos
       url: /es/docs/primeros-pasos/
-      description: Abre un espacio, reconoce la interfaz y realiza tu primer cambio.
+      description: Abre un espacio, crea un documento Markdown y guarda tu primer cambio.
 
   - docs_key: workspaces-files
     order: 2
@@ -49,11 +49,11 @@ chapters:
     en:
       title: Workspaces and files
       url: /en/docs/workspaces-and-files/
-      description: Navigate local folders and files, save changes, and reload from disk.
+      description: Create, sort, rename, and delete files and folders; save changes and reload from disk.
     es:
       title: Espacios y archivos
       url: /es/docs/espacios-y-archivos/
-      description: Recorre carpetas y archivos locales, guarda cambios y recarga desde el disco.
+      description: Crea, ordena, renombra y elimina archivos y carpetas; guarda cambios y recarga desde el disco.
 
   - docs_key: edit-markdown
     order: 3
