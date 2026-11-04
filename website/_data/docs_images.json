@@ -95,9 +95,9 @@
       "flow": "automation/flows/docs-en-markdown-format.json",
       "step": 4,
       "scope": "element",
-      "width": 640,
-      "height": 1157,
-      "bytes": 19368,
+      "width": 320,
+      "height": 715,
+      "bytes": 10354,
       "alt": "Markdown Format panel with document, block style, and text formatting controls."
     },
     {
@@ -109,9 +109,9 @@
       "flow": "automation/flows/docs-en-markdown-frontmatter.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 68118,
+      "width": 1024,
+      "height": 768,
+      "bytes": 39266,
       "alt": "Document properties editor showing YAML front matter above the Markdown content."
     },
     {
@@ -123,9 +123,9 @@
       "flow": "automation/flows/docs-en-markdown-format.json",
       "step": 7,
       "scope": "element",
-      "width": 640,
-      "height": 1157,
-      "bytes": 16434,
+      "width": 320,
+      "height": 715,
+      "bytes": 9362,
       "alt": "Lower part of the Markdown Format panel with list, image, table, code, math, and Mermaid actions."
     },
     {
@@ -137,10 +137,10 @@
       "flow": "automation/flows/docs-en-markdown-typing-rules.json",
       "step": 44,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 24626,
-      "alt": "Fenced code block created by typing three backticks."
+      "width": 1024,
+      "height": 768,
+      "bytes": 12434,
+      "alt": "Fenced code block created by typing three backticks followed by a space."
     },
     {
       "id": "en-edit-markdown-typing-divider",
@@ -151,9 +151,9 @@
       "flow": "automation/flows/docs-en-markdown-typing-rules.json",
       "step": 53,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 24622,
+      "width": 1024,
+      "height": 768,
+      "bytes": 12370,
       "alt": "Horizontal divider created with the Markdown three-hyphen typing rule."
     },
     {
@@ -165,9 +165,9 @@
       "flow": "automation/flows/docs-en-markdown-typing-rules.json",
       "step": 6,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 32376,
+      "width": 1024,
+      "height": 768,
+      "bytes": 15840,
       "alt": "Heading created by typing a number sign followed by a space at the start of a line."
     },
     {
@@ -179,10 +179,10 @@
       "flow": "automation/flows/docs-en-markdown-typing-rules.json",
       "step": 26,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 28180,
-      "alt": "Bullet, task, and numbered lists created with Markdown typing rules."
+      "width": 1024,
+      "height": 768,
+      "bytes": 14066,
+      "alt": "A bullet item and an unchecked task created with Markdown typing rules."
     },
     {
       "id": "en-edit-markdown-typing-quote",
@@ -193,9 +193,9 @@
       "flow": "automation/flows/docs-en-markdown-typing-rules.json",
       "step": 15,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 26752,
+      "width": 1024,
+      "height": 768,
+      "bytes": 13364,
       "alt": "Block quote created with the Markdown greater-than typing rule."
     },
     {
@@ -935,9 +935,9 @@
       "flow": "automation/flows/docs-es-markdown-format.json",
       "step": 4,
       "scope": "element",
-      "width": 640,
-      "height": 1157,
-      "bytes": 20932,
+      "width": 320,
+      "height": 715,
+      "bytes": 10960,
       "alt": "Panel Formato de Markdown con controles de documento, estilo de bloque y formato de texto."
     },
     {
@@ -949,9 +949,9 @@
       "flow": "automation/flows/docs-es-markdown-frontmatter.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 73930,
+      "width": 1024,
+      "height": 768,
+      "bytes": 41730,
       "alt": "Editor de propiedades del documento con el bloque de front matter YAML sobre el contenido Markdown."
     },
     {
@@ -963,9 +963,9 @@
       "flow": "automation/flows/docs-es-markdown-format.json",
       "step": 7,
       "scope": "element",
-      "width": 640,
-      "height": 1157,
-      "bytes": 18366,
+      "width": 320,
+      "height": 715,
+      "bytes": 9874,
       "alt": "Parte inferior del panel Formato con acciones de listas, imagen, tabla, código, matemáticas y Mermaid."
     },
     {
@@ -977,10 +977,10 @@
       "flow": "automation/flows/docs-es-markdown-typing-rules.json",
       "step": 44,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 27424,
-      "alt": "Bloque de código delimitado creado al escribir tres acentos graves."
+      "width": 1024,
+      "height": 768,
+      "bytes": 13888,
+      "alt": "Bloque de código delimitado creado al escribir tres acentos graves seguidos de un espacio."
     },
     {
       "id": "es-edit-markdown-typing-divider",
@@ -991,9 +991,9 @@
       "flow": "automation/flows/docs-es-markdown-typing-rules.json",
       "step": 53,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 27462,
+      "width": 1024,
+      "height": 768,
+      "bytes": 13948,
       "alt": "Separador horizontal creado mediante la regla Markdown de tres guiones."
     },
     {
@@ -1005,9 +1005,9 @@
       "flow": "automation/flows/docs-es-markdown-typing-rules.json",
       "step": 6,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 33166,
+      "width": 1024,
+      "height": 768,
+      "bytes": 15958,
       "alt": "Encabezado creado al escribir una almohadilla seguida de un espacio al principio de una línea."
     },
     {
@@ -1019,10 +1019,10 @@
       "flow": "automation/flows/docs-es-markdown-typing-rules.json",
       "step": 26,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 29974,
-      "alt": "Listas con viñetas, de tareas y numerada creadas mediante reglas de escritura Markdown."
+      "width": 1024,
+      "height": 768,
+      "bytes": 15152,
+      "alt": "Un elemento con viñeta y una tarea pendiente creados mediante reglas de escritura Markdown."
     },
     {
       "id": "es-edit-markdown-typing-quote",
@@ -1033,9 +1033,9 @@
       "flow": "automation/flows/docs-es-markdown-typing-rules.json",
       "step": 15,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 28656,
+      "width": 1024,
+      "height": 768,
+      "bytes": 14524,
       "alt": "Cita en bloque creada mediante la regla de escritura Markdown del signo mayor que."
     },
     {

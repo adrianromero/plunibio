@@ -15,9 +15,11 @@ Plunibio displays Markdown as a visual document while saving an ordinary Markdow
 
 Open a `.md`, `.markdown`, `.mdown`, or `.mkd` file to use the Markdown editor. Select text to replace it by typing or to apply formatting. If you only place the cursor, block styles act on the current paragraph and compatible inline formats apply to the text that you type next.
 
-The usual selection, cut, copy, and paste operations use the standard system commands. Use **Undo** to reverse an edit and **Redo** to restore it. The verified keyboard shortcuts appear later in this chapter.
+The usual selection, cut, copy, and paste operations use the standard system commands. You can undo and redo using the editing shortcuts listed later in this chapter. To create an empty document from a folder, follow [Getting started]({{ '/en/docs/getting-started/' | relative_url }}).
 
 Plunibio keeps the file as Markdown while presenting headings, lists, quotes, links, and images visually. It does not display a split source view. It also does not include a `/` command menu, a general floating formatting toolbar, or a block drag handle: the main actions are in the **Format** tab.
+
+Text, formatting, and property changes are saved in the same file. See [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}) to save, reload, or leave a document with pending changes.
 
 {% capture source_note %}
 If you need to preserve exact spacing, delimiters, or a particular syntax variant, review the file with version control or a text editor. A visual operation may normalize an equivalent construct; for example, dividers are saved as `---`.
@@ -37,6 +39,8 @@ The **Blocks** actions insert images, tables, code, math, and Mermaid. They are 
 
 {% include docs-figure.html id="en-edit-markdown-lists-and-blocks" %}
 
+To change the document's presentation, open **More options** and select **Typography**. This preference is available from any view and changes Markdown's appearance without adding formatting to the file. See [Customize Plunibio]({{ '/en/docs/customize-plunibio/' | relative_url }}) to choose typography and a theme.
+
 ## Change a block style
 
 Use **Block style** to change complete paragraphs:
@@ -55,13 +59,15 @@ Headings create the document structure: use **Heading 1** for the main title, **
 The **Text formatting** section provides **Bold**, **Italic**, **Strikethrough**, **Link**, **Inline code**, and **Inline math**.
 
 1. Select the text that you want to change.
-2. Select an action. Its button remains selected when the selection or cursor has that format.
-3. Select the same action again to remove it.
+2. Select **Bold**, **Italic**, **Strikethrough**, or **Inline code**. Its button remains selected when the selection or cursor has that format.
+3. Select the same button again to remove the format.
 {: .docs-steps}
 
 Without a selection, **Bold**, **Italic**, **Strikethrough**, and **Inline code** toggle the format for what you type next. You can combine bold, italic, and strikethrough. **Inline code** is suitable for filenames, commands, and short fragments, not complete paragraphs.
 
-[Links and images]({{ '/en/docs/links-and-images/' | relative_url }}) explains how to create and edit links. [Tables, code, and advanced content]({{ '/en/docs/tables-code-and-advanced-content/' | relative_url }}) covers inline formulas and math blocks.
+For example, press <kbd>Ctrl</kbd> + <kbd>B</kbd> on Windows and Linux or <kbd>⌘</kbd> + <kbd>B</kbd> on macOS, type a few words, and press the combination again to continue without bold.
+
+**Link** and **Inline math** have their own editing controls. Inserting a formula with the button opens the **LaTeX expression** field for you to enter and confirm it. Existing formulas offer **Edit expression** and **Copy expression** when you move the pointer over them. [Tables, code, and advanced content]({{ '/en/docs/tables-code-and-advanced-content/' | relative_url }}) explains these steps, canceling, and math blocks. [Links and images]({{ '/en/docs/links-and-images/' | relative_url }}) explains how to create and edit links.
 
 ## Create and organize lists
 
@@ -103,7 +109,7 @@ Inline marks also transform when you complete their syntax: `**text**` creates b
 
 ## Use the verified editing shortcuts
 
-These shortcuts have been verified in Plunibio. Formatting actions apply or remove the style from the selection; without a selection, they control subsequent text when the format supports it.
+These shortcuts have been verified in the visual Markdown body. Formatting actions apply or remove the style from the selection; without a selection, they control subsequent text when the format supports it. The YAML properties editor is a separate field.
 
 | Action | Windows and Linux | macOS |
 | --- | --- | --- |
@@ -121,7 +127,7 @@ These shortcuts have been verified in Plunibio. Formatting actions apply or remo
 | Undo | <kbd>Ctrl</kbd> + <kbd>Z</kbd> | <kbd>⌘</kbd> + <kbd>Z</kbd> |
 | Redo | <kbd>Ctrl</kbd> + <kbd>Y</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> | <kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Z</kbd> |
 
-The [shortcuts reference chapter]({{ '/en/docs/shortcuts-and-troubleshooting/' | relative_url }}) will combine these keys with general actions and those from the other editors.
+Use the **Inline code** shortcut on a text selection. See the [shortcuts reference chapter]({{ '/en/docs/shortcuts-and-troubleshooting/' | relative_url }}) for general actions and those from the other editors.
 
 ## Edit document properties
 
@@ -134,6 +140,18 @@ Properties are a YAML front matter block at the start of the file. They commonly
 {: .docs-steps}
 
 {% include docs-figure.html id="en-edit-markdown-frontmatter-panel" %}
+
+For example, enter these properties in the YAML editor:
+
+```yaml
+title: My notes
+lang: en
+tags:
+  - work
+  - ideas
+```
+
+Enter only the keys and their values; Plunibio adds the `---` delimiters when saving. Hiding the editor with **Properties** keeps its contents.
 
 {% capture yaml_warning %}
 Plunibio provides YAML syntax highlighting, but it does not guarantee that values are valid for the tool that will process the document. An indentation or syntax error may prevent another application from interpreting the properties.

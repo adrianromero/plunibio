@@ -15,9 +15,11 @@ Plunibio muestra Markdown como un documento visual, pero guarda un archivo de te
 
 Abre un archivo `.md`, `.markdown`, `.mdown` o `.mkd` para utilizar el editor Markdown. Selecciona texto para reemplazarlo al escribir o para aplicarle formato. Si solo colocas el cursor, los estilos de bloque actúan sobre el párrafo actual y los formatos en línea compatibles se aplican al texto que escribas a continuación.
 
-Las operaciones habituales de selección, cortar, copiar y pegar utilizan los comandos estándar del sistema. Para revertir una edición, utiliza **Deshacer**; para recuperarla, utiliza **Rehacer**. Los atajos comprobados aparecen más adelante en este capítulo.
+Las operaciones habituales de selección, cortar, copiar y pegar utilizan los comandos estándar del sistema. Puedes deshacer y rehacer mediante los atajos de edición que aparecen más adelante. Para crear un documento vacío desde una carpeta, sigue [Primeros pasos]({{ '/es/docs/primeros-pasos/' | relative_url }}).
 
 Plunibio conserva el archivo como Markdown mientras presenta encabezados, listas, citas, enlaces e imágenes de forma visual. No muestra una vista dividida con el código fuente. Tampoco incluye un menú de comandos `/`, una barra flotante general de formato ni un asa para arrastrar bloques: las acciones principales están en la pestaña **Formato**.
+
+Los cambios de texto, formato y propiedades se guardan en el mismo archivo. Consulta [Espacios y archivos]({{ '/es/docs/espacios-y-archivos/' | relative_url }}) para guardar, recargar o salir del documento con cambios pendientes.
 
 {% capture source_note %}
 Si necesitas conservar exactamente espacios, delimitadores o una variante concreta de sintaxis, revisa el archivo con control de versiones o con un editor de texto. Una operación visual puede normalizar una construcción equivalente; por ejemplo, los separadores se guardan como `---`.
@@ -37,6 +39,8 @@ Las acciones de **Bloques** insertan imágenes, tablas, código, matemáticas y 
 
 {% include docs-figure.html id="es-edit-markdown-lists-and-blocks" %}
 
+Para cambiar la presentación del documento, abre **Más opciones** y selecciona **Tipografía**. Esta preferencia está disponible desde cualquier vista y cambia la apariencia de Markdown, sin añadir formato al archivo. Consulta [Personalizar Plunibio]({{ '/es/docs/personalizar-plunibio/' | relative_url }}) para elegir tipografía y tema.
+
 ## Cambiar el estilo de un bloque
 
 Utiliza **Estilo de bloque** para cambiar párrafos completos:
@@ -55,13 +59,15 @@ Los encabezados crean la estructura del documento: utiliza **Encabezado 1** para
 La sección **Formato de texto** ofrece **Negrita**, **Cursiva**, **Tachado**, **Enlace**, **Código en línea** y **Fórmula en línea**.
 
 1. Selecciona el texto que quieres modificar.
-2. Selecciona una acción. El botón queda marcado cuando la selección o el cursor tienen ese formato.
-3. Selecciona la misma acción otra vez para retirarlo.
+2. Selecciona **Negrita**, **Cursiva**, **Tachado** o **Código en línea**. El botón queda marcado cuando la selección o el cursor tienen ese formato.
+3. Selecciona el mismo botón otra vez para retirar el formato.
 {: .docs-steps}
 
 Sin una selección, **Negrita**, **Cursiva**, **Tachado** y **Código en línea** activan o desactivan el formato para lo que escribas a continuación. Puedes combinar negrita, cursiva y tachado. **Código en línea** es apropiado para nombres de archivo, comandos y fragmentos cortos, no para párrafos completos.
 
-[Enlaces e imágenes]({{ '/es/docs/enlaces-e-imagenes/' | relative_url }}) explica cómo crear y editar enlaces. [Tablas, código y contenido avanzado]({{ '/es/docs/tablas-codigo-y-contenido-avanzado/' | relative_url }}) incluye fórmulas en línea y bloques matemáticos.
+Por ejemplo, pulsa <kbd>Ctrl</kbd> + <kbd>B</kbd> en Windows y Linux o <kbd>⌘</kbd> + <kbd>B</kbd> en macOS, escribe unas palabras y pulsa la combinación de nuevo para continuar sin negrita.
+
+**Enlace** y **Fórmula en línea** tienen sus propios controles de edición. Al insertar una fórmula con el botón, se abre el campo **Expresión LaTeX** para escribirla y confirmarla. Las fórmulas existentes ofrecen **Editar expresión** y **Copiar expresión** al pasar el puntero sobre ellas. [Tablas, código y contenido avanzado]({{ '/es/docs/tablas-codigo-y-contenido-avanzado/' | relative_url }}) explica estos pasos, la cancelación y los bloques matemáticos. [Enlaces e imágenes]({{ '/es/docs/enlaces-e-imagenes/' | relative_url }}) explica cómo crear y editar enlaces.
 
 ## Crear y organizar listas
 
@@ -103,7 +109,7 @@ El capítulo de [Tablas, código y contenido avanzado]({{ '/es/docs/tablas-codig
 
 ## Utilizar los atajos de edición comprobados
 
-Estos atajos se han comprobado en Plunibio. Las acciones de formato activan o retiran el estilo de la selección; sin selección, controlan el texto siguiente cuando el formato lo permite.
+Estos atajos se han comprobado en el cuerpo visual de Markdown. Las acciones de formato activan o retiran el estilo de la selección; sin selección, controlan el texto siguiente cuando el formato lo permite. El editor de propiedades YAML es un campo independiente.
 
 | Acción | Windows y Linux | macOS |
 | --- | --- | --- |
@@ -121,7 +127,7 @@ Estos atajos se han comprobado en Plunibio. Las acciones de formato activan o re
 | Deshacer | <kbd>Ctrl</kbd> + <kbd>Z</kbd> | <kbd>⌘</kbd> + <kbd>Z</kbd> |
 | Rehacer | <kbd>Ctrl</kbd> + <kbd>Y</kbd> o <kbd>Ctrl</kbd> + <kbd>Mayús</kbd> + <kbd>Z</kbd> | <kbd>⌘</kbd> + <kbd>⇧</kbd> + <kbd>Z</kbd> |
 
-El [capítulo de referencia de atajos]({{ '/es/docs/atajos-y-solucion-de-problemas/' | relative_url }}) reunirá estas combinaciones con las acciones generales y las del resto de editores.
+Utiliza **Código en línea** mediante su atajo sobre una selección de texto. Consulta el [capítulo de referencia de atajos]({{ '/es/docs/atajos-y-solucion-de-problemas/' | relative_url }}) para las acciones generales y las del resto de editores.
 
 ## Editar las propiedades del documento
 
@@ -134,6 +140,18 @@ Las propiedades son un bloque de *front matter* YAML situado al principio del ar
 {: .docs-steps}
 
 {% include docs-figure.html id="es-edit-markdown-frontmatter-panel" %}
+
+Por ejemplo, escribe estas propiedades en el editor de YAML:
+
+```yaml
+title: Mis notas
+lang: es
+tags:
+  - trabajo
+  - ideas
+```
+
+Introduce únicamente las claves y sus valores; Plunibio añade los delimitadores `---` al guardar. Ocultar el editor con **Propiedades** conserva su contenido.
 
 {% capture yaml_warning %}
 Plunibio ofrece resaltado de YAML, pero no garantiza que los valores sean válidos para la herramienta que vaya a procesar el documento. Un error de sangría o de sintaxis puede impedir que otra aplicación interprete las propiedades.
