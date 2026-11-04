@@ -9,12 +9,14 @@ export type Target = {
 export type FlowApp = {
     basePath: string;
     workspaceMode: "read-only" | "temporary-copy";
+    fixtureTimestamp?: string;
     preferences?: {
         locale?: "en" | "es" | "ca" | "gl" | "eu";
         theme?: "light" | "dark";
         typography?: "sans-serif" | "serif" | "modern" | "reading";
         sidebarVisible?: boolean;
         showHiddenFiles?: boolean;
+        folderSort?: { attribute: "name" | "size" | "modified"; direction: "asc" | "desc" };
     };
     file?: string;
     width?: number;
@@ -121,7 +123,13 @@ export type WaitSelectionStep = {
 export type WaitClipboardStep = {
     action: "waitClipboard";
     text: string;
+    source?: "native" | "browser" | "write";
     timeoutMs?: number;
+};
+
+export type ObserveClipboardWriteStep = {
+    action: "observeClipboardWrite";
+    text: string;
 };
 
 export type RefreshStep = {
@@ -152,6 +160,7 @@ export type FlowStep =
     | WaitStep
     | WaitSelectionStep
     | WaitClipboardStep
+    | ObserveClipboardWriteStep
     | RefreshStep
     | CaptureStep;
 

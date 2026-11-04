@@ -2,8 +2,10 @@
     "name": "Docs ES: propiedades Markdown",
     "app": {
         "basePath": "examples/atlas-de-lumina",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "es",
             "theme": "light",
             "typography": "sans-serif",
@@ -60,7 +62,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "Más opciones" }
         },
         {
             "action": "click",
@@ -76,7 +78,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "Más opciones" }
         },
         {
             "action": "click",

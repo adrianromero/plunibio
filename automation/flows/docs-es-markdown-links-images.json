@@ -2,8 +2,10 @@
     "name": "Docs ES: enlaces e imágenes Markdown",
     "app": {
         "basePath": "examples/atlas-de-lumina",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "es",
             "theme": "light",
             "typography": "sans-serif",
@@ -128,7 +130,7 @@
             "action": "click",
             "target": {
                 "using": "css",
-                "value": "form[aria-label='Acciones de la imagen'] button[title='assets/atlas-de-lumina.png']"
+                "value": "form[aria-label='Acciones de la imagen'] button:first-of-type"
             }
         },
         {

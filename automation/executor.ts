@@ -16,6 +16,9 @@ type ExecutionContext = {
 
 type FlowPreferences = NonNullable<AutomationFlow["app"]["preferences"]>;
 
+type ClipboardWriteProbe = { called: boolean; matches: boolean; status: string };
+type ClipboardProbeWindow = Window & { __plunibioClipboardWriteProbe?: ClipboardWriteProbe };
+
 const execFileAsync = promisify(execFile);
 
 async function applyPreferences(preferences: FlowPreferences | undefined): Promise<void> {
@@ -27,12 +30,13 @@ async function applyPreferences(preferences: FlowPreferences | undefined): Promi
             typography: "plunibio.typography",
             sidebarVisible: "plunibio.sidebarVisible",
             showHiddenFiles: "plunibio.showHiddenFiles",
+            folderSort: "plunibio.folderSort",
         };
         for (const [name, value] of Object.entries(values) as [
             keyof FlowPreferences,
             FlowPreferences[keyof FlowPreferences],
         ][]) {
-            window.localStorage.setItem(keys[name], String(value));
+            window.localStorage.setItem(keys[name], typeof value === "object" ? JSON.stringify(value) : String(value));
         }
     }, preferences);
     await browser.refresh();
@@ -88,6 +92,7 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
                 break;
             }
             await element.waitForDisplayed({ timeout: context.timeoutMs });
+            await element.waitForEnabled({ timeout: context.timeoutMs });
             if (step.action === "doubleClick") {
                 await element.doubleClick();
             } else {
@@ -186,7 +191,8 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             const element = await findTarget(step.target);
             await element.waitForExist({ timeout: context.timeoutMs });
             await browser.execute(
-                (input: HTMLInputElement, value: number) => {
+                (input: HTMLElement, value: number) => {
+                    if (!(input instanceof HTMLInputElement)) throw new Error("setRange requires an input");
                     input.value = String(value);
                     input.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
                 },
@@ -297,34 +303,83 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             );
             break;
         }
+        case "observeClipboardWrite": {
+            await browser.execute((expected: string) => {
+                const probe: ClipboardWriteProbe = { called: false, matches: false, status: "not-called" };
+                (window as ClipboardProbeWindow).__plunibioClipboardWriteProbe = probe;
+                if (typeof navigator.clipboard?.writeText !== "function") {
+                    probe.status = "API-unavailable";
+                    return;
+                }
+                const original = navigator.clipboard.writeText.bind(navigator.clipboard);
+                navigator.clipboard.writeText = async (value: string): Promise<void> => {
+                    probe.called = true;
+                    probe.matches = value === expected;
+                    try {
+                        await original(value);
+                        probe.status = "written";
+                    } catch (error: unknown) {
+                        probe.status = error instanceof Error ? error.name : "write-error";
+                        throw error;
+                    }
+                };
+            }, step.text);
+            break;
+        }
         case "waitClipboard": {
             const timeout = step.timeoutMs ?? context.timeoutMs;
-            await browser.waitUntil(
-                async () =>
-                    await browser.execute(async (expected: string) => {
-                        try {
-                            const internals = (
-                                window as Window & {
-                                    __TAURI_INTERNALS__?: {
-                                        invoke<T>(command: string): Promise<T>;
+            const source = step.source ?? "native";
+            if (source === "browser") {
+                const capability = await browser.execute(() => ({
+                    secureContext: window.isSecureContext,
+                    read: typeof navigator.clipboard?.readText === "function",
+                    write: typeof navigator.clipboard?.writeText === "function",
+                }));
+                console.log(`Browser clipboard capability: ${JSON.stringify(capability)}`);
+                if (!capability.read) throw new Error("Browser clipboard readText is unavailable");
+            }
+            let clipboardStatus = "not-read";
+            try {
+                await browser.waitUntil(
+                    async () => {
+                        const result = await browser.execute(async (expected: string, provider: string) => {
+                            try {
+                                if (provider === "write") {
+                                    const probe = (window as ClipboardProbeWindow).__plunibioClipboardWriteProbe;
+                                    return {
+                                        matches: Boolean(probe?.called && probe.matches && probe.status === "written"),
+                                        status: probe?.status ?? "probe-not-installed",
                                     };
                                 }
-                            ).__TAURI_INTERNALS__;
-                            const actual = internals
-                                ? await internals.invoke<string>(
-                                      "plugin:clipboard-manager|read_text"
-                                  )
-                                : await navigator.clipboard.readText();
-                            return actual === expected;
-                        } catch {
-                            return false;
-                        }
-                    }, step.text),
-                {
-                    timeout,
-                    timeoutMsg: "Clipboard text did not match the requested value",
-                }
-            );
+                                const internals = (
+                                    window as Window & {
+                                        __TAURI_INTERNALS__?: {
+                                            invoke<T>(command: string): Promise<T>;
+                                        };
+                                    }
+                                ).__TAURI_INTERNALS__;
+                                const actual = provider === "native" && internals
+                                    ? await internals.invoke<string>("plugin:clipboard-manager|read_text")
+                                    : await navigator.clipboard.readText();
+                                return {
+                                    matches: actual === expected,
+                                    status: actual === expected ? "matched" : "readable-but-different",
+                                };
+                            } catch (error: unknown) {
+                                return { matches: false, status: error instanceof Error ? error.name : "read-error" };
+                            }
+                        }, step.text, source);
+                        clipboardStatus = result.status;
+                        return result.matches;
+                    },
+                    {
+                        timeout,
+                        timeoutMsg: `${source} clipboard text did not match the requested value`,
+                    }
+                );
+            } catch {
+                throw new Error(`${source} clipboard check failed (${clipboardStatus}); clipboard contents were not logged`);
+            }
             break;
         }
         case "refresh": {

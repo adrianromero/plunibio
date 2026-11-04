@@ -1,0 +1,114 @@
+{
+    "name": "Docs EN: verify Mermaid file highlighting",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "mermaid-audit.mmd",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "text-editor"
+            }
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "flowchart LR"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter",
+                "A[Source] --> B[Preview]"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .tok-typeName"
+            },
+            "text": "flowchart"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .tok-operator"
+            },
+            "text": "-->"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .tok-typeName"
+            },
+            "text": "flowchart"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .tok-operator"
+            },
+            "text": "-->"
+        }
+    ]
+}

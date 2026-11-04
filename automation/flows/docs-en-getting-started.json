@@ -1,9 +1,14 @@
 {
-    "name": "Docs EN: getting started",
+    "name": "Docs EN: getting started and first document",
     "app": {
         "basePath": "examples/atlas-de-lumina",
-        "workspaceMode": "read-only",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            },
             "locale": "en",
             "theme": "light",
             "typography": "sans-serif",
@@ -19,12 +24,18 @@
     "steps": [
         {
             "action": "wait",
-            "target": { "using": "css", "value": "html[lang='en']" },
+            "target": {
+                "using": "css",
+                "value": "html[lang='en']"
+            },
             "state": "existing"
         },
         {
             "action": "wait",
-            "target": { "using": "testId", "value": "markdown-editor" },
+            "target": {
+                "using": "testId",
+                "value": "markdown-editor"
+            },
             "state": "visible"
         },
         {
@@ -43,17 +54,211 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": {
+                "using": "aria",
+                "value": "More options"
+            }
         },
         {
             "action": "wait",
-            "target": { "using": "testId", "value": "toolbar-menu" },
+            "target": {
+                "using": "css",
+                "value": "[data-testid='toolbar-menu'][aria-label='More options']"
+            },
             "state": "visible"
         },
         {
             "action": "capture",
             "scope": "viewport",
             "name": "general-menu"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "More options"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='toolbar-menu'][aria-label='More options']"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "folder-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-create-kind='markdown']"
+            },
+            "state": "enabled"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "folder-actions"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-create-kind='markdown']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "my-first-note"
+            ]
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-dialog"
+            },
+            "name": "create-document"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='create-entry-dialog'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "file-breadcrumb"
+            },
+            "state": "visible",
+            "text": "my-first-note.md"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "This is my first note in Plunibio",
+                "Decimal"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "This is my first note in Plunibio."
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "first-document-unsaved"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "This is my first note in Plunibio."
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
         }
     ]
 }

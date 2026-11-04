@@ -7,6 +7,18 @@
         "en": "General options menu with theme, language, hidden-file, and Markdown typography settings.",
         "es": "Menú de opciones generales con los ajustes de tema, idioma, archivos ocultos y tipografía Markdown."
     },
+    "getting-started/folder-actions": {
+        "en": "Workspace folder with file sizes and modification dates, and the Actions panel for creating files and folders.",
+        "es": "Carpeta del espacio con tamaños y fechas de modificación, y el panel Acciones para crear archivos y carpetas."
+    },
+    "getting-started/create-document": {
+        "en": "Create file dialog with my-first-note.md entered as the name of the new Markdown document.",
+        "es": "Diálogo Crear archivo con mi-primera-nota.md como nombre del nuevo documento Markdown."
+    },
+    "getting-started/first-document-unsaved": {
+        "en": "New Markdown note with its first sentence and the square-pencil Unsaved changes indicator beside the filename.",
+        "es": "Nueva nota Markdown con su primera frase y el indicador Cambios sin guardar, un lápiz en un cuadrado junto al nombre del archivo."
+    },
     "view-edit-images/image-adjust": {
         "en": "Image editor Adjust tab with brightness, contrast, saturation, grayscale, sepia, and invert controls.",
         "es": "Pestaña Ajustar del editor de imágenes con controles de brillo, contraste, saturación, escala de grises, sepia e inversión."
@@ -156,8 +168,8 @@
         "es": "Raíz del espacio mostrando la carpeta oculta y el archivo Markdown oculto cuyos nombres empiezan por punto."
     },
     "workspaces-and-files/unsaved-indicator": {
-        "en": "Dot beside the current filename indicating unsaved changes.",
-        "es": "Punto junto al nombre del archivo actual que indica cambios sin guardar."
+        "en": "Square-pencil icon beside the current filename indicating unsaved changes, with Save enabled in the general menu.",
+        "es": "Icono cuadrado con lápiz junto al nombre del archivo que indica cambios sin guardar, con Guardar activo en el menú general."
     },
     "workspaces-and-files/reload-confirmation": {
         "en": "Confirmation dialog shown before reloading the current file.",
@@ -192,8 +204,32 @@
         "es": "Archivo JSON en el editor de texto y código después de reemplazar todas las palabras coincidentes."
     },
     "workspaces-and-files/workspace-root": {
-        "en": "Workspace root listing the Atlas of Lúmina folders and files.",
-        "es": "Raíz del espacio con las carpetas y archivos de Atlas de Lúmina."
+        "en": "Workspace root listing Atlas of Lúmina folders and files with item counts, file sizes, and modification dates.",
+        "es": "Raíz del espacio con carpetas y archivos de Atlas de Lúmina, recuentos de elementos, tamaños y fechas de modificación."
+    },
+    "workspaces-and-files/folder-sorting": {
+        "en": "Folder listing sorted by descending size, with folders first and Size active in the Actions panel.",
+        "es": "Listado ordenado por tamaño descendente, con carpetas primero y Tamaño activo en el panel Acciones."
+    },
+    "workspaces-and-files/create-folder": {
+        "en": "Create folder dialog with drafts entered as the new folder name.",
+        "es": "Diálogo Crear carpeta con borradores como nombre de la nueva carpeta."
+    },
+    "workspaces-and-files/item-menu": {
+        "en": "Current file menu in the breadcrumb with Rename and Delete actions for draft.md.",
+        "es": "Menú del archivo actual en la ruta, con las acciones Renombrar y Eliminar para borrador.md."
+    },
+    "workspaces-and-files/rename-entry": {
+        "en": "Rename file dialog with guide.md entered as the new filename.",
+        "es": "Diálogo Renombrar archivo con guia.md como nuevo nombre."
+    },
+    "workspaces-and-files/rename-extension": {
+        "en": "Confirmation warning that changing the filename to guide.txt changes its extension and may affect how it opens.",
+        "es": "Confirmación que advierte de que renombrar como guia.txt cambia la extensión y puede afectar a cómo se abre."
+    },
+    "workspaces-and-files/delete-folder": {
+        "en": "Confirmation that deleting drafts permanently removes the folder and all its contents, with Delete and Cancel options.",
+        "es": "Confirmación de que eliminar borradores borra permanentemente la carpeta y todo su contenido, con las opciones Eliminar y Cancelar."
     },
     "workspaces-and-files/nested-file": {
         "en": "Nested Markdown file open with its location shown in the file path.",

@@ -2,8 +2,10 @@
     "name": "Docs ES: guardar y recargar",
     "app": {
         "basePath": "examples/atlas-de-lumina",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "es",
             "theme": "light",
             "typography": "sans-serif",
@@ -40,7 +42,7 @@
         },
         {
             "action": "keys",
-            "keys": ["Enter", "Cambio guardado para la guía."]
+            "keys": ["Enter", "Cambio guardado para la guía", "Decimal"]
         },
         {
             "action": "wait",
@@ -49,7 +51,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "Más opciones" }
         },
         {
             "action": "wait",
@@ -78,7 +80,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "Más opciones" }
         },
         {
             "action": "click",
@@ -121,7 +123,7 @@
         },
         {
             "action": "keys",
-            "keys": ["Enter", "Este cambio se descartará."]
+            "keys": ["Enter", "Este cambio se descartará", "Decimal"]
         },
         {
             "action": "wait",
@@ -129,8 +131,14 @@
             "state": "visible"
         },
         {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "Este cambio se descartará."
+        },
+        {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "Más opciones" }
         },
         {
             "action": "click",
@@ -170,6 +178,12 @@
                 "value": "//*[contains(concat(' ', normalize-space(@class), ' '), ' ProseMirror ') and contains(., 'Este cambio se descartará.')]"
             },
             "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "Cambio guardado para la guía."
         }
     ]
 }

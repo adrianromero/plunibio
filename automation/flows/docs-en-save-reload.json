@@ -2,8 +2,10 @@
     "name": "Docs EN: save and reload",
     "app": {
         "basePath": "examples/atlas-de-lumina",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "en",
             "theme": "light",
             "typography": "sans-serif",
@@ -40,7 +42,7 @@
         },
         {
             "action": "keys",
-            "keys": ["Enter", "Saved change for the guide."]
+            "keys": ["Enter", "Saved change for the guide", "Decimal"]
         },
         {
             "action": "wait",
@@ -49,7 +51,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "More options" }
         },
         {
             "action": "wait",
@@ -78,7 +80,7 @@
         },
         {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "More options" }
         },
         {
             "action": "click",
@@ -121,7 +123,7 @@
         },
         {
             "action": "keys",
-            "keys": ["Enter", "This change will be discarded."]
+            "keys": ["Enter", "This change will be discarded", "Decimal"]
         },
         {
             "action": "wait",
@@ -129,8 +131,14 @@
             "state": "visible"
         },
         {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "This change will be discarded."
+        },
+        {
             "action": "click",
-            "target": { "using": "testId", "value": "toolbar-menu-trigger" }
+            "target": { "using": "aria", "value": "More options" }
         },
         {
             "action": "click",
@@ -170,6 +178,12 @@
                 "value": "//*[contains(concat(' ', normalize-space(@class), ' '), ' ProseMirror ') and contains(., 'This change will be discarded.')]"
             },
             "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" },
+            "state": "visible",
+            "text": "Saved change for the guide."
         }
     ]
 }

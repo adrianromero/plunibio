@@ -1,0 +1,217 @@
+{
+    "name": "Docs ES: verify MVP inline-math",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        },
+        "file": "markdown/editor-lab.es.md",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z"
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Editar expresión"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Editar expresión"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "text": "b^2+c^2",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la fórmula en línea'] button[type='submit']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Editar expresión"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Editar expresión"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "text": "discarded",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la fórmula en línea'] button[aria-label='Cancelar']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Más opciones"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Copiar expresión"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la fórmula en línea']"
+            },
+            "state": "visible",
+            "text": "b^2+c^2"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Copiar expresión"
+            }
+        },
+        {
+            "action": "waitClipboard",
+            "text": "b^2+c^2"
+        }
+    ]
+}

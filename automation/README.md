@@ -31,6 +31,19 @@ Every flow must also declare how it treats its workspace:
 Use `temporary-copy` for every mutable documentation flow. The original example path is never passed
 to Plunibio in that mode.
 
+Documentation flows use `temporary-copy` and declare a fixed UTC fixture timestamp:
+
+```json
+"workspaceMode": "temporary-copy",
+"fixtureTimestamp": "2026-10-01T12:00:00Z"
+```
+
+The runner applies this timestamp to files and folders in the disposable copy only, after copying.
+It does not follow symlinks or modify their targets. `fixtureTimestamp` is rejected for `read-only`
+flows. Subsequent user edits and newly created entries retain their real modification dates; capture
+folder metadata before mutations or prepare a dedicated fixture for that scene. Never normalize the
+original examples to get a repeatable screenshot.
+
 Documentation flows may set deterministic application preferences before their first step. The runner
 writes these values to the WebView storage and refreshes the frontend once:
 
@@ -40,11 +53,14 @@ writes these values to the WebView storage and refreshes the frontend once:
   "theme": "light",
   "typography": "sans-serif",
   "sidebarVisible": true,
-  "showHiddenFiles": false
+  "showHiddenFiles": false,
+  "folderSort": { "attribute": "name", "direction": "asc" }
 }
 ```
 
 Only include preferences that matter to the capture. Supported values match the application settings.
+`folderSort` supports `name`, `size`, or `modified` and `asc` or `desc`; the runner serializes the
+object as JSON to match the application preference. Every documentation flow explicitly resets it.
 
 ```json
 { "using": "aria", "value": "Formato" }
@@ -62,14 +78,14 @@ of the automation contract and should not be renamed without updating the flows.
 
 | Area | Test id | Instance attributes |
 | --- | --- | --- |
-| Application | `app-main`, `main-toolbar`, `spinner-overlay`, `error-view` | `data-message-kind` |
+| Application | `app-main`, `main-toolbar`, `spinner-overlay`, `message-view` | `data-message-kind` |
 | Navigation | `navigate-back`, `navigate-forward`, `file-breadcrumb`, `breadcrumb-segment` | `data-path` |
 | Sidebar | `sidebar-toggle`, `app-sidebar`, `sidebar-tabs`, `sidebar-tab`, `sidebar-panel` | `data-tab-key` |
 | Editors | `markdown-view`, `markdown-editor`, `frontmatter-panel`, `frontmatter-editor`, `text-view`, `text-editor` | — |
 | Image editor | `image-view`, `image-viewport`, `image-canvas`, `image-action`, `image-preset`, `control` | `data-action`, `data-preset`, `data-control-id` |
-| Folders | `folder-view`, `folder-entry` | `data-path`, `data-entry-kind` |
+| Folders | `folder-view`, `folder-entry` | `data-path`, `data-entry-kind`, `data-create-kind`, `data-sort-attribute`, `data-sort-direction` |
 | Search | `search-panel`, `search-input`, `replace-input`, `search-match-case`, `search-whole-word`, `search-regexp` | — |
-| Dialogs | `workspace-dialog`, `workspace-directory`, `about-dialog`, `message-dialog` | `data-path`, `data-message-kind` |
+| Dialogs | `workspace-dialog`, `workspace-directory`, `about-dialog`, `message-dialog`, `create-entry-dialog`, `create-entry-name`, `rename-entry-dialog`, `rename-entry-name` | `data-path`, `data-message-kind` |
 | Menus | `toolbar-menu-trigger`, `toolbar-menu` | `data-toolbar-menu-entry`, `data-toolbar-menu-section`, `data-choice-option` |
 
 For repeated elements, combine the test id and its instance attribute:
@@ -84,20 +100,44 @@ For repeated elements, combine the test id and its instance attribute:
 ARIA selectors remain useful for accessibility assertions and user-visible wording. Prefer test ids
 for flows that must run in several interface languages.
 
+The reusable menu exposes `toolbar-menu-trigger` and `toolbar-menu` for both the general menu and
+current-file actions. Use **More options / Más opciones** for the general trigger, and scope the
+current-file trigger to `[data-testid='file-breadcrumb']`. Scope menu panels by `aria-label`. Closed
+dialogs remain in the DOM: scope **OK**, **Cancel**, and form controls to the specific visible dialog
+instead of choosing a global label. The link/image address button no longer has a `title` containing
+the URL; use its displayed address or the first button in the relevant actions form.
+If the flow itself switches locale, select the general trigger with
+`[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']`
+instead of keeping the accessible name from the initial language.
+
 ## Actions
 
 Supported actions are `click`, `domClick`, `doubleClick`, `contextClick`, `type`, `keys`, `focus`, `hover`,
 `pointerOver`, `pointerMove`, `clear`, `caret`, `scroll`, `scrollIntoView`, `select`, `drag`,
-`pointerDrag`, `setRange`, `pause`, `wait`, `waitSelection`, `waitClipboard`, `refresh`, and `capture`. `pointerOver` dispatches the standard pointer event
+`pointerDrag`, `setRange`, `pause`, `wait`, `waitSelection`, `observeClipboardWrite`, `waitClipboard`, `refresh`, and `capture`. `pointerOver` dispatches the standard pointer event
 used by hover-only application controls when WebKitGTK's WebDriver `moveTo` does not emit it.
 `pointerMove` accepts `xRatio` and `yRatio` within a target, which is useful for table boundaries;
 `waitSelection` confirms that the browser selection has moved inside a semantic target. `waitClipboard`
 compares clipboard text after a user-visible copy action without printing its contents.
-`domClick` is reserved for existing hover-only controls that WebKitGTK locates but reports as hidden
-because its WebDriver implementation does not apply CSS `:hover` after `moveTo`.
+Its default `source: "native"` reads through Tauri's clipboard plugin. `source: "browser"` checks
+the WebView API directly and reports only API availability, never clipboard contents. The browser
+option is intended for diagnosis when a browser write and native read disagree; do not silently
+change a failing native assertion to a different provider and call it verified.
+For a write-side probe, run `observeClipboardWrite` with the known fixture text before clicking Copy,
+then `waitClipboard` with `source: "write"`. It delegates to the original browser method and records
+only whether the supplied text matches and the promise succeeds or rejects. No clipboard value is
+logged or retained. This diagnostic wrapper exists only during that automated application session;
+it does not change application code. A successful write-side probe alone does not prove a native read.
+`domClick` is reserved for existing hover-only controls that WebKitGTK reports as hidden or dismisses
+while moving the pointer to click. Its WebDriver implementation does not apply CSS `:hover` after
+`moveTo`. This covers Crepe code-block controls and the floating inline-math Copy action. It calls the
+existing handler; native clipboard assertions must still verify copy effects.
 `pointerDrag` performs a real mouse gesture from the centre of one target by an `x`/`y` offset;
 `setRange` changes a range input and dispatches its normal `input` event. `refresh` reloads the
 complete frontend and is intended for verifying persisted preferences.
+
+Normal click actions wait until the control is both displayed and enabled. A sidebar tab can become
+visible before its editor finishes loading; waiting for readiness prevents a click from being ignored.
 
 `capture` supports:
 
@@ -139,9 +179,22 @@ input on the documentation machine.
 }
 ```
 
-The runner copies editable fixtures automatically when `workspaceMode` is `temporary-copy`. A
-read-only documentation flow may use `examples/atlas-de-lumina` directly. Do not implement ad hoc
+The runner copies fixtures automatically when `workspaceMode` is `temporary-copy`. Documentation
+flows use copies even for read-only tasks so that visible metadata has a deterministic date. Do not implement ad hoc
 copy or cleanup steps inside a flow.
+
+The `docs-{es,en}-file-management.json` flows capture folder sorting, creation, the current-item
+menu, renaming, extension confirmation, and recursive deletion. They create their own disposable
+folder inside the temporary workspace, verify that renaming saves pending edits, and check both
+canceling and confirming deletion. The matching workspace-navigation and save-reload flows
+provide the rest of the Workspaces and files chapter captures.
+
+Check runner types and fixture safety with:
+
+```bash
+npm run automation:check
+npm run automation:test
+```
 
 ## Optimize documentation captures
 
@@ -179,3 +232,10 @@ The suite launches each flow with `--verify-only`. Viewport checkpoints must hav
 element checkpoints must still resolve to a displayed element with a positive bounding box. The suite
 hashes the complete published WebP tree before and after execution and fails if any image is added,
 removed, or changed. It requires the automation binary produced by `npm run automation:build`.
+It also hashes every source fixture tree referenced by the flows. Both protections run even if a
+flow fails, so a failed regression cannot hide a change to the originals.
+
+The command includes `docs-*.json` capture flows and `verify-docs-*.json` behavior-only flows. The
+latter cover new file management, inline math editing, and Mermaid file highlighting in ES/EN.
+They do not own image destinations or require new WebP files in the manifest. Integrate a scene into
+a capture flow only when the chapter has selected that scene and its bilingual alternative text.

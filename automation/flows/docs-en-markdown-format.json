@@ -2,8 +2,10 @@
     "name": "Docs EN: Markdown formatting",
     "app": {
         "basePath": "examples/atlas-de-lumina",
-        "workspaceMode": "read-only",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "en",
             "theme": "light",
             "typography": "sans-serif",

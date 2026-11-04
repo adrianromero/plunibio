@@ -1,0 +1,492 @@
+{
+    "name": "Docs ES: file creation, sorting, rename and deletion",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "outputDir": "website/assets/images/docs/es/workspaces-and-files",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "folder-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='size']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='size']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='size']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='size'][data-sort-direction='desc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "folder-sorting",
+            "scope": "viewport"
+        },
+        {
+            "action": "refresh"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='size'][data-sort-direction='desc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='name']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='name'][data-sort-direction='asc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-create-kind='directory']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-name"
+            },
+            "text": "borradores",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "name": "create-folder",
+            "scope": "element",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-dialog"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='create-entry-dialog'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "file-breadcrumb"
+            },
+            "state": "visible",
+            "text": "borradores"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-create-kind='markdown']"
+            },
+            "state": "enabled"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-create-kind='markdown']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "create-entry-name"
+            },
+            "text": "borrador.md",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='create-entry-dialog'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Nota para organizar el espacio",
+                "Decimal"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='file-breadcrumb'] [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='rename-entry']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "item-menu",
+            "scope": "viewport"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='rename-entry']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "rename-entry-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "rename-entry-name"
+            },
+            "text": "guia.md",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "name": "rename-entry",
+            "scope": "element",
+            "target": {
+                "using": "testId",
+                "value": "rename-entry-dialog"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='rename-entry-dialog'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "file-breadcrumb"
+            },
+            "state": "visible",
+            "text": "guia.md"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "Nota para organizar el espacio."
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "F2"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "rename-entry-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "rename-entry-name"
+            },
+            "text": "guia.txt",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='rename-entry-dialog'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "rename-extension",
+            "scope": "element",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "text-editor"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "text-editor"
+            },
+            "state": "visible",
+            "text": "Nota para organizar el espacio."
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='borradores']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "folder-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='file-breadcrumb'] [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='delete-entry']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "delete-folder",
+            "scope": "element",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:last-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='borradores/guia.txt']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='file-breadcrumb'] [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='delete-entry']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "folder-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='borradores']"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='']"
+            },
+            "state": "visible"
+        }
+    ]
+}

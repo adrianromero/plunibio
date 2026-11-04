@@ -2,8 +2,10 @@
     "name": "Docs EN: code, Mermaid, and math",
     "app": {
         "basePath": "examples/plunibio-docs-lab",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "en",
             "theme": "light",
             "typography": "sans-serif",
@@ -134,7 +136,7 @@
             "target": { "using": "aria", "value": "Unsaved changes" },
             "state": "missing"
         },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "More options" } },
         { "action": "click", "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" } },
         {
             "action": "wait",

@@ -1,4 +1,4 @@
-import { access, cp, mkdtemp, rm } from "node:fs/promises";
+import { access, cp, lstat, mkdtemp, readdir, rm, utimes } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { resolveFlowPath } from "./flow";
@@ -9,6 +9,18 @@ export type PreparedWorkspace = {
     temporary: boolean;
     cleanup: () => Promise<void>;
 };
+
+async function setFixtureTimestamp(path: string, timestamp: Date): Promise<void> {
+    const metadata = await lstat(path);
+    // Never follow a link to an original fixture or an external target.
+    if (metadata.isSymbolicLink()) return;
+    if (metadata.isDirectory()) {
+        for (const name of await readdir(path)) {
+            await setFixtureTimestamp(join(path, name), timestamp);
+        }
+    }
+    await utimes(path, timestamp, timestamp);
+}
 
 export async function prepareFlowWorkspace(
     flow: AutomationFlow,
@@ -33,6 +45,11 @@ export async function prepareFlowWorkspace(
             errorOnExist: true,
             force: false,
         });
+        if (flow.app.fixtureTimestamp) {
+            const timestamp = new Date(flow.app.fixtureTimestamp);
+            if (!Number.isFinite(timestamp.getTime())) throw new Error("Invalid fixture timestamp");
+            await setFixtureTimestamp(temporaryBasePath, timestamp);
+        }
     } catch (error) {
         await rm(temporaryRoot, { recursive: true, force: true });
         throw error;

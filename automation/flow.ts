@@ -95,6 +95,7 @@ function parseSteps(value: unknown): FlowStep[] {
         "wait",
         "waitSelection",
         "waitClipboard",
+        "observeClipboardWrite",
         "refresh",
         "capture",
     ]);
@@ -146,8 +147,11 @@ function parseSteps(value: unknown): FlowStep[] {
         ) {
             throw new Error(`steps[${index}].value must be a number`);
         }
-        if (action === "waitClipboard") {
+        if (action === "waitClipboard" || action === "observeClipboardWrite") {
             requireString(step, "text", `steps[${index}]`);
+            if (step.source !== undefined && !["native", "browser", "write"].includes(String(step.source))) {
+                throw new Error(`steps[${index}].source must be native, browser, or write`);
+            }
         }
         return step as FlowStep;
     });
@@ -188,6 +192,14 @@ function parsePreferences(value: unknown): FlowPreferences | undefined {
             preferences[key] = value[key];
         }
     }
+    if (value.folderSort !== undefined) {
+        const sort = value.folderSort;
+        if (!isRecord(sort) || !["name", "size", "modified"].includes(String(sort.attribute)) ||
+            !["asc", "desc"].includes(String(sort.direction))) {
+            throw new Error("app.preferences.folderSort must specify attribute and direction");
+        }
+        preferences.folderSort = sort as NonNullable<FlowPreferences["folderSort"]>;
+    }
     return preferences;
 }
 
@@ -205,6 +217,12 @@ export async function loadFlow(filename: string): Promise<AutomationFlow> {
         throw new Error(
             "app.workspaceMode must be either 'read-only' or 'temporary-copy'"
         );
+    }
+    if (parsed.app.fixtureTimestamp !== undefined &&
+        (workspaceMode !== "temporary-copy" || typeof parsed.app.fixtureTimestamp !== "string" ||
+            !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(parsed.app.fixtureTimestamp) ||
+            !Number.isFinite(Date.parse(parsed.app.fixtureTimestamp)))) {
+        throw new Error("app.fixtureTimestamp requires temporary-copy and an ISO UTC timestamp");
     }
     return {
         ...(parsed as Omit<AutomationFlow, "name" | "app" | "steps">),

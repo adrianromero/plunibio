@@ -2,8 +2,10 @@
     "name": "Docs ES: reglas de escritura Markdown",
     "app": {
         "basePath": "examples/plunibio-docs-lab",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
         "workspaceMode": "temporary-copy",
         "preferences": {
+            "folderSort": { "attribute": "name", "direction": "asc" },
             "locale": "es",
             "theme": "light",
             "typography": "sans-serif",
@@ -50,7 +52,7 @@
             "text": "Título creado al escribir"
         },
         { "action": "capture", "scope": "viewport", "name": "typing-heading" },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "Más opciones" } },
         {
             "action": "click",
             "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
@@ -92,7 +94,7 @@
             "text": "Cita creada al escribir"
         },
         { "action": "capture", "scope": "viewport", "name": "typing-quote" },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "Más opciones" } },
         {
             "action": "click",
             "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
@@ -143,7 +145,7 @@
             "state": "existing"
         },
         { "action": "capture", "scope": "viewport", "name": "typing-lists" },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "Más opciones" } },
         {
             "action": "click",
             "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
@@ -184,7 +186,7 @@
             "state": "existing"
         },
         { "action": "keys", "keys": ["Elemento numerado creado al escribir"] },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "Más opciones" } },
         {
             "action": "click",
             "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
@@ -225,7 +227,7 @@
             "state": "visible"
         },
         { "action": "capture", "scope": "viewport", "name": "typing-code-fence" },
-        { "action": "click", "target": { "using": "testId", "value": "toolbar-menu-trigger" } },
+        { "action": "click", "target": { "using": "aria", "value": "Más opciones" } },
         {
             "action": "click",
             "target": { "using": "css", "value": "[data-toolbar-menu-entry='reload']" }
