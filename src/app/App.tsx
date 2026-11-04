@@ -47,7 +47,7 @@ function AppContent(): JSX.Element {
 
     return (
         <main class={styles.appMain} data-testid="app-main">
-            <Toolbar contextualSections={selection()?.toolbarSections ?? []} />
+            <Toolbar />
             <RootContent selection={selection()} loading={pathResult.loading} />
         </main>
     );

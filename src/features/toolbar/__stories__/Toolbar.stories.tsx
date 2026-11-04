@@ -25,7 +25,7 @@ const meta = {
             reloadAvailable={args.reloadAvailable}
         >
             <div class="catalogToolbarStage">
-                <Toolbar contextualSections={["markdown"]} />
+                <Toolbar />
             </div>
         </StoryAppProvider>
     ),

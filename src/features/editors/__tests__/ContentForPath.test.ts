@@ -11,25 +11,23 @@ import EditorText from "../text/EditorText";
 
 describe("contentForPath", () => {
     it.each(["README.md", "notes.markdown", "draft.mdown", "document.mkd"])(
-        "opens %s with EditorMarkdown and enables its menu section",
+        "opens %s with EditorMarkdown",
         (filename) => {
             const selection = contentForPath(filename, { kind: "file" });
 
             expect(selection?.kind).toBe("content");
             if (selection?.kind !== "content") return;
             expect(selection.component).toBe(EditorMarkdown);
-            expect(selection.toolbarSections).toEqual(["markdown"]);
         }
     );
 
-    it("opens LaTeX files with EditorText without contextual menu sections", () => {
+    it("opens LaTeX files with EditorText", () => {
         const selection = contentForPath("formula.tex", { kind: "file" });
 
         expect(selection?.kind).toBe("content");
         if (selection?.kind !== "content") return;
         expect(selection.component).toBe(EditorText);
         expect(selection.props.extensions).toHaveLength(1);
-        expect(selection.toolbarSections).toEqual([]);
     });
 
     it("selects EditorFolder from the path kind even if its name has a Markdown extension", () => {
@@ -38,18 +36,15 @@ describe("contentForPath", () => {
         expect(selection?.kind).toBe("content");
         if (selection?.kind !== "content") return;
         expect(selection.component).toBe(EditorFolder);
-        expect(selection.toolbarSections).toEqual([]);
     });
 
-    it("does not expose contextual sections for unsupported paths and errors", () => {
+    it("handles unsupported paths and errors", () => {
         expect(contentForPath("socket", { kind: "other" })).toEqual({
             kind: "unsupported",
-            toolbarSections: [],
         });
         expect(contentForPath("missing.md", { kind: "error", error: "Not found" })).toEqual({
             kind: "error",
             error: "Not found",
-            toolbarSections: [],
         });
         expect(contentForPath("loading.md", undefined)).toBeUndefined();
     });
