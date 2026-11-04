@@ -1,0 +1,233 @@
+{
+    "name": "Docs ES: verify bold toggling and inline math insertion",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "width": 1024,
+        "height": 768,
+        "file": "markdown/typing-rules.es.md",
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror[contenteditable='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "b"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Texto en negrita"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child strong"
+            },
+            "state": "visible",
+            "text": "Texto en negrita"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "b"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                " texto normal"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[aria-label='Negrita']:not(.selected)"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "state": "visible",
+            "text": "Texto en negrita texto normal"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Fórmula en línea"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Expresión LaTeX"
+            },
+            "text": "x^2",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la fórmula en línea'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "aria", "value": "Expresión LaTeX" },
+            "state": "missing"
+        },
+        {
+            "action": "focus",
+            "target": { "using": "css", "value": "[data-testid='markdown-editor'] .ProseMirror" }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "Texto en negrita texto normal"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child strong"
+            },
+            "state": "visible",
+            "text": "Texto en negrita"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//strong[contains(., 'texto normal')]"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones de la fórmula en línea']"
+            },
+            "state": "visible",
+            "text": "x^2"
+        }
+    ]
+}

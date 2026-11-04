@@ -132,12 +132,12 @@
         "es": "Cita en bloque creada mediante la regla de escritura Markdown del signo mayor que."
     },
     "edit-markdown/typing-lists": {
-        "en": "Bullet, task, and numbered lists created with Markdown typing rules.",
-        "es": "Listas con viñetas, de tareas y numerada creadas mediante reglas de escritura Markdown."
+        "en": "A bullet item and an unchecked task created with Markdown typing rules.",
+        "es": "Un elemento con viñeta y una tarea pendiente creados mediante reglas de escritura Markdown."
     },
     "edit-markdown/typing-code-fence": {
-        "en": "Fenced code block created by typing three backticks.",
-        "es": "Bloque de código delimitado creado al escribir tres acentos graves."
+        "en": "Fenced code block created by typing three backticks followed by a space.",
+        "es": "Bloque de código delimitado creado al escribir tres acentos graves seguidos de un espacio."
     },
     "edit-markdown/typing-divider": {
         "en": "Horizontal divider created with the Markdown three-hyphen typing rule.",

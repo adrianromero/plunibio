@@ -189,6 +189,11 @@ folder inside the temporary workspace, verify that renaming saves pending edits,
 canceling and confirming deletion. The matching workspace-navigation and save-reload flows
 provide the rest of the Workspaces and files chapter captures.
 
+The `verify-docs-{es,en}-markdown-basics.json` flows check the Bold shortcut as a typing toggle
+and insertion of inline math from the formatting sidebar, then save and reload to verify both.
+They wait for the expression input to close and focus the editor before sending Save. They generate
+no images; math action captures belong to the advanced-content chapter.
+
 Check runner types and fixture safety with:
 
 ```bash
