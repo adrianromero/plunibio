@@ -24,7 +24,7 @@ import {
     externalCodeMirrorSearch,
 } from "@/features/search/CodeMirrorSearchController";
 import type { SearchController } from "@/features/search/SearchController";
-import ErrorView from "@/shared/errors/ErrorView";
+import MessageView from "@/shared/errors/MessageView";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 
 type EditorTextProps = {
@@ -70,6 +70,7 @@ export function EditorText(props: EditorTextProps): JSX.Element {
             currentSearchController = new CodeMirrorSearchController(editorView);
             setSearchController(currentSearchController);
         },
+        focus: () => editorView?.focus(),
         destroy: () => {
             currentSearchController?.destroy();
             currentSearchController = null;
@@ -98,9 +99,9 @@ export function EditorText(props: EditorTextProps): JSX.Element {
     return (
         <section class={styles.studio} data-testid="text-view">
             <Show when={error()}>
-                <ErrorView>{error() ?? t("errors.unknown")}</ErrorView>
+                <MessageView>{error() ?? t("errors.unknown")}</MessageView>
             </Show>
-            <div class={`scrollingView ${error() ? "errorView" : ""}`}>
+            <div class={`scrollingView ${error() ? "messageView" : ""}`}>
                 <div
                     ref={editorRef}
                     class={`contentView ${styles.editorText}`}

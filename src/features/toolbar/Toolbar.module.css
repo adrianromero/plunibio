@@ -25,9 +25,14 @@
 }
 
 .modifiedIndicator {
+    display: flex;
     color: var(--color-warning);
-    font-size: 1.35rem;
-    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.modifiedIndicator > :global(.lucide) {
+    width: 0.9rem;
+    height: 0.9rem;
 }
 
 .toolbarActions {

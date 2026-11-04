@@ -23,6 +23,7 @@ import {
     insertImage,
     insertTypedCodeBlock,
     observeEditorState,
+    toggleInlineMath,
     toggleList,
 } from "../EditorMarkdownSidebar";
 import { insertResolvedMarkdownImage } from "../MarkdownTransferInsertion";
@@ -106,6 +107,23 @@ describe("acciones de EditorMarkdownSidebar", () => {
             );
             expect(getInlineStyleState(ctx).math).toBe(false);
         });
+    });
+
+    it("abre la edición con el texto convertido a matemática en línea", async () => {
+        let opened = false;
+        const result = await runCrepeMarkdownAction("Antes [[a + b]] después", (ctx) => {
+            toggleInlineMath(ctx, () => {
+                opened = true;
+            });
+
+            const selection = ctx.get(editorViewCtx).state.selection;
+            expect(selection).toBeInstanceOf(NodeSelection);
+            expect((selection as NodeSelection).node.type.name).toBe("math_inline");
+            expect((selection as NodeSelection).node.attrs.value).toBe("a + b");
+        });
+
+        expect(opened).toBe(true);
+        expect(result).toContain("$a + b$");
     });
 
     it("inserta una imagen de bloque en un párrafo nuevo vacío", async () => {

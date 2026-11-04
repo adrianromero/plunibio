@@ -11,21 +11,17 @@ import Languages from "lucide-solid/icons/languages";
 import TypeIcon from "lucide-solid/icons/type";
 import Eye from "lucide-solid/icons/eye";
 import EyeOff from "lucide-solid/icons/eye-off";
+import SquarePen from "lucide-solid/icons/square-pen";
 import { useAppContext } from "@/app/AppContext";
 import { useI18N, type Locale } from "@/i18n/Localization";
 import type { AppTheme } from "@/preferences/ThemePreferences";
 import type { AppTypography } from "@/preferences/TypographyPreferences";
-import type { ContextualToolbarSection } from "@/features/editors/ContentForPath";
 import FileBreadcrumb from "@/features/navigation/FileBreadcrumb";
 import FileNavigation from "@/features/navigation/FileNavigation";
-import ToolbarMenu, { type ToolbarMenuChoiceItem } from "./ToolbarMenu";
+import Menu, { type MenuChoiceItem } from "@/shared/ui/menu/Menu";
 import styles from "./Toolbar.module.css";
 
-type ToolbarProps = {
-    contextualSections: readonly ContextualToolbarSection[];
-};
-
-export function Toolbar(props: ToolbarProps) {
+export function Toolbar() {
     const { t, locale, setLocale } = useI18N();
     const {
         main: { openWorkspace, showAbout },
@@ -59,7 +55,7 @@ export function Toolbar(props: ToolbarProps) {
                         aria-label={t("toolbar.unsavedChanges")}
                         title={t("toolbar.unsavedChanges")}
                     >
-                        •
+                        <SquarePen aria-hidden="true" />
                     </span>
                 </Show>
             </div>
@@ -79,7 +75,7 @@ export function Toolbar(props: ToolbarProps) {
                         <PanelRight aria-hidden="true" />
                     </button>
                 </Show>
-                <ToolbarMenu
+                <Menu
                     label={t("toolbar.moreOptions")}
                     blocks={[
                         {
@@ -134,7 +130,7 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (nextTheme): void => {
                                         setTheme(nextTheme);
                                     },
-                                } satisfies ToolbarMenuChoiceItem<AppTheme>,
+                                } satisfies MenuChoiceItem<AppTheme>,
                                 {
                                     kind: "choice",
                                     id: "language",
@@ -171,7 +167,7 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (nextLocale): void => {
                                         setLocale(nextLocale);
                                     },
-                                } satisfies ToolbarMenuChoiceItem<Locale>,
+                                } satisfies MenuChoiceItem<Locale>,
                                 {
                                     kind: "choice",
                                     id: "hidden-files",
@@ -192,60 +188,56 @@ export function Toolbar(props: ToolbarProps) {
                                     onChange: (visibility): void => {
                                         setShowHiddenFiles(visibility === "show");
                                     },
-                                } satisfies ToolbarMenuChoiceItem<HiddenFilesVisibility>,
+                                } satisfies MenuChoiceItem<HiddenFilesVisibility>,
                             ],
                         },
-                        ...(props.contextualSections.includes("markdown")
-                            ? [
-                                  {
-                                      kind: "section",
-                                      id: "markdown",
-                                      label: t("toolbar.markdownSection"),
-                                      items: [
+                        {
+                            kind: "section",
+                            id: "markdown",
+                            label: t("toolbar.markdownSection"),
+                            items: [
+                                {
+                                    kind: "choice",
+                                    id: "typography",
+                                    label: t("toolbar.typography"),
+                                    currentIcon: TypeIcon,
+                                    value: typography,
+                                    options: [
                                         {
-                                            kind: "choice",
-                                            id: "typography",
-                                            label: t("toolbar.typography"),
-                                            currentIcon: TypeIcon,
-                                            value: typography,
-                                            options: [
-                                                {
-                                                    value: "sans-serif",
-                                                    label: t("toolbar.sansSerifTypography"),
-                                                    description: t(
-                                                        "toolbar.sansSerifTypographyDescription"
-                                                    ),
-                                                },
-                                                {
-                                                    value: "serif",
-                                                    label: t("toolbar.serifTypography"),
-                                                    description: t(
-                                                        "toolbar.serifTypographyDescription"
-                                                    ),
-                                                },
-                                                {
-                                                    value: "modern",
-                                                    label: t("toolbar.modernTypography"),
-                                                    description: t(
-                                                        "toolbar.modernTypographyDescription"
-                                                    ),
-                                                },
-                                                {
-                                                    value: "reading",
-                                                    label: t("toolbar.readingTypography"),
-                                                    description: t(
-                                                        "toolbar.readingTypographyDescription"
-                                                    ),
-                                                },
-                                            ],
-                                            onChange: (nextTypography): void => {
-                                                setTypography(nextTypography);
-                                            },
-                                        } satisfies ToolbarMenuChoiceItem<AppTypography>,
-                                      ],
-                                  } as const,
-                              ]
-                            : []),
+                                            value: "sans-serif",
+                                            label: t("toolbar.sansSerifTypography"),
+                                            description: t(
+                                                "toolbar.sansSerifTypographyDescription"
+                                            ),
+                                        },
+                                        {
+                                            value: "serif",
+                                            label: t("toolbar.serifTypography"),
+                                            description: t(
+                                                "toolbar.serifTypographyDescription"
+                                            ),
+                                        },
+                                        {
+                                            value: "modern",
+                                            label: t("toolbar.modernTypography"),
+                                            description: t(
+                                                "toolbar.modernTypographyDescription"
+                                            ),
+                                        },
+                                        {
+                                            value: "reading",
+                                            label: t("toolbar.readingTypography"),
+                                            description: t(
+                                                "toolbar.readingTypographyDescription"
+                                            ),
+                                        },
+                                    ],
+                                    onChange: (nextTypography): void => {
+                                        setTypography(nextTypography);
+                                    },
+                                } satisfies MenuChoiceItem<AppTypography>,
+                            ],
+                        },
                         {
                             kind: "section",
                             id: "information",

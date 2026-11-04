@@ -42,7 +42,13 @@ import {
 import { lift } from "@milkdown/kit/prose/commands";
 import type { MarkType, Node as ProseMirrorNode, NodeType } from "@milkdown/kit/prose/model";
 import { liftListItem, wrapInList } from "@milkdown/kit/prose/schema-list";
-import { Plugin, TextSelection, type Selection, type Transaction } from "@milkdown/kit/prose/state";
+import {
+    NodeSelection,
+    Plugin,
+    TextSelection,
+    type Selection,
+    type Transaction,
+} from "@milkdown/kit/prose/state";
 
 import { type LucideIcon } from "lucide-solid";
 import Bold from "lucide-solid/icons/bold";
@@ -91,6 +97,7 @@ type EditorMarkdownSidebarProps = {
     onSelectedTabChange: (key: string) => void;
     registerSearchFocus?: (focus: (() => void) | null) => void;
     onCreateLink?: () => void;
+    onCreateMath?: () => void;
 };
 
 type ListKind = "bullet" | "ordered" | "task";
@@ -121,6 +128,7 @@ const EMPTY_INLINE_STYLE_STATE: InlineStyleState = {
 };
 
 type SidebarButtonProps = {
+    layout?: "action" | "compact";
     getEditor: () => Editor | null;
     selected?: boolean;
     focusEditorAfterRun?: boolean;
@@ -135,7 +143,7 @@ function SidebarButton(props: SidebarButtonProps): JSX.Element {
 
     return (
         <button
-            class={`stdButton toolbar ${selected() ? "selected" : ""}`}
+            class={`stdButton toolbar ${props.layout === "compact" ? "" : "sidebarAction"} ${selected() ? "selected" : ""}`}
             type="button"
             aria-label={props.label}
             title={props.label}
@@ -156,7 +164,9 @@ function SidebarButton(props: SidebarButtonProps): JSX.Element {
             }}
         >
             <Dynamic component={props.icon} aria-hidden="true" />
-            {props.label}
+            <span class={props.layout === "compact" ? undefined : "sidebarActionLabel"}>
+                {props.label}
+            </span>
         </button>
     );
 }
@@ -323,6 +333,16 @@ function toggleLink(ctx: Ctx, onCreateLink?: () => void): void {
     }
 
     onCreateLink();
+}
+
+export function toggleInlineMath(ctx: Ctx, onCreateMath?: () => void): void {
+    const view = ctx.get(editorViewCtx);
+    const selectedMath =
+        view.state.selection instanceof NodeSelection &&
+        view.state.selection.node.type.name === "math_inline";
+
+    ctx.get(commandsCtx).call("ToggleLatex");
+    if (!selectedMath) onCreateMath?.();
 }
 
 function getListContext(ctx: Ctx): ListContext | null {
@@ -676,12 +696,14 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                         <div class="sidebarButtonGrid sidebarButtonGrid--2">
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={Quote}
                                 label={t("markdownToolbar.quote")}
                                 onRun={toggleBlockquote}
                             />
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={Minus}
                                 label={t("markdownToolbar.divider")}
                                 onRun={(ctx) => {
@@ -752,7 +774,7 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                                 icon={Sigma}
                                 label={t("markdownToolbar.inlineMath")}
                                 onRun={(ctx) => {
-                                    ctx.get(commandsCtx).call("ToggleLatex");
+                                    toggleInlineMath(ctx, props.onCreateMath);
                                     updateSelectedState(ctx);
                                 }}
                             />
@@ -782,12 +804,14 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                         <div class="sidebarButtonGrid sidebarButtonGrid--2">
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={IndentIncrease}
                                 label={t("markdownToolbar.increaseIndent")}
                                 onRun={(ctx) => ctx.get(commandsCtx).call(sinkListItemCommand.key)}
                             />
                             <SidebarButton
                                 getEditor={props.getEditor}
+                                layout="compact"
                                 icon={IndentDecrease}
                                 label={t("markdownToolbar.decreaseIndent")}
                                 onRun={(ctx) => ctx.get(commandsCtx).call(liftListItemCommand.key)}

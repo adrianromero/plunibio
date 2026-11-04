@@ -4,6 +4,240 @@
 use super::{read_file, write_file};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+fn unique_temp_dir(label: &str) -> std::path::PathBuf {
+    let unique = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    std::env::temp_dir().join(format!("plunibio-{label}-{unique}"))
+}
+
+#[test]
+fn renames_files_and_non_empty_directories_without_overwriting() {
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("rename-entry");
+        std::fs::create_dir_all(base.join("docs/folder/nested")).unwrap();
+        std::fs::write(base.join("docs/note.md"), "content").unwrap();
+        std::fs::write(base.join("docs/folder/nested/child.txt"), "child").unwrap();
+        std::fs::write(base.join("docs/existing.md"), "existing").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let renamed = super::rename_entry(
+            basepath.clone(),
+            "docs/note.md".to_owned(),
+            "renamed.md".to_owned(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            renamed,
+            std::path::Path::new("docs/renamed.md").to_string_lossy()
+        );
+        assert_eq!(
+            std::fs::read_to_string(base.join(&renamed)).unwrap(),
+            "content"
+        );
+        assert!(!base.join("docs/note.md").exists());
+
+        let renamed_directory = super::rename_entry(
+            basepath.clone(),
+            "docs/folder".to_owned(),
+            "archive".to_owned(),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            std::fs::read_to_string(base.join(&renamed_directory).join("nested/child.txt"))
+                .unwrap(),
+            "child"
+        );
+
+        let duplicate = super::rename_entry(basepath, renamed, "existing.md".to_owned())
+            .await
+            .unwrap_err();
+        assert_eq!(
+            serde_json::to_value(duplicate).unwrap()["code"],
+            "path_already_exists"
+        );
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn deletes_files_and_directory_trees_but_never_the_workspace_root() {
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("delete-entry");
+        std::fs::create_dir_all(base.join("folder/nested")).unwrap();
+        std::fs::write(base.join("file.md"), "content").unwrap();
+        std::fs::write(base.join("folder/nested/child.txt"), "child").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        super::delete_entry(basepath.clone(), "file.md".to_owned())
+            .await
+            .unwrap();
+        assert!(!base.join("file.md").exists());
+
+        super::delete_entry(basepath.clone(), "folder".to_owned())
+            .await
+            .unwrap();
+        assert!(!base.join("folder").exists());
+
+        let root_error = super::delete_entry(basepath, String::new())
+            .await
+            .unwrap_err();
+        assert_eq!(
+            serde_json::to_value(root_error).unwrap()["code"],
+            "invalid_path"
+        );
+        assert!(base.is_dir());
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[cfg(unix)]
+#[test]
+fn deleting_a_directory_symlink_does_not_delete_its_target() {
+    use std::os::unix::fs::symlink;
+
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("delete-symlink");
+        std::fs::create_dir_all(base.join("target/nested")).unwrap();
+        std::fs::write(base.join("target/nested/child.txt"), "child").unwrap();
+        symlink(base.join("target"), base.join("link")).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        super::delete_entry(basepath, "link".to_owned())
+            .await
+            .unwrap();
+
+        assert!(!base.join("link").exists());
+        assert_eq!(
+            std::fs::read_to_string(base.join("target/nested/child.txt")).unwrap(),
+            "child"
+        );
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn creates_empty_files_and_directories_without_overwriting() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-create-entry-{unique}"));
+        std::fs::create_dir_all(base.join("docs")).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let directory =
+            super::create_directory(basepath.clone(), "docs".to_owned(), "notes".to_owned())
+                .await
+                .unwrap();
+        assert_eq!(directory.name, "notes");
+        assert_eq!(directory.item_count, Some(0));
+        assert_eq!(directory.size_bytes, None);
+        assert!(directory.modified_at.is_some());
+        assert_eq!(
+            directory.filename,
+            std::path::Path::new("docs").join("notes").to_string_lossy()
+        );
+        assert!(base.join("docs/notes").is_dir());
+
+        let file = super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
+            .await
+            .unwrap();
+        assert_eq!(file.name, "new.md");
+        assert_eq!(file.size_bytes, Some(0));
+        assert_eq!(file.item_count, None);
+        assert!(file.modified_at.is_some());
+        assert_eq!(
+            std::fs::read(base.join("docs/new.md")).unwrap(),
+            Vec::<u8>::new()
+        );
+
+        let duplicate =
+            super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
+                .await
+                .unwrap_err();
+        let value = serde_json::to_value(duplicate).unwrap();
+        assert_eq!(value["code"], "path_already_exists");
+        assert_eq!(value["path"], "new.md");
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn list_directory_reports_file_metadata_and_visible_child_counts() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-list-metadata-{unique}"));
+        std::fs::create_dir_all(base.join("folder/nested")).unwrap();
+        std::fs::write(base.join("folder/visible.txt"), "hello").unwrap();
+        std::fs::write(base.join("folder/.hidden.txt"), "hidden").unwrap();
+        std::fs::write(base.join("document.md"), "content").unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        let visible_entries = super::list_directory(basepath.clone(), String::new(), false)
+            .await
+            .unwrap();
+        let folder = visible_entries
+            .iter()
+            .find(|entry| entry.name == "folder")
+            .unwrap();
+        let file = visible_entries
+            .iter()
+            .find(|entry| entry.name == "document.md")
+            .unwrap();
+        assert_eq!(folder.item_count, Some(2));
+        assert_eq!(folder.size_bytes, None);
+        assert!(folder.modified_at.is_some());
+        assert_eq!(file.size_bytes, Some(7));
+        assert_eq!(file.item_count, None);
+        assert!(file.modified_at.is_some());
+
+        let all_entries = super::list_directory(basepath, String::new(), true)
+            .await
+            .unwrap();
+        let folder = all_entries
+            .iter()
+            .find(|entry| entry.name == "folder")
+            .unwrap();
+        assert_eq!(folder.item_count, Some(3));
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
+#[test]
+fn create_entry_rejects_paths_instead_of_names() {
+    tauri::async_runtime::block_on(async {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let base = std::env::temp_dir().join(format!("plunibio-create-name-{unique}"));
+        std::fs::create_dir(&base).unwrap();
+        let basepath = base.to_string_lossy().into_owned();
+
+        for name in ["", "   ", ".", "..", "nested/file.md", "nested\\file.md"] {
+            let error = super::create_file(basepath.clone(), String::new(), name.to_owned())
+                .await
+                .unwrap_err();
+            let value = serde_json::to_value(error).unwrap();
+            assert_eq!(value["code"], "invalid_path");
+        }
+
+        std::fs::remove_dir_all(base).unwrap();
+    });
+}
+
 #[test]
 fn missing_file_is_unsaved_until_written() {
     tauri::async_runtime::block_on(async {

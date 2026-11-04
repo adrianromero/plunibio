@@ -23,7 +23,6 @@ import type {
     MarkdownFloatingActionsController,
     MarkdownFloatingTarget,
 } from "./MarkdownFloatingActionsHost";
-import "./MarkdownImageActions.module.css";
 
 interface MarkdownImageActionsProps {
     editorRoot: () => HTMLDivElement;
@@ -88,9 +87,24 @@ export default function MarkdownImageActions(props: MarkdownImageActionsProps): 
         const nativeCaptionButton = image
             .closest(".milkdown-image-block")
             ?.querySelector<HTMLElement>(":scope > .image-wrapper > .operation > .operation-item");
-        nativeCaptionButton?.dispatchEvent(
+        if (!nativeCaptionButton) return;
+
+        const scrollContainer = props.editorRoot().closest<HTMLElement>(".scrollingView");
+        const scrollPosition = scrollContainer
+            ? { left: scrollContainer.scrollLeft, top: scrollContainer.scrollTop }
+            : null;
+        const restoreScroll = (): void => {
+            if (!scrollContainer || !scrollPosition) return;
+            scrollContainer.scrollLeft = scrollPosition.left;
+            scrollContainer.scrollTop = scrollPosition.top;
+        };
+
+        nativeCaptionButton.dispatchEvent(
             new PointerEvent("pointerdown", { bubbles: true, cancelable: true })
         );
+        restoreScroll();
+        queueMicrotask(restoreScroll);
+        requestAnimationFrame(restoreScroll);
     };
 
     const imageAnchorRect = (image: HTMLImageElement): DOMRect | null => {
@@ -130,11 +144,11 @@ export default function MarkdownImageActions(props: MarkdownImageActionsProps): 
         key: image,
         kind: "image",
         activation,
-        href: () => sourceForImage(image),
+        value: () => sourceForImage(image),
         getAnchorRect: () => imageAnchorRect(image),
         isConnected: () => image.isConnected,
         onNavigate: () => navigateToImage(image),
-        onSaveHref: (source) => saveEditedSource(image, source),
+        onSaveValue: (source) => saveEditedSource(image, source),
         onEditingEnd: () => requestAnimationFrame(focusEditor),
         onPointerLeave: (event) => handleActionPointerLeave(image, event),
         actions: () =>

@@ -3,9 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createResource, For, JSX, Match, onCleanup, Show, Switch } from "solid-js";
+import {
+    createMemo, createResource, createSignal, For, JSX, Match, onCleanup, Show, Switch,
+} from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
+import FileImage from "lucide-solid/icons/file-image";
+import FilePen from "lucide-solid/icons/file-pen";
+import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
 import { useAppContext } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
@@ -13,18 +18,79 @@ import { useI18N } from "@/i18n/Localization";
 import type { DirectoryEntry } from "@/backend/rusttypes";
 import styles from "./EditorFolder.module.css";
 import { Dynamic } from "solid-js/web";
+import { sortFolderEntries } from "./FolderSorting";
+import { nextFolderSort } from "@/preferences/FolderSortPreferences";
+import EditorFolderSidebar from "./EditorFolderSidebar";
+import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
+import MessageView from "@/shared/errors/MessageView";
+import EditorImage from "@/features/editors/image/EditorImage";
+import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
+import { editorForFilename } from "@/features/editors/EditorForFilename";
+import EditorText from "@/features/editors/text/EditorText";
 
 type DirectoryResult =
     | { entries: DirectoryEntry[]; error?: never }
     | { entries?: never; error: string };
 
+const FILE_SIZE_UNITS = [
+    { minimum: 1024 ** 3, divisor: 1024 ** 3, label: "GB" },
+    { minimum: 1024 ** 2, divisor: 1024 ** 2, label: "MB" },
+    { minimum: 0, divisor: 1024, label: "KB" },
+] as const;
+
+export function fileIconForFilename(filename: string): typeof File {
+    const editor = editorForFilename(filename);
+    if (editor === EditorMarkdown) return FilePen;
+    if (editor === EditorText) return FileText;
+    if (editor === EditorImage) return FileImage;
+    return File;
+}
+
+export function formatFileSize(sizeBytes: number, locale: string): string {
+    const unit = FILE_SIZE_UNITS.find(({ minimum }) => sizeBytes >= minimum)!;
+    const value = Math.max(0, sizeBytes) / unit.divisor;
+    const amount = new Intl.NumberFormat(locale, {
+        maximumFractionDigits: value > 0 && value < 10 ? 1 : 0,
+    }).format(value);
+    return `${amount} ${unit.label}`;
+}
+
+function formatModifiedAt(modifiedAt: number | null, locale: string): string | null {
+    if (modifiedAt === null) return null;
+    const date = new Date(modifiedAt);
+    if (Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date);
+}
+
 export function EditorFolder(): JSX.Element {
-    const { t } = useI18N();
+    const { t, locale } = useI18N();
     const {
-        main: { basepath, filename, loadFilename },
+        main: { basepath, filename, loadFilename, showAppMessage, setCreateEntry },
         spinner: { showSpinner, hideSpinner, setSpinnerParams },
-        editor: { setReloadFile, showHiddenFiles },
+        editor: { setReloadFile, showHiddenFiles, folderSort, setFolderSort },
     } = useAppContext();
+    const [createKind, setCreateKind] = createSignal<CreateEntryKind | null>(null);
+    const openCreateDialog = (kind: CreateEntryKind): void => {
+        if (!directoryResult()?.entries || directoryResult.loading) return;
+        setCreateKind(kind);
+    };
+    setCreateEntry(openCreateDialog);
+
+    const entryDetails = (entry: DirectoryEntry): string => {
+        const size =
+            entry.kind === "directory"
+                ? entry.itemCount === null
+                    ? t("folder.itemsUnavailable")
+                    : entry.itemCount === 1
+                      ? t("folder.itemCount", { count: entry.itemCount })
+                      : t("folder.itemsCount", { count: entry.itemCount })
+                : formatFileSize(entry.sizeBytes, locale());
+        const modified = formatModifiedAt(entry.modifiedAt, locale()) ?? t("folder.dateUnavailable");
+        return `${size} · ${modified}`;
+    };
     const [directoryResult, { refetch }] = createResource(
         () => ({ basepath: basepath(), filename: filename(), showHidden: showHiddenFiles() }),
         async (path): Promise<DirectoryResult> => {
@@ -42,6 +108,39 @@ export function EditorFolder(): JSX.Element {
         }
     );
 
+    const sortedEntries = createMemo(() =>
+        sortFolderEntries(directoryResult()?.entries ?? [], folderSort(), locale())
+    );
+
+    const createEntry = async (kind: CreateEntryKind, name: string): Promise<void> => {
+        const currentBasepath = basepath();
+        const currentFilename = filename();
+        setCreateKind(null);
+        setSpinnerParams(
+            kind === "directory"
+                ? t("folder.creatingFolder", { name })
+                : t("folder.creatingFile", { name })
+        );
+        showSpinner();
+        let errorMessage: string | null = null;
+        let createdFilename: string | null = null;
+        try {
+            const entry = await invoke<DirectoryEntry>(
+                kind === "directory" ? "create_directory" : "create_file",
+                { basepath: currentBasepath, filename: currentFilename, name }
+            );
+            if (basepath() !== currentBasepath || filename() !== currentFilename) return;
+            createdFilename = entry.filename;
+        } catch (error: unknown) {
+            console.error("Unable to create directory entry:", error);
+            errorMessage = translateAppError(error, t);
+        } finally {
+            hideSpinner();
+        }
+        if (errorMessage) await showAppMessage(errorMessage, "error");
+        else if (createdFilename) await loadFilename(createdFilename);
+    };
+
     const reloadDirectory = async (): Promise<void> => {
         await refetch();
     };
@@ -49,17 +148,8 @@ export function EditorFolder(): JSX.Element {
 
     onCleanup(() => {
         setReloadFile(null);
+        setCreateEntry(null);
     });
-
-    //  <ToolbarView>
-    //     <button class="stdButton small" type="button" aria-label="Add item">
-    //         <ListPlus aria-hidden="true" />
-    //     </button>
-    //     <button class="stdButton small" type="button" aria-label="Refresh folder">
-    //         <RefreshCw aria-hidden="true" />
-    //         Refresh
-    //     </button>
-    // </ToolbarView>
 
     return (
         <section class={styles.studio} data-testid="folder-view">
@@ -72,11 +162,13 @@ export function EditorFolder(): JSX.Element {
                         <Match when={directoryResult()?.entries}>
                             <Show
                                 when={(directoryResult()?.entries?.length ?? 0) > 0}
-                                fallback={<div class={styles.emptyFolder}>{t("folder.empty")}</div>}
+                                fallback={
+                                    <MessageView info="status">{t("folder.empty")}</MessageView>
+                                }
                             >
                                 <div class="contentView">
                                     <ul class={styles.entryList}>
-                                        <For each={directoryResult()?.entries}>
+                                        <For each={sortedEntries()}>
                                             {(entry) => (
                                                 <li>
                                                     <button
@@ -98,11 +190,18 @@ export function EditorFolder(): JSX.Element {
                                                             component={
                                                                 entry.kind === "directory"
                                                                     ? Folder
-                                                                    : File
+                                                                    : fileIconForFilename(
+                                                                          entry.name
+                                                                      )
                                                             }
                                                         />
-                                                        <span class={styles.entryName}>
-                                                            {entry.name}
+                                                        <span class={styles.entryContent}>
+                                                            <span class={styles.entryName}>
+                                                                {entry.name}
+                                                            </span>
+                                                            <span class={styles.entryDetails}>
+                                                                {entryDetails(entry)}
+                                                            </span>
                                                         </span>
                                                     </button>
                                                 </li>
@@ -115,6 +214,21 @@ export function EditorFolder(): JSX.Element {
                     </Switch>
                 </Show>
             </div>
+            <EditorFolderSidebar
+                disabled={directoryResult.loading || !directoryResult()?.entries}
+                onCreate={openCreateDialog}
+                sort={folderSort()}
+                onSort={(attribute) => setFolderSort((current) => nextFolderSort(current, attribute))}
+            />
+            <CreateEntryDialog
+                open={createKind() !== null}
+                kind={createKind() ?? "other"}
+                onCancel={() => setCreateKind(null)}
+                onConfirm={(name) => {
+                    const kind = createKind();
+                    if (kind) void createEntry(kind, name);
+                }}
+            />
         </section>
     );
 }

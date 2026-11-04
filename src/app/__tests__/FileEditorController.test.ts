@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { DEFAULT_FOLDER_SORT, type FolderSort } from "@/preferences/FolderSortPreferences";
 import { createRoot, createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type {
@@ -52,6 +53,7 @@ describe("createFileEditorController", () => {
         const [filename, setFilename] = createSignal("notes.md");
         const [fileModified, setFileModified] = createSignal(false);
         const [sidebarVisible, setSidebarVisible] = createSignal(true);
+        const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
         const [showHiddenFiles, setShowHiddenFiles] = createSignal(false);
         const [theme, setTheme] = createSignal<"light" | "dark">("light");
         const [typography, setTypography] = createSignal<
@@ -78,6 +80,11 @@ describe("createFileEditorController", () => {
                 filename,
                 setFilename,
                 loadFilename: vi.fn(() => Promise.resolve()),
+                loadFilenameAfterMutation: vi.fn(() => Promise.resolve()),
+                renameEntry: () => null,
+                setRenameEntry: vi.fn(),
+                createEntry: () => null,
+                setCreateEntry: vi.fn(),
                 navigateBack: () => null,
                 setNavigateBack: vi.fn(),
                 navigateForward: () => null,
@@ -107,6 +114,8 @@ describe("createFileEditorController", () => {
                 setSearchFile: vi.fn(),
                 sidebarVisible,
                 setSidebarVisible,
+                folderSort,
+                setFolderSort,
                 showHiddenFiles,
                 setShowHiddenFiles,
                 toggleSidebar: () => null,
@@ -126,6 +135,38 @@ describe("createFileEditorController", () => {
         dispose?.();
         dispose = undefined;
         localizationState.revision = null;
+    });
+
+    it("focuses the editor after the initial load and a reload", async () => {
+        const focus = vi.fn();
+        const adapter: FileEditorAdapter = {
+            getContent: vi.fn(() => Promise.resolve("content")),
+            replaceContent: vi.fn(() => Promise.resolve()),
+            focus,
+            destroy: vi.fn(),
+        };
+        const storage: FileEditorStorage<string> = {
+            read: vi.fn(() => Promise.resolve({ content: "loaded", isNew: false })),
+            write: vi.fn(() => Promise.resolve()),
+        };
+        let controller!: FileEditorController;
+
+        createRoot((rootDispose) => {
+            dispose = rootDispose;
+            controller = createFileEditorController("TestEditor", adapter, storage);
+        });
+
+        await vi.waitFor(() => {
+            expect(controller.state().status).toBe("ready");
+            expect(focus).toHaveBeenCalledTimes(1);
+        });
+
+        await reloadFile?.();
+
+        await vi.waitFor(() => {
+            expect(controller.state().status).toBe("ready");
+            expect(focus).toHaveBeenCalledTimes(2);
+        });
     });
 
     it("does not reload the file when the translation locale changes", async () => {

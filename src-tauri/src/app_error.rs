@@ -17,6 +17,11 @@ pub(crate) enum AppErrorCode {
     ReadFileFailed,
     OpenFileFailed,
     WriteFileFailed,
+    PathAlreadyExists,
+    CreateDirectoryFailed,
+    CreateFileFailed,
+    RenameEntryFailed,
+    DeleteEntryFailed,
 }
 
 #[derive(Debug, serde::Serialize)]

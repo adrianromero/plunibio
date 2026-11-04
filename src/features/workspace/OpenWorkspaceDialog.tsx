@@ -11,7 +11,7 @@ import HardDrive from "lucide-solid/icons/hard-drive";
 import { createEffect, createSignal, For, JSX, Show } from "solid-js";
 import { translateAppError } from "@/shared/errors/AppError";
 import dialogStyles from "@/shared/ui/dialog/Dialog.module.css";
-import { dismissDialogOnBackdropClick } from "@/shared/ui/dialog/DialogDismiss";
+import ModalDialog from "@/shared/ui/dialog/ModalDialog";
 import { useI18N } from "@/i18n/Localization";
 import { formatPathForDisplay } from "@/shared/paths/PathPresentation";
 import folderStyles from "@/features/editors/folder/EditorFolder.module.css";
@@ -28,7 +28,6 @@ type OpenWorkspaceDialogProps = {
 
 export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Element {
     const { t } = useI18N();
-    let dialogRef!: HTMLDialogElement;
     const [location, setLocation] = createSignal<DirectoryBrowserLocation | null>(null);
     const [roots, setRoots] = createSignal<DirectoryBrowserEntry[] | null>(null);
     const [loading, setLoading] = createSignal(false);
@@ -87,11 +86,6 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
         }
         wasOpen = props.open;
         previousShowHidden = showHidden;
-        if (props.open && !dialogRef.open) {
-            dialogRef.showModal();
-        } else if (!props.open && dialogRef.open) {
-            dialogRef.close();
-        }
     });
 
     const confirm = async (): Promise<void> => {
@@ -109,17 +103,12 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
     const displayedPath = () => formatPathForDisplay(location()?.path ?? props.initialPath);
 
     return (
-        <dialog
-            ref={dialogRef}
-            class={`${dialogStyles.dialog} ${styles.workspaceDialog}`}
-            data-testid="workspace-dialog"
-            aria-labelledby="open-workspace-title"
-            tabIndex={-1}
-            onCancel={(event) => {
-                event.preventDefault();
-                cancel();
-            }}
-            onClick={(event) => dismissDialogOnBackdropClick(event, cancel)}
+        <ModalDialog
+            open={props.open}
+            class={styles.workspaceDialog}
+            testId="workspace-dialog"
+            labelledBy="open-workspace-title"
+            onCancel={cancel}
         >
             <div class={`${dialogStyles.iconRow} ${styles.iconRow}`}>
                 <FolderOpen class={dialogStyles.icon} aria-hidden="true" />
@@ -211,7 +200,7 @@ export function OpenWorkspaceDialog(props: OpenWorkspaceDialogProps): JSX.Elemen
                     {t("dialog.cancel")}
                 </button>
             </div>
-        </dialog>
+        </ModalDialog>
     );
 }
 

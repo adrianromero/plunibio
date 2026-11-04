@@ -36,12 +36,16 @@ import {
     saveTypography,
     type AppTypography,
 } from "@/preferences/TypographyPreferences";
+import { loadFolderSort, saveFolderSort, type FolderSort } from "@/preferences/FolderSortPreferences";
 import AppShortcuts, { type ShortcutDefinition } from "./AppShortcuts";
 
 export type SaveFileHandler = () => Promise<void>;
 export type ReloadFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
 export type NavigateFileHandler = () => Promise<void>;
+export type RenameEntryHandler = () => void | Promise<void>;
+export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
+export type CreateEntryHandler = (kind: CreateEntryKind) => void;
 export type ToggleSidebarHandler = () => void;
 export type ToggleThemeHandler = () => void;
 export type OnunloadHandler = () => Promise<void>;
@@ -55,6 +59,11 @@ export type AppContextValues = {
         filename: Accessor<string>;
         setFilename: Setter<string>;
         loadFilename: (filename: string) => Promise<void>;
+        loadFilenameAfterMutation: (filename: string) => Promise<void>;
+        renameEntry: Accessor<RenameEntryHandler | null>;
+        setRenameEntry: (handler: RenameEntryHandler | null) => void;
+        createEntry: Accessor<CreateEntryHandler | null>;
+        setCreateEntry: (handler: CreateEntryHandler | null) => void;
         navigateBack: Accessor<NavigateFileHandler | null>;
         setNavigateBack: (handler: NavigateFileHandler | null) => void;
         navigateForward: Accessor<NavigateFileHandler | null>;
@@ -82,6 +91,8 @@ export type AppContextValues = {
         setSearchFile: (handler: SearchFileHandler | null) => void;
         sidebarVisible: Accessor<boolean>;
         setSidebarVisible: Setter<boolean>;
+        folderSort: Accessor<FolderSort>;
+        setFolderSort: Setter<FolderSort>;
         showHiddenFiles: Accessor<boolean>;
         setShowHiddenFiles: Setter<boolean>;
         toggleSidebar: Accessor<ToggleSidebarHandler | null>;
@@ -129,7 +140,15 @@ export function AppProvider(props: {
     const [navigateBack, setNavigateBackSignal] = createSignal<NavigateFileHandler | null>(null);
     const [navigateForward, setNavigateForwardSignal] =
         createSignal<NavigateFileHandler | null>(null);
+    const [renameEntry, setRenameEntrySignal] = createSignal<RenameEntryHandler | null>(null);
+    const [createEntry, setCreateEntrySignal] = createSignal<CreateEntryHandler | null>(null);
     const [sidebarVisible, setSidebarVisibleSignal] = createSignal(loadSidebarVisible());
+    const [folderSort, setFolderSortSignal] = createSignal<FolderSort>(loadFolderSort());
+    const setFolderSort: Setter<FolderSort> = (value) => {
+        const next = setFolderSortSignal(value);
+        saveFolderSort(next);
+        return next;
+    };
     const [showHiddenFiles, setShowHiddenFilesSignal] = createSignal(loadShowHiddenFiles());
     const [toggleSidebar, setToggleSidebarSignal] = createSignal<ToggleSidebarHandler | null>(null);
     const initialTheme = loadTheme();
@@ -169,6 +188,12 @@ export function AppProvider(props: {
     };
     const setNavigateForward = (handler: NavigateFileHandler | null) => {
         setNavigateForwardSignal(() => handler);
+    };
+    const setRenameEntry = (handler: RenameEntryHandler | null) => {
+        setRenameEntrySignal(() => handler);
+    };
+    const setCreateEntry = (handler: CreateEntryHandler | null) => {
+        setCreateEntrySignal(() => handler);
     };
     const setToggleSidebar = (handler: ToggleSidebarHandler | null) => {
         setToggleSidebarSignal(() => handler);
@@ -217,6 +242,43 @@ export function AppProvider(props: {
         }
     };
     const shortcuts = [
+        {
+            id: "rename-entry",
+            key: "F2",
+            primary: false,
+            phase: "capture",
+            getHandler: renameEntry,
+        },
+        {
+            id: "new-directory",
+            key: "n",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("directory") : null;
+            },
+        },
+        {
+            id: "new-markdown",
+            key: "m",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("markdown") : null;
+            },
+        },
+        {
+            id: "new-text",
+            key: "t",
+            shift: true,
+            preventDefaultWhenUnavailable: false,
+            getHandler: () => {
+                const handler = createEntry();
+                return handler ? () => handler("text") : null;
+            },
+        },
         {
             id: "open-workspace",
             key: "o",
@@ -349,6 +411,15 @@ export function AppProvider(props: {
         }
     };
 
+    const commitFilename = async (nextFilename: string): Promise<void> => {
+        setFilename(nextFilename);
+        try {
+            await invoke("set_current_filename", { filename: nextFilename });
+        } catch (error: unknown) {
+            console.error("Unable to update the current filename:", error);
+        }
+    };
+
     const loadFilename = async (nextFilename: string): Promise<void> => {
         try {
             await onunload()?.();
@@ -365,12 +436,12 @@ export function AppProvider(props: {
             }
             setOnunload(null);
         }
-        setFilename(nextFilename);
-        try {
-            await invoke("set_current_filename", { filename: nextFilename });
-        } catch (error: unknown) {
-            console.error("Unable to update the current filename:", error);
-        }
+        await commitFilename(nextFilename);
+    };
+
+    const loadFilenameAfterMutation = async (nextFilename: string): Promise<void> => {
+        setOnunload(null);
+        await commitFilename(nextFilename);
     };
 
     let unlistenCloseRequested: (() => void) | undefined;
@@ -426,6 +497,11 @@ export function AppProvider(props: {
                     filename,
                     setFilename,
                     loadFilename,
+                    loadFilenameAfterMutation,
+                    renameEntry,
+                    setRenameEntry,
+                    createEntry,
+                    setCreateEntry,
                     navigateBack,
                     setNavigateBack,
                     navigateForward,
@@ -449,6 +525,8 @@ export function AppProvider(props: {
                     setSearchFile,
                     sidebarVisible,
                     setSidebarVisible,
+                    folderSort,
+                    setFolderSort,
                     showHiddenFiles,
                     setShowHiddenFiles,
                     toggleSidebar,

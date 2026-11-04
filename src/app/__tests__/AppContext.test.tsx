@@ -46,6 +46,7 @@ describe("AppProvider workspace changes", () => {
         dispose = undefined;
         document.body.replaceChildren();
         vi.mocked(invoke).mockReset();
+        window.localStorage.removeItem("plunibio.folderSort");
     });
 
     const pressShortcut = (key: string, code: string): KeyboardEvent => {
@@ -84,6 +85,18 @@ describe("AppProvider workspace changes", () => {
         return context;
     };
 
+    it("persists folder sorting and restores it when the app provider is recreated", () => {
+        window.localStorage.removeItem("plunibio.folderSort");
+        const context = renderProvider();
+        expect(context.editor.folderSort()).toEqual({ attribute: "name", direction: "asc" });
+        context.editor.setFolderSort({ attribute: "size", direction: "desc" });
+        expect(JSON.parse(window.localStorage.getItem("plunibio.folderSort") ?? "null"))
+            .toEqual({ attribute: "size", direction: "desc" });
+        dispose?.();
+        const restored = renderProvider();
+        expect(restored.editor.folderSort()).toEqual({ attribute: "size", direction: "desc" });
+    });
+
     it("routes navigation and sidebar shortcuts only to registered handlers", () => {
         const context = renderProvider();
         const navigateBack = vi.fn(() => Promise.resolve());
@@ -106,6 +119,57 @@ describe("AppProvider workspace changes", () => {
         pressShortcut("b", "KeyX");
         expect(navigateBack).toHaveBeenCalledOnce();
         expect(toggleSidebar).toHaveBeenCalledOnce();
+    });
+
+    it("routes F2 to the registered rename action without a primary modifier", () => {
+        const context = renderProvider();
+        const renameEntry = vi.fn();
+        context.main.setRenameEntry(renameEntry);
+
+        const event = new KeyboardEvent("keydown", {
+            key: "F2",
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(event);
+
+        expect(event.defaultPrevented).toBe(true);
+        expect(renameEntry).toHaveBeenCalledOnce();
+    });
+
+    it("routes Mod+Shift creation shortcuts to the active folder handler", () => {
+        const context = renderProvider();
+        const createEntry = vi.fn();
+        context.main.setCreateEntry(createEntry);
+
+        for (const key of ["n", "m", "t"]) {
+            document.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    bubbles: true,
+                    cancelable: true,
+                })
+            );
+        }
+
+        expect(createEntry.mock.calls).toEqual([
+            ["directory"],
+            ["markdown"],
+            ["text"],
+        ]);
+
+        context.main.setCreateEntry(null);
+        const unavailableEvent = new KeyboardEvent("keydown", {
+            key: "n",
+            ctrlKey: true,
+            shiftKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        document.dispatchEvent(unavailableEvent);
+        expect(unavailableEvent.defaultPrevented).toBe(false);
     });
 
     it("opens and closes the About dialog through the application context", () => {
@@ -211,5 +275,20 @@ describe("AppProvider workspace changes", () => {
         );
         expect(context?.main.filename()).toBe("");
         expect(calls).toEqual(["save", "backend"]);
+    });
+
+    it("navigates after a filesystem mutation without unloading the old filename", async () => {
+        const context = renderProvider();
+        const unload = vi.fn(async () => undefined);
+        context.main.setOnunload(unload);
+
+        await context.main.loadFilenameAfterMutation("renamed.md");
+
+        expect(unload).not.toHaveBeenCalled();
+        expect(context.main.onunload()).toBeNull();
+        expect(context.main.filename()).toBe("renamed.md");
+        expect(invoke).toHaveBeenCalledWith("set_current_filename", {
+            filename: "renamed.md",
+        });
     });
 });

@@ -114,10 +114,10 @@ export default function MarkdownLinkActions(props: MarkdownLinkActionsProps): JS
             key: link.element,
             kind: "link",
             activation: "hover",
-            href: () => href,
+            value: () => href,
             getAnchorRect: () => anchorRect(link.from, link.to),
             onNavigate: () => props.onNavigate(href),
-            onSaveHref: (nextHref) => {
+            onSaveValue: (nextHref) => {
                 const crepe = props.crepe();
                 if (!crepe) return false;
 
@@ -175,7 +175,10 @@ export default function MarkdownLinkActions(props: MarkdownLinkActionsProps): JS
     const handlePointerOver = (event: PointerEvent): void => {
         if (!(event.target instanceof Element)) return;
         const element = event.target.closest<HTMLAnchorElement>(".milkdown .editor a[href]");
-        if (element && props.editorRoot().contains(element)) showLink(element);
+        if (!element || !props.editorRoot().contains(element)) return;
+        const related = event.relatedTarget;
+        if (related instanceof Node && element.contains(related)) return;
+        showLink(element);
     };
 
     const handlePointerOut = (event: PointerEvent): void => {
@@ -203,10 +206,10 @@ export default function MarkdownLinkActions(props: MarkdownLinkActionsProps): JS
                 key: {},
                 kind: "link",
                 activation: "explicit",
-                href: () => "",
+                value: () => "",
                 getAnchorRect: () => anchorRect(from, to),
                 onNavigate: () => undefined,
-                onSaveHref: (href) => {
+                onSaveValue: (href) => {
                     createMarkdownLink(ctx, from, to, href);
                     return Boolean(href);
                 },

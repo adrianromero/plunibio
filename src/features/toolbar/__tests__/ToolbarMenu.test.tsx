@@ -6,7 +6,7 @@
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import ToolbarMenu from "../ToolbarMenu";
+import Menu from "@/shared/ui/menu/Menu";
 
 describe("ToolbarMenu", () => {
     let dispose: (() => void) | undefined;
@@ -17,6 +17,63 @@ describe("ToolbarMenu", () => {
         document.body.replaceChildren();
     });
 
+    it("supports a labelled trigger aligned to its start edge", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <Menu
+                    label="New"
+                    triggerText="New"
+                    triggerClass="custom-trigger"
+                    align="start"
+                    blocks={[]}
+                />
+            ),
+            root
+        );
+
+        expect(root.querySelector(".custom-trigger")?.textContent).toBe("New");
+        expect(root.querySelector('[role="menu"]')?.className).toContain("alignStart");
+    });
+
+    it("keeps an open menu positioned from the trigger while scrolling", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => <Menu label="New" align="start" blocks={[]} />,
+            root
+        );
+        const trigger = root.querySelector<HTMLButtonElement>('[data-testid="toolbar-menu-trigger"]')!;
+        const menu = root.querySelector<HTMLDivElement>('[role="menu"]')!;
+        let triggerTop = 20;
+        trigger.getBoundingClientRect = () =>
+            ({
+                top: triggerTop,
+                bottom: triggerTop + 30,
+                left: 24,
+                right: 80,
+                width: 56,
+                height: 30,
+                x: 24,
+                y: triggerTop,
+                toJSON: () => ({}),
+            }) as DOMRect;
+        Object.defineProperties(menu, {
+            offsetWidth: { configurable: true, value: 160 },
+            offsetHeight: { configurable: true, value: 100 },
+        });
+        const toggle = new Event("toggle");
+        Object.defineProperty(toggle, "newState", { value: "open" });
+        menu.dispatchEvent(toggle);
+        expect(menu.style.getPropertyValue("--toolbar-menu-top")).toBe("56px");
+
+        triggerTop = 0;
+        window.dispatchEvent(new Event("scroll"));
+        expect(menu.style.getPropertyValue("--toolbar-menu-top")).toBe("36px");
+        expect(menu.style.getPropertyValue("--toolbar-menu-left")).toBe("24px");
+    });
+
     it("runs an item action and closes the popover", () => {
         const root = document.createElement("div");
         document.body.append(root);
@@ -25,7 +82,7 @@ describe("ToolbarMenu", () => {
 
         dispose = render(
             () => (
-                <ToolbarMenu
+                <Menu
                     label="More options"
                     blocks={[
                         { kind: "action", id: "one", label: "One", onSelect },
@@ -51,7 +108,7 @@ describe("ToolbarMenu", () => {
 
         dispose = render(
             () => (
-                <ToolbarMenu
+                <Menu
                     label="More options"
                     blocks={[
                         {
@@ -127,7 +184,7 @@ describe("ToolbarMenu", () => {
 
         dispose = render(
             () => (
-                <ToolbarMenu
+                <Menu
                     label="More options"
                     blocks={[
                         {
@@ -159,7 +216,7 @@ describe("ToolbarMenu", () => {
 
         dispose = render(
             () => (
-                <ToolbarMenu
+                <Menu
                     label="More options"
                     blocks={[
                         {

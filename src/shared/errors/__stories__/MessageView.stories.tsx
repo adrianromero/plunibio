@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { ErrorView } from "../ErrorView";
+import { MessageView } from "../MessageView";
 
 const meta = {
-    title: "Components/ErrorView",
-    component: ErrorView,
+    title: "Components/MessageView",
+    component: MessageView,
     tags: ["autodocs"],
     argTypes: {
         info: {
@@ -14,7 +14,7 @@ const meta = {
     args: {
         children: "Mensaje de ejemplo",
     },
-} satisfies Meta<typeof ErrorView>;
+} satisfies Meta<typeof MessageView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -39,3 +39,4 @@ export const Error: Story = {
         children: "No se ha podido cargar el archivo.",
     },
 };
+

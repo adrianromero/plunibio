@@ -5,12 +5,18 @@
 
 .menu {
     position: fixed;
-    inset: var(--toolbar-menu-top, 4rem) var(--toolbar-menu-right, 1.5rem) auto auto;
+    inset: var(--toolbar-menu-top, 4rem) auto auto var(--toolbar-menu-left, 1.5rem);
     box-sizing: border-box;
     min-width: 16rem;
     margin: 0;
     padding: 0.3rem;
     color: var(--color-text);
+    font-family: var(--font-interface);
+    font-size: 0.8rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: normal;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-medium);
@@ -44,9 +50,12 @@
     justify-content: flex-start;
     padding: 0.5rem 0.65rem;
     color: inherit;
-    font: inherit;
+    font-family: var(--font-interface);
     font-size: 0.8rem;
+    font-style: normal;
+    font-weight: 400;
     line-height: 1.25;
+    letter-spacing: normal;
     text-align: left;
     background: transparent;
     border: 0;
@@ -151,17 +160,10 @@
 
 .menuItem:disabled .shortcut {
     color: var(--color-menu-disabled);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 @supports (top: anchor(bottom)) {
-    .menu {
-        position: absolute;
-        inset: auto;
-        top: calc(anchor(bottom) + 0.4rem);
-        right: anchor(right);
-    }
-
     .submenu {
         inset: auto;
         top: anchor(bottom);
@@ -176,6 +178,10 @@
         transform-origin: top right;
     }
 
+    .menu.alignStart:popover-open {
+        transform-origin: top left;
+    }
+
     .submenu:popover-open {
         transform-origin: top right;
     }
@@ -187,3 +193,4 @@
         transform: translateY(-0.2rem) scale(0.98);
     }
 }
+

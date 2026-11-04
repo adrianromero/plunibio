@@ -21,11 +21,11 @@ export const Link: Story = {
             <div class={styles.stage}>
                 <MarkdownFloatingActions
                     kind="link"
-                    href={href()}
+                    value={href()}
                     editing={editing()}
                     onEditingChange={setEditing}
                     onNavigate={() => undefined}
-                    onSaveHref={(value) => {
+                    onSaveValue={(value) => {
                         setHref(value);
                         return true;
                     }}
@@ -51,11 +51,11 @@ export const Image: Story = {
             <div class={styles.stage}>
                 <MarkdownFloatingActions
                     kind="image"
-                    href={href()}
+                    value={href()}
                     editing={editing()}
                     onEditingChange={setEditing}
                     onNavigate={() => undefined}
-                    onSaveHref={(value) => {
+                    onSaveValue={(value) => {
                         setHref(value);
                         return true;
                     }}
@@ -67,6 +67,27 @@ export const Image: Story = {
                             onClick: () => setCaptionVisible((visible) => !visible),
                         },
                     ]}
+                />
+            </div>
+        );
+    },
+};
+
+export const Math: Story = {
+    render: () => {
+        const [expression, setExpression] = createSignal("a^2 + b^2 = c^2");
+        const [editing, setEditing] = createSignal(false);
+        return (
+            <div class={styles.stage}>
+                <MarkdownFloatingActions
+                    kind="math"
+                    value={expression()}
+                    editing={editing()}
+                    onEditingChange={setEditing}
+                    onSaveValue={(value) => {
+                        setExpression(value);
+                        return true;
+                    }}
                 />
             </div>
         );

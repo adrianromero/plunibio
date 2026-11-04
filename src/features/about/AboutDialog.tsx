@@ -9,7 +9,7 @@ import ExternalLink from "lucide-solid/icons/external-link";
 import { createEffect, createSignal, JSX } from "solid-js";
 import appIcon from "../../../src-tauri/icons/128x128.png";
 import dialogStyles from "@/shared/ui/dialog/Dialog.module.css";
-import { dismissDialogOnBackdropClick } from "@/shared/ui/dialog/DialogDismiss";
+import ModalDialog from "@/shared/ui/dialog/ModalDialog";
 import { useI18N } from "@/i18n/Localization";
 import styles from "./AboutDialog.module.css";
 
@@ -25,9 +25,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
     const { t } = useI18N();
     const [appName, setAppName] = createSignal("Plunibio");
     const [appVersion, setAppVersion] = createSignal("…");
-    let dialogRef!: HTMLDialogElement;
     let closeButtonRef!: HTMLButtonElement;
-    let previouslyFocusedElement: HTMLElement | null = null;
     let metadataRequested = false;
     const close = (): void => props.onClose();
 
@@ -38,17 +36,6 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
     };
 
     createEffect(() => {
-        if (props.open && !dialogRef.open) {
-            previouslyFocusedElement = document.activeElement as HTMLElement | null;
-            dialogRef.showModal();
-            queueMicrotask(() => closeButtonRef.focus());
-        } else if (!props.open && dialogRef.open) {
-            dialogRef.close();
-            queueMicrotask(() => {
-                if (previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus();
-            });
-        }
-
         if (props.open && !metadataRequested) {
             metadataRequested = true;
             void Promise.all([getName(), getVersion()])
@@ -63,18 +50,14 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
     });
 
     return (
-        <dialog
-            ref={dialogRef}
-            class={`${dialogStyles.dialog} ${styles.aboutDialog}`}
-            data-testid="about-dialog"
-            aria-labelledby="about-dialog-title"
-            aria-describedby="about-dialog-details"
-            tabIndex={-1}
-            onCancel={(event) => {
-                event.preventDefault();
-                close();
-            }}
-            onClick={(event) => dismissDialogOnBackdropClick(event, close)}
+        <ModalDialog
+            open={props.open}
+            class={styles.aboutDialog}
+            testId="about-dialog"
+            labelledBy="about-dialog-title"
+            describedBy="about-dialog-details"
+            onCancel={close}
+            initialFocus={() => closeButtonRef}
         >
             <div class={styles.identity}>
                 <img class={styles.appIcon} src={appIcon} alt="" aria-hidden="true" />
@@ -118,7 +101,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
                     {t("dialog.close")}
                 </button>
             </div>
-        </dialog>
+        </ModalDialog>
     );
 }
 

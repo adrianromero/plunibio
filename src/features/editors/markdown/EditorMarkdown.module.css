@@ -53,6 +53,22 @@
     outline: none;
 }
 
+.editorMarkdown :global(.ProseMirror span[data-type="math_inline"]) {
+    user-select: none;
+}
+
+/* Crepe's generic selection color overrides ProseMirror's hidden DOM range
+ * for NodeSelection. Keep only the selected-node background visible. */
+.editorMarkdown :global(.ProseMirror.ProseMirror-hideselection *::selection) {
+    background: transparent;
+}
+
+/* Crepe's virtual cursor keeps its border when ProseMirror loses focus. */
+.editorMarkdown
+    :global(.ProseMirror:not(.ProseMirror-focused) .prosemirror-virtual-cursor) {
+    display: none;
+}
+
 @media (max-width: 650px) {
     .studio {
         flex-direction: column;

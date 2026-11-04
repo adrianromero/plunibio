@@ -146,6 +146,25 @@ describe("EditorMarkdown", () => {
         });
     });
 
+    it("focuses the editor after loading the file", async () => {
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        await vi.waitFor(() => {
+            expect(document.activeElement).toBe(root?.querySelector(".ProseMirror"));
+        });
+    });
+
     it("imports an image exposed by the clipboard as a local file URI", async () => {
         markdownContent = "Start";
         root = document.createElement("div");
@@ -613,6 +632,12 @@ describe("EditorMarkdown", () => {
             expect(element).not.toBeNull();
             return element!;
         });
+        expect(actions.querySelector('button:not([aria-label])')?.hasAttribute("title")).toBe(
+            false
+        );
+        expect(actions.querySelector('button[aria-label="Edit link"]')?.getAttribute("title")).toBe(
+            "Edit link"
+        );
         activateButton(actions.querySelector<HTMLButtonElement>('button[aria-label="Edit link"]')!);
         const input = actions.querySelector<HTMLInputElement>('input[aria-label="Link address"]');
         expect(input).not.toBeNull();
@@ -679,7 +704,9 @@ describe("EditorMarkdown", () => {
             const nextActions = root?.querySelector<HTMLFormElement>(
                 'form[aria-label="Link actions"]'
             );
-            expect(nextActions?.querySelector('button[title="./other.md"]')).not.toBeNull();
+            expect(nextActions?.querySelector('button:not([aria-label])')?.textContent).toBe(
+                "./other.md"
+            );
             expect(nextActions?.closest("[hidden]")).toBeNull();
         });
     });
@@ -766,7 +793,11 @@ describe("EditorMarkdown", () => {
 
         firstLink.dispatchEvent(new PointerEvent("pointerover", { bubbles: true }));
         await vi.waitFor(() => {
-            expect(root?.querySelector('form[aria-label="Link actions"] button[title="./old.md"]')).not.toBeNull();
+            expect(
+                root?.querySelector(
+                    'form[aria-label="Link actions"] button:not([aria-label])'
+                )?.textContent
+            ).toBe("./old.md");
         });
 
         firstLink.dispatchEvent(
@@ -777,8 +808,10 @@ describe("EditorMarkdown", () => {
         );
         await vi.waitFor(() => {
             expect(
-                root?.querySelector('form[aria-label="Link actions"] button[title="./other.md"]')
-            ).not.toBeNull();
+                root?.querySelector(
+                    'form[aria-label="Link actions"] button:not([aria-label])'
+                )?.textContent
+            ).toBe("./other.md");
         });
 
         document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
@@ -857,6 +890,9 @@ describe("EditorMarkdown", () => {
                 'form[aria-label="Image actions"]'
             );
             expect(actions).not.toBeNull();
+            expect(
+                actions?.querySelector('button:not([aria-label])')?.hasAttribute("title")
+            ).toBe(false);
             expect(actions?.closest("[hidden]")).toBeNull();
         });
     });
@@ -928,6 +964,62 @@ describe("EditorMarkdown", () => {
         });
     });
 
+    it("updates the floating icon when moving quickly between a link and math", async () => {
+        markdownContent = "[Open](./old.md) and $a^2$";
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const link = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLAnchorElement>(
+                '.ProseMirror a[href="./old.md"]'
+            );
+            expect(element).not.toBeNull();
+            return element!;
+        });
+        const math = root.querySelector<HTMLElement>('span[data-type="math_inline"]')!;
+
+        link.dispatchEvent(new PointerEvent("pointerover", { bubbles: true }));
+        link.dispatchEvent(
+            new PointerEvent("pointerout", { bubbles: true, relatedTarget: math })
+        );
+        math.dispatchEvent(
+            new PointerEvent("pointerover", { bubbles: true, relatedTarget: link })
+        );
+
+        await vi.waitFor(() => {
+            const actions = root?.querySelector<HTMLFormElement>(
+                'form[aria-label="Inline math actions"]'
+            );
+            expect(actions?.querySelector("svg.lucide-sigma")).not.toBeNull();
+            expect(actions?.querySelector("svg.lucide-link")).toBeNull();
+        });
+
+        math.dispatchEvent(
+            new PointerEvent("pointerout", { bubbles: true, relatedTarget: link })
+        );
+        link.dispatchEvent(
+            new PointerEvent("pointerover", { bubbles: true, relatedTarget: math })
+        );
+
+        await vi.waitFor(() => {
+            const actions = root?.querySelector<HTMLFormElement>(
+                'form[aria-label="Link actions"]'
+            );
+            expect(actions?.querySelector("svg.lucide-link")).not.toBeNull();
+            expect(actions?.querySelector("svg.lucide-sigma")).toBeNull();
+        });
+    });
+
     it("edits, cancels and toggles the caption from the image actions", async () => {
         root = document.createElement("div");
         document.body.append(root);
@@ -968,7 +1060,9 @@ describe("EditorMarkdown", () => {
         input.dispatchEvent(new InputEvent("input", { bubbles: true }));
         activateButton(actions.querySelector<HTMLButtonElement>('button[aria-label="Cancel"]')!);
         expect(actions.querySelector('input[aria-label="Link address"]')).toBeNull();
-        expect(actions.querySelector('button[title="./plunibio-logo.png"]')).not.toBeNull();
+        expect(actions.querySelector('button:not([aria-label])')?.textContent).toBe(
+            "./plunibio-logo.png"
+        );
 
         activateButton(actions.querySelector<HTMLButtonElement>('button[aria-label="Edit link"]')!);
         input = actions.querySelector<HTMLInputElement>('input[aria-label="Link address"]')!;
@@ -978,8 +1072,22 @@ describe("EditorMarkdown", () => {
 
         actions = await hoverImage();
         await vi.waitFor(() => {
-            expect(actions.querySelector('button[title="./updated-logo.png"]')).not.toBeNull();
+            expect(actions.querySelector('button:not([aria-label])')?.textContent).toBe(
+                "./updated-logo.png"
+            );
         });
+        const scrollContainer = root.querySelector<HTMLElement>(".scrollingView")!;
+        const nativeCaptionButton = root.querySelector<HTMLElement>(
+            ".milkdown-image-block > .image-wrapper > .operation > .operation-item"
+        )!;
+        scrollContainer.scrollTop = 420;
+        nativeCaptionButton.addEventListener(
+            "pointerdown",
+            () => {
+                scrollContainer.scrollTop = 0;
+            },
+            { once: true }
+        );
         activateButton(
             actions.querySelector<HTMLButtonElement>(
                 'button[aria-label="Show or hide image caption"]'
@@ -987,6 +1095,7 @@ describe("EditorMarkdown", () => {
         );
         await vi.waitFor(() => {
             expect(root?.querySelector(".milkdown-image-block .caption-input")).not.toBeNull();
+            expect(scrollContainer.scrollTop).toBe(420);
         });
     });
 

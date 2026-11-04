@@ -543,6 +543,29 @@ body {
     font-weight: 600;
 }
 
+.stdButton.toolbar.sidebarAction {
+    justify-content: flex-start;
+    text-align: start;
+}
+
+.sidebarAction > .lucide {
+    flex-shrink: 0;
+}
+
+.sidebarActionLabel {
+    flex: 1;
+    min-width: 0;
+    text-align: start;
+}
+
+.sidebarActionShortcut {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    color: var(--color-text-subtle);
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
 .sidebarButtonGrid {
     display: grid;
     gap: 0.5rem;
@@ -577,7 +600,7 @@ body {
     background-color: var(--color-view-background);
 }
 
-.scrollingView.errorView {
+.scrollingView.messageView {
     display: none;
 }
 
