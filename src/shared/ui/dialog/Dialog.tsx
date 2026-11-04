@@ -58,7 +58,7 @@ export function Dialog(props: DialogProps): JSX.Element {
                     </button>
                 ) : null}
                 {props.cancelLabel ? (
-                    <button class="stdButton" type="button" onClick={cancel}>
+                    <button class="stdButton" type="button" autofocus onClick={cancel}>
                         {props.cancelLabel}
                     </button>
                 ) : null}
