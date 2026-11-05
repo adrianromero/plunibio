@@ -142,7 +142,8 @@ body.image-viewer-open { overflow: hidden; }
 .docs-hero h1 { overflow-wrap: anywhere; }
 .page-docs :is(a, button, summary, [tabindex="0"]):focus-visible { outline-color: var(--green-dark); }
 .page-docs .skip-link:focus-visible { outline-color: var(--paper); }
-.docs-content table { display: block; width: 100%; margin: 30px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; border-spacing: 0; background: rgba(255,255,255,.4); font-size: 14px; }
+.docs-table-scroll { margin: 30px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.4); }
+.docs-content table { width: 100%; border-spacing: 0; font-size: 14px; }
 .docs-content caption { padding: 0 0 10px; color: var(--muted); font-size: 13px; text-align: left; }
 .docs-content th,
 .docs-content td { min-width: 130px; padding: 11px 14px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
@@ -158,7 +159,7 @@ body.image-viewer-open { overflow: hidden; }
 .docs-callout-tip .docs-callout-title { color: #765c12; }
 .docs-callout-content > :first-child { margin-top: 0; }
 .docs-callout-content > :last-child { margin-bottom: 0; }
-.docs-content .docs-figure { margin: 36px 0; }
+.docs-content .docs-figure { margin: 36px auto; }
 .docs-figure img { display: block; width: 100%; height: auto; border: 1px solid #bfc9c2; border-radius: 12px; background: var(--paper); box-shadow: 0 16px 42px rgba(40,64,52,.12); }
 .docs-figure figcaption { max-width: 760px; margin: 10px 4px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .docs-content .docs-steps { margin: 28px 0; padding-left: 0; counter-reset: docs-step; list-style: none; }
