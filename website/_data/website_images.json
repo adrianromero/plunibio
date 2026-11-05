@@ -1,0 +1,146 @@
+{
+  "plunibio-editor-en.webp": {
+    "flow": "automation/flows/website-en-markdown.json",
+    "captureStep": 9,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 254766
+  },
+  "plunibio-editor-es.webp": {
+    "flow": "automation/flows/website-es-markdown.json",
+    "captureStep": 9,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 255056
+  },
+  "plunibio-features-folders-en.webp": {
+    "flow": "automation/flows/website-en-files.json",
+    "captureStep": 4,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 7704
+  },
+  "plunibio-features-folders-es.webp": {
+    "flow": "automation/flows/website-es-files.json",
+    "captureStep": 4,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 7652
+  },
+  "plunibio-features-image-adjust-en.webp": {
+    "flow": "automation/flows/website-en-files.json",
+    "captureStep": 31,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 335124
+  },
+  "plunibio-features-image-adjust-es.webp": {
+    "flow": "automation/flows/website-es-files.json",
+    "captureStep": 31,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 335994
+  },
+  "plunibio-features-image-transform-en.webp": {
+    "flow": "automation/flows/website-en-files.json",
+    "captureStep": 25,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 322558
+  },
+  "plunibio-features-image-transform-es.webp": {
+    "flow": "automation/flows/website-es-files.json",
+    "captureStep": 25,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 324590
+  },
+  "plunibio-features-markdown-blocks-en.webp": {
+    "flow": "automation/flows/website-en-markdown.json",
+    "captureStep": 33,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 32864
+  },
+  "plunibio-features-markdown-blocks-es.webp": {
+    "flow": "automation/flows/website-es-markdown.json",
+    "captureStep": 33,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 30964
+  },
+  "plunibio-features-markdown-format-en.webp": {
+    "flow": "automation/flows/website-en-markdown.json",
+    "captureStep": 6,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 39162
+  },
+  "plunibio-features-markdown-format-es.webp": {
+    "flow": "automation/flows/website-es-markdown.json",
+    "captureStep": 6,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 41096
+  },
+  "plunibio-features-menu-theme-en.webp": {
+    "flow": "automation/flows/website-en-markdown.json",
+    "captureStep": 17,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 257206
+  },
+  "plunibio-features-menu-theme-es.webp": {
+    "flow": "automation/flows/website-es-markdown.json",
+    "captureStep": 17,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 256448
+  },
+  "plunibio-features-menu-typography-en.webp": {
+    "flow": "automation/flows/website-en-markdown.json",
+    "captureStep": 27,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 252784
+  },
+  "plunibio-features-menu-typography-es.webp": {
+    "flow": "automation/flows/website-es-markdown.json",
+    "captureStep": 27,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 251914
+  },
+  "plunibio-features-text-search-en.webp": {
+    "flow": "automation/flows/website-en-files.json",
+    "captureStep": 15,
+    "language": "en",
+    "width": 1024,
+    "height": 768,
+    "bytes": 28180
+  },
+  "plunibio-features-text-search-es.webp": {
+    "flow": "automation/flows/website-es-files.json",
+    "captureStep": 15,
+    "language": "es",
+    "width": 1024,
+    "height": 768,
+    "bytes": 29958
+  }
+}

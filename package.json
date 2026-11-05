@@ -18,6 +18,8 @@
         "docs:images:optimize": "node scripts/optimize-doc-images.mjs",
         "docs:images:manifest": "node scripts/generate-doc-image-manifest.mjs",
         "docs:images:regression": "node scripts/verify-doc-capture-flows.mjs",
+        "website:images:refresh": "node scripts/refresh-website-images.mjs",
+        "website:images:regression": "node scripts/refresh-website-images.mjs --verify-only",
         "check": "tsc --noEmit && tsc --noEmit -p .storybook/tsconfig.json",
         "serve": "vite preview",
         "test": "vitest run",

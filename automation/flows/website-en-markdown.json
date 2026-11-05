@@ -1,0 +1,255 @@
+{
+  "name": "Website EN: Markdown, landing and customization",
+  "app": {
+    "basePath": "examples/atlas-de-lumina",
+    "workspaceMode": "temporary-copy",
+    "fixtureTimestamp": "2026-10-01T12:00:00Z",
+    "width": 1024,
+    "height": 768,
+    "preferences": {
+      "locale": "en",
+      "theme": "light",
+      "typography": "serif",
+      "sidebarVisible": true,
+      "showHiddenFiles": false,
+      "folderSort": {
+        "attribute": "name",
+        "direction": "asc"
+      }
+    },
+    "file": "README.en.md"
+  },
+  "outputDir": "/tmp/plunibio-website-captures/en",
+  "settleMs": 600,
+  "steps": [
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "html[lang='en'][data-theme='light']"
+      },
+      "state": "existing"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "markdown-editor"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='markdown-editor'] h1"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "click",
+      "target": { "using": "aria", "value": "Properties" }
+    },
+    {
+      "action": "wait",
+      "target": { "using": "testId", "value": "frontmatter-panel" },
+      "state": "hidden"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-markdown-format-en"
+    },
+    {
+      "action": "scrollIntoView",
+      "target": {
+        "using": "xpath",
+        "value": "//*[@data-testid='markdown-editor']//h2[normalize-space()='The city at a glance']"
+      },
+      "block": "start"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='markdown-editor'] img"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-editor-en"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-toolbar-menu-entry='theme']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='dark']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "html[data-theme='dark']"
+      },
+      "state": "existing"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-toolbar-menu-entry='theme']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='dark'][aria-checked='true']"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-menu-theme-en"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='light']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "html[data-theme='light']"
+      },
+      "state": "existing"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-toolbar-menu-entry='typography']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='modern']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "html[data-typography='modern']"
+      },
+      "state": "existing"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-toolbar-menu-entry='typography']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='reading']"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-menu-typography-en"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-choice-option='serif']"
+      }
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "testId",
+        "value": "sidebar-toggle"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "app-sidebar"
+      },
+      "state": "hidden"
+    },
+    {
+      "action": "scrollIntoView",
+      "target": {
+        "using": "xpath",
+        "value": "//*[@data-testid='markdown-editor']//h2[normalize-space()='A route through the lights']"
+      },
+      "block": "start"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='markdown-editor'] .milkdown-code-block .preview svg"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-markdown-blocks-en"
+    }
+  ]
+}

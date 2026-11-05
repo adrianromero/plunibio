@@ -1,3 +1,4 @@
+{% assign feature_capture = site.data.website_images[include.image] %}
 <figure class="feature-shot">
   <button
     class="feature-shot-button"
@@ -7,8 +8,8 @@
   >
     <img
       src="{{ '/assets/images/' | append: include.image | relative_url }}"
-      width="1024"
-      height="768"
+      width="{{ feature_capture.width }}"
+      height="{{ feature_capture.height }}"
       alt="{{ include.alt }}"
       loading="lazy"
     >

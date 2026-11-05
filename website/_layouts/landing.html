@@ -15,11 +15,13 @@ layout: default
       <p class="hero-note"><span aria-hidden="true">●</span> {{ page.hero_note }}</p>
     </div>
     <div class="editor-showcase">
+      {% assign hero_image = 'plunibio-editor-' | append: page.lang | append: '.webp' %}
+      {% assign hero_capture = site.data.website_images[hero_image] %}
       <img
         class="editor-screenshot"
         src="{{ '/assets/images/plunibio-editor-' | append: page.lang | append: '.webp' | relative_url }}"
-        width="1024"
-        height="768"
+        width="{{ hero_capture.width }}"
+        height="{{ hero_capture.height }}"
         alt="{{ page.demo_label }}"
         fetchpriority="high"
       >
