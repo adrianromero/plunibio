@@ -13,7 +13,7 @@ layout: default
 <div class="docs-layout shell">
   {% include docs-sidebar.html %}
   <article class="docs-content prose">
-    {{ content }}
+    {{ content | replace: '<table', '<table tabindex="0"' | replace: '<pre', '<pre tabindex="0"' }}
     {% include docs-pagination.html %}
   </article>
 </div>

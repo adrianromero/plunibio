@@ -188,7 +188,7 @@ When you leave a modified file—by opening another item, switching workspaces, 
 If the attempt fails, Plunibio displays the error and lets you decide:
 
 - Select **Cancel** to stay in the file and resolve the problem without leaving your changes.
-- Select **Continue** while navigating, or **Quit anyway** while closing, only if you accept the risk of losing the pending content.
+- Select **Continue**, both when navigating and when closing, only if you accept the risk of losing the pending content.
 
 {% capture save_warning %}
 Continuing after a save error can result in data loss. Check permissions, available disk space, and whether the file is still accessible; then use **Save** again.
@@ -229,6 +229,6 @@ See [Command line]({{ '/en/docs/command-line/' | relative_url }}) for the parame
 
 ## Keep paths inside the workspace
 
-The file list, file path, and relative links opened by Plunibio resolve inside the workspace root. A path that attempts to escape it with `..` is rejected. Web links, `mailto:` links, and external files inserted as URIs are handed to the system's default application instead of becoming internal paths.
+The file list, file path, and relative links opened by Plunibio resolve inside the workspace root. A path that attempts to escape it with `..` is rejected. Web and `mailto:` links are handed to the system's default application. A `file:` URI for an external file can be kept in the document, but Plunibio rejects opening it from the editor.
 
 This boundary prevents relative navigation from silently switching to another folder tree. [Links and images]({{ '/en/docs/links-and-images/' | relative_url }}) explains how links behave inside and outside the workspace.

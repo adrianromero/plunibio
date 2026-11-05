@@ -188,7 +188,7 @@ Cuando sales de un archivo modificado —al abrir otro elemento, cambiar de espa
 Si el intento falla, Plunibio muestra el error y te permite decidir:
 
 - Selecciona **Cancelar** para permanecer en el archivo y resolver el problema sin abandonar los cambios.
-- Selecciona **Continuar** al navegar, o **Salir de todos modos** al cerrar, únicamente si aceptas el riesgo de perder el contenido pendiente.
+- Selecciona **Continuar**, tanto al navegar como al cerrar, únicamente si aceptas el riesgo de perder el contenido pendiente.
 
 {% capture save_warning %}
 Continuar después de un error de guardado puede perder datos. Comprueba permisos, espacio disponible y que el archivo siga accesible; después utiliza **Guardar** de nuevo.
@@ -229,6 +229,6 @@ Consulta [Línea de comandos]({{ '/es/docs/linea-de-comandos/' | relative_url }}
 
 ## Mantener las rutas dentro del espacio
 
-La lista de archivos, la ruta y los enlaces relativos que abre Plunibio se resuelven dentro de la raíz del espacio. Una ruta que intente escapar mediante `..` se rechaza. Los enlaces web, `mailto:` y los archivos externos insertados como URI se entregan a la aplicación predeterminada del sistema en lugar de convertirse en rutas internas.
+La lista de archivos, la ruta y los enlaces relativos que abre Plunibio se resuelven dentro de la raíz del espacio. Una ruta que intente escapar mediante `..` se rechaza. Los enlaces web y `mailto:` se entregan a la aplicación predeterminada del sistema. Una URI `file:` de un archivo externo puede conservarse en el documento, pero Plunibio rechaza su apertura desde el editor.
 
 Este límite evita que una navegación relativa cambie silenciosamente a otro árbol de carpetas. [Enlaces e imágenes]({{ '/es/docs/enlaces-e-imagenes/' | relative_url }}) explica cómo se comportan los enlaces dentro y fuera del espacio.

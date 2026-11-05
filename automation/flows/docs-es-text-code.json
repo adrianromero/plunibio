@@ -1,0 +1,617 @@
+{
+    "name": "Docs ES: text and code editing",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "code/example.js",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "sidebarVisible": false,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "outputDir": "website/assets/images/docs/es/edit-text-code",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='es']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "state": "visible",
+            "text": "districtLabel"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "javascript-editor"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".cm-foldGutter span[title='Fold line']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".cm-foldPlaceholder"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-editor"
+            },
+            "name": "folded-function"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".cm-foldPlaceholder"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".cm-foldPlaceholder"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "const districtName = \"Harbour\";\ndistrictN\n\n\n\n",
+            "replace": true
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowDown",
+                "End"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                " "
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".cm-tooltip-autocomplete"
+            },
+            "state": "visible",
+            "text": "districtName"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "name": "javascript-completion",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-editor"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',@class,' '),' cm-line ') and string(.)='districtName']"
+            }
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "const district = \"Harbour\";\nconst primary = district;\nconst secondary = district;",
+            "replace": true
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight",
+                "ArrowRight",
+                "ArrowRight",
+                "ArrowRight",
+                "ArrowRight",
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "d"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "d"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "d"
+            ]
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "name": "multiple-selection",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-editor"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "area"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=3 and string(div[1])='const area = \"Harbour\";' and string(div[2])='const primary = area;' and string(div[3])='const secondary = area;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "z"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=3 and string(div[1])='const district = \"Harbour\";' and string(div[2])='const primary = district;' and string(div[3])='const secondary = district;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "y"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=3 and string(div[1])='const area = \"Harbour\";' and string(div[2])='const primary = area;' and string(div[3])='const secondary = area;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "state": "visible",
+            "text": "const area"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=3 and string(div[1])='const area = \"Harbour\";' and string(div[2])='const primary = area;' and string(div[3])='const secondary = area;']"
+            }
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "const first = 1;\nconst second = 2;",
+            "replace": true
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Escape"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Alt",
+                "ArrowDown"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',normalize-space(@class),' '),' cm-line ') and string(.)=\"const second = 2;\"]"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=2 and string(div[1])='const second = 2;' and string(div[2])='const first = 1;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Alt",
+                "ArrowUp"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "End"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Alt",
+                "ArrowUp"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=2 and string(div[1])='const first = 1;' and string(div[2])='const second = 2;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Shift",
+                "Alt",
+                "ArrowDown"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "c"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='text-editor']//div[contains(concat(' ',@class,' '),' cm-content ') and count(div)=3 and string(div[1])='const first = 1;' and string(div[2])='const first = 1;' and string(div[3])='const second = 2;']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Home"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "/"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',normalize-space(@class),' '),' cm-line ') and string(.)=\"// const first = 1;\"]"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "/"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',normalize-space(@class),' '),' cm-line ') and string(.)=\"const first = 1;\"]"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "]"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',normalize-space(@class),' '),' cm-line ') and string(.)=\"  const first = 1;\"]"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        }
+    ]
+}

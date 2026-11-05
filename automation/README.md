@@ -203,6 +203,62 @@ npm run automation:test
 
 ## Optimize documentation captures
 
+`docs-{es,en}-help-recovery.json` modifies a disposable BMP, attempts to navigate away, and
+captures the save-failure dialog. It verifies Continue/Cancel labels, cancels to keep the edit,
+then discards through Reload and navigates successfully. Closing uses the same Continue label
+in the current AppContext source; the flow does not close the application window.
+
+`verify-docs-{es,en}-cli-new-file.json` starts with a missing Markdown filename passed through
+the real application arguments. Leaving it empty does not create a folder entry; returning and
+using Save creates it, and Reload reads it back without an unsaved indicator. These flows use
+temporary copies and create no captures. CLI syntax/error checks are recorded separately in
+`private/scripts/verify-documentation-cli.mjs`; every case exits before GUI startup.
+
+`docs-{es,en}-preferences.json` captures the general menu, all four typography choices, language
+choices, Reading typography, the dark theme, and hidden files before/after. It checks persisted
+theme, language, typography, and hidden-file visibility through frontend refreshes.
+`verify-docs-{es,en}-preferences.json` additionally selects typography from text and folder views,
+checks sidebar visibility after refresh, switches through all five languages, and checks that
+descending Modified sorting survives refresh and navigation to another folder. It creates no captures.
+These checks exercise local preference restoration; they are not a full process-restart test on
+each desktop platform.
+
+`verify-docs-{es,en}-image-behavior.json` checks view-only zoom, free rotation, reset scopes,
+all preset settings across the capture and verification flows, discarding changes, and PNG persistence.
+It writes two temporary canvas captures under `/tmp/plunibio-doc-images-{es,en}-check`.
+Compare `before-save.png` with `after-reload.png` using ImageMagick's `compare -metric AE`;
+the expected result is zero different pixels even though inversion returns to 0% after reloading.
+These are verification artifacts, not published figures. With `--verify-only`, capture checkpoints
+only validate visible positive dimensions as in the rest of the regression suite.
+The unsupported-image-save capture flows also discard the failed BMP edit through Reload.
+
+`docs-{es,en}-text-code.json` checks JavaScript folding through the gutter and ellipsis,
+completion acceptance, editing three selected occurrences, undo/redo, save/reload, line movement,
+duplication, comments, and indentation. Exact DOM line assertions compare both content and order;
+copy shortcuts in the flow do not constitute native clipboard verification. Completion captures
+leave blank space below the insertion point so the suggestion list is not clipped by its container.
+`docs-{es,en}-text-code-mermaid.json` captures saved and reloaded standalone Mermaid source.
+`verify-docs-{es,en}-text-code-input.json` checks bracket pairs, Tab leaving text unchanged, YAML without
+completion proposals, and the default-application option for unrecognized extensions without launching it.
+
+`verify-docs-{es,en}-search-behavior.json` checks individual replacement, an empty replacement,
+clearing the query, metadata/link-address exclusion, code-block inclusion, and hiding/reopening
+Search. Clear an input with Ctrl+A followed by Backspace; passing an empty string to `type` does
+not reliably delete the previous value. These flows create no captures.
+
+The advanced-content chapter uses `docs-*-markdown-table`, `docs-*-markdown-code-mermaid-math`,
+and `docs-*-markdown-inline-math` capture flows. `verify-docs-*-advanced-table` checks creation
+of a 3×3 table and persistent row/column deletion. The code flow also checks Mermaid error
+recovery and math-block edits after saving and reloading; inline math copying is checked against
+the native clipboard. Table drag reordering remains outside the documented contract.
+
+`docs-{es,en}-markdown-links-create.json` verifies link creation, native clipboard copying, editing,
+removal, image insertion by relative path, caption persistence, resize persistence, and rejection of
+external `file:` links. `domPointerDrag` dispatches pointerdown/move/up to the existing resize
+handler when WebKitGTK cannot expose the hover-only handle through native pointer movement.
+It requires a target with nonzero dimensions and does not alter the document directly; record this
+as handler-level verification rather than a physical desktop drag.
+
 Documentation flows always produce PNG source captures. After regenerating the complete selected
 batch, convert them to the single publishable WebP copy with:
 

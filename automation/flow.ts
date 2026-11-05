@@ -48,6 +48,7 @@ function validateTargetFields(step: Record<string, unknown>, index: number): voi
         "pointerOver",
         "pointerMove",
         "pointerDrag",
+        "domPointerDrag",
         "setRange",
         "clear",
         "caret",
@@ -84,6 +85,7 @@ function parseSteps(value: unknown): FlowStep[] {
         "pointerOver",
         "pointerMove",
         "pointerDrag",
+        "domPointerDrag",
         "setRange",
         "clear",
         "caret",
@@ -126,7 +128,7 @@ function parseSteps(value: unknown): FlowStep[] {
                 }
             }
         }
-        if (action === "pointerDrag") {
+        if (action === "pointerDrag" || action === "domPointerDrag") {
             for (const key of ["x", "y"] as const) {
                 if (typeof step[key] !== "number" || !Number.isFinite(step[key])) {
                     throw new Error(`steps[${index}].${key} must be a number`);

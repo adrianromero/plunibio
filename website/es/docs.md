@@ -40,6 +40,6 @@ Consulta [Espacios y archivos]({{ '/es/docs/espacios-y-archivos/' | relative_url
 Cuando una diferencia entre Windows, Linux y macOS afecta a un procedimiento, se explica junto al paso correspondiente.
 
 {% capture alpha_notice %}
-Este manual se está actualizando para el próximo lanzamiento de Plunibio. El **número definitivo de versión está pendiente de confirmar**. Última revisión: **4 de noviembre de 2026**. Plunibio está en fase alpha. Puedes comunicar un problema mediante [GitHub Issues]({{ site.github_url }}/issues).
+Este manual se está actualizando para el próximo lanzamiento de Plunibio. El **número definitivo de versión está pendiente de confirmar**. Última revisión: **5 de noviembre de 2026**. Plunibio está en fase alpha. Puedes comunicar un problema mediante [GitHub Issues]({{ site.github_url }}/issues).
 {% endcapture %}
 {% include docs-callout.html type="warning" title="Versión y estado del producto" content=alpha_notice %}

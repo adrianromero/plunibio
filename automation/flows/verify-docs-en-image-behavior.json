@@ -1,0 +1,696 @@
+{
+    "name": "Docs EN: image reset and persistence contract",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "images/editor/image-lab.png",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "outputDir": "/tmp/plunibio-doc-images-en-check",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas'][width='1200'][height='500']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='actual-size']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='zoom']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='zoom-out']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='zoom']"
+            },
+            "state": "visible",
+            "text": "83%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='zoom-in']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='zoom']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='zoom'] input"
+            },
+            "value": 250
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='zoom']"
+            },
+            "state": "visible",
+            "text": "250%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='fit']"
+            }
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation'] input"
+            },
+            "value": 30
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation']"
+            },
+            "state": "visible",
+            "text": "30°"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='flip-vertical']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness'] input"
+            },
+            "value": 80
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='grayscale'] input"
+            },
+            "value": 50
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='sepia'] input"
+            },
+            "value": 40
+        },
+        {
+            "action": "setRange",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='invert'] input"
+            },
+            "value": 20
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='reset-filters']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='grayscale']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='sepia']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='invert']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='transform']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation']"
+            },
+            "state": "visible",
+            "text": "30°"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='presets']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-preset'][data-preset='vintage']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='transform']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation']"
+            },
+            "state": "visible",
+            "text": "0°"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas'][width='1200'][height='500']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='sepia']"
+            },
+            "state": "visible",
+            "text": "70%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "90%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='contrast']"
+            },
+            "state": "visible",
+            "text": "90%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='transform']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='rotate-left']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation']"
+            },
+            "state": "visible",
+            "text": "-90°"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-action'][data-action='reset-transform']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='rotation']"
+            },
+            "state": "visible",
+            "text": "0°"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='sepia']"
+            },
+            "state": "visible",
+            "text": "70%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "90%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='presets']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-preset'][data-preset='monochrome']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='grayscale']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='contrast']"
+            },
+            "state": "visible",
+            "text": "120%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='presets']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-preset'][data-preset='dramatic']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='contrast']"
+            },
+            "state": "visible",
+            "text": "150%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "85%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='saturation']"
+            },
+            "state": "visible",
+            "text": "80%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='presets']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-preset'][data-preset='normal']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='contrast']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='saturation']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='grayscale']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='sepia']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='invert']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas'][width='1200'][height='500']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='brightness']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='presets']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-preset'][data-preset='negative']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='invert']"
+            },
+            "state": "visible",
+            "text": "100%"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas']"
+            },
+            "name": "before-save"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas'][width='1200'][height='500']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='control'][data-control-id='invert']"
+            },
+            "state": "visible",
+            "text": "0%"
+        },
+        {
+            "action": "capture",
+            "scope": "element",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='image-canvas']"
+            },
+            "name": "after-reload"
+        }
+    ]
+}

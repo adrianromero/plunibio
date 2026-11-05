@@ -9,11 +9,11 @@
       "capture": "dark-theme",
       "path": "/assets/images/docs/en/customize/dark-theme.webp",
       "flow": "automation/flows/docs-en-preferences.json",
-      "step": 32,
+      "step": 37,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 63436,
+      "width": 1024,
+      "height": 768,
+      "bytes": 34392,
       "alt": "Markdown editor and formatting controls displayed with the dark theme."
     },
     {
@@ -23,11 +23,11 @@
       "capture": "hidden-files-after",
       "path": "/assets/images/docs/en/customize/hidden-files-after.webp",
       "flow": "automation/flows/docs-en-preferences.json",
-      "step": 64,
+      "step": 69,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 12306,
+      "width": 1024,
+      "height": 768,
+      "bytes": 17764,
       "alt": "Workspace root showing the dot-prefixed hidden folder and hidden Markdown file."
     },
     {
@@ -37,11 +37,11 @@
       "capture": "hidden-files-before",
       "path": "/assets/images/docs/en/customize/hidden-files-before.webp",
       "flow": "automation/flows/docs-en-preferences.json",
-      "step": 58,
+      "step": 63,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 9790,
+      "width": 1024,
+      "height": 768,
+      "bytes": 15620,
       "alt": "Workspace root with hidden files disabled; dot-prefixed entries are absent."
     },
     {
@@ -53,9 +53,9 @@
       "flow": "automation/flows/docs-en-preferences.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 89308,
+      "width": 1024,
+      "height": 768,
+      "bytes": 47634,
       "alt": "Language menu offering English, Spanish, Catalan, Galician, and Basque."
     },
     {
@@ -67,9 +67,9 @@
       "flow": "automation/flows/docs-en-preferences.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 77036,
+      "width": 1024,
+      "height": 768,
+      "bytes": 42266,
       "alt": "General options menu showing the current theme, language, hidden-file setting, and Markdown typography."
     },
     {
@@ -79,12 +79,26 @@
       "capture": "reading-typography",
       "path": "/assets/images/docs/en/customize/reading-typography.webp",
       "flow": "automation/flows/docs-en-preferences.json",
-      "step": 23,
+      "step": 28,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 65356,
+      "width": 1024,
+      "height": 768,
+      "bytes": 34810,
       "alt": "Markdown document displayed with the Reading typography in the light theme."
+    },
+    {
+      "id": "en-customize-typography-menu",
+      "language": "en",
+      "chapter": "customize",
+      "capture": "typography-menu",
+      "path": "/assets/images/docs/en/customize/typography-menu.webp",
+      "flow": "automation/flows/docs-en-preferences.json",
+      "step": 25,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 49564,
+      "alt": "Typography menu offering Sans Serif, Serif, Modern, and Reading for Markdown presentation."
     },
     {
       "id": "en-edit-markdown-format-panel",
@@ -199,6 +213,76 @@
       "alt": "Block quote created with the Markdown greater-than typing rule."
     },
     {
+      "id": "en-edit-text-code-folded-function",
+      "language": "en",
+      "chapter": "edit-text-code",
+      "capture": "folded-function",
+      "path": "/assets/images/docs/en/edit-text-code/folded-function.webp",
+      "flow": "automation/flows/docs-en-text-code.json",
+      "step": 6,
+      "scope": "element",
+      "width": 990,
+      "height": 164,
+      "bytes": 9796,
+      "alt": "JavaScript function folded into an ellipsis, with a gap in the line numbers showing the hidden body."
+    },
+    {
+      "id": "en-edit-text-code-javascript-completion",
+      "language": "en",
+      "chapter": "edit-text-code",
+      "capture": "javascript-completion",
+      "path": "/assets/images/docs/en/edit-text-code/javascript-completion.webp",
+      "flow": "automation/flows/docs-en-text-code.json",
+      "step": 14,
+      "scope": "element",
+      "width": 990,
+      "height": 98,
+      "bytes": 4658,
+      "alt": "JavaScript completion list offering districtName after typing districtN below its declaration."
+    },
+    {
+      "id": "en-edit-text-code-javascript-editor",
+      "language": "en",
+      "chapter": "edit-text-code",
+      "capture": "javascript-editor",
+      "path": "/assets/images/docs/en/edit-text-code/javascript-editor.webp",
+      "flow": "automation/flows/docs-en-text-code.json",
+      "step": 3,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 14462,
+      "alt": "JavaScript file in the text and code editor, with line numbers, syntax highlighting, and a fold arrow beside the function."
+    },
+    {
+      "id": "en-edit-text-code-mermaid-file",
+      "language": "en",
+      "chapter": "edit-text-code",
+      "capture": "mermaid-file",
+      "path": "/assets/images/docs/en/edit-text-code/mermaid-file.webp",
+      "flow": "automation/flows/docs-en-text-code-mermaid.json",
+      "step": 13,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 400,
+      "bytes": 5662,
+      "alt": "Standalone Mermaid file open as highlighted source code, with a flowchart declaration and an arrow between two nodes."
+    },
+    {
+      "id": "en-edit-text-code-multiple-selection",
+      "language": "en",
+      "chapter": "edit-text-code",
+      "capture": "multiple-selection",
+      "path": "/assets/images/docs/en/edit-text-code/multiple-selection.webp",
+      "flow": "automation/flows/docs-en-text-code.json",
+      "step": 25,
+      "scope": "element",
+      "width": 990,
+      "height": 98,
+      "bytes": 5112,
+      "alt": "Three occurrences of district selected together before replacing them in the JavaScript file."
+    },
+    {
       "id": "en-getting-started-create-document",
       "language": "en",
       "chapter": "getting-started",
@@ -269,6 +353,20 @@
       "alt": "Plunibio with Atlas of Lúmina open in the Markdown editor and the formatting sidebar visible."
     },
     {
+      "id": "en-links-and-images-create-link",
+      "language": "en",
+      "chapter": "links-and-images",
+      "capture": "create-link",
+      "path": "/assets/images/docs/en/links-and-images/create-link.webp",
+      "flow": "automation/flows/docs-en-markdown-links-create.json",
+      "step": 9,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 15750,
+      "alt": "Link creation controls with README.md entered as the address for the selected Field notes text."
+    },
+    {
       "id": "en-links-and-images-image-actions",
       "language": "en",
       "chapter": "links-and-images",
@@ -277,9 +375,9 @@
       "flow": "automation/flows/docs-en-markdown-links-images.json",
       "step": 14,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1602766,
+      "width": 1024,
+      "height": 768,
+      "bytes": 450642,
       "alt": "Floating image actions for opening the file, editing its link, and showing its caption."
     },
     {
@@ -291,10 +389,38 @@
       "flow": "automation/flows/docs-en-markdown-links-images.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1470234,
+      "width": 1024,
+      "height": 768,
+      "bytes": 449098,
       "alt": "Relative image path being edited in the Markdown image controls."
+    },
+    {
+      "id": "en-links-and-images-image-caption",
+      "language": "en",
+      "chapter": "links-and-images",
+      "capture": "image-caption",
+      "path": "/assets/images/docs/en/links-and-images/image-caption.webp",
+      "flow": "automation/flows/docs-en-markdown-links-create.json",
+      "step": 55,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 164740,
+      "alt": "Block image with a panoramic-view caption and a reduced display size in the Markdown editor."
+    },
+    {
+      "id": "en-links-and-images-insert-image",
+      "language": "en",
+      "chapter": "links-and-images",
+      "capture": "insert-image",
+      "path": "/assets/images/docs/en/links-and-images/insert-image.webp",
+      "flow": "automation/flows/docs-en-markdown-links-create.json",
+      "step": 40,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 14742,
+      "alt": "Empty block image insertion box with the image link field below the Field notes paragraph."
     },
     {
       "id": "en-links-and-images-link-actions",
@@ -305,9 +431,9 @@
       "flow": "automation/flows/docs-en-markdown-links-images.json",
       "step": 5,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 59682,
+      "width": 1024,
+      "height": 768,
+      "bytes": 33386,
       "alt": "Floating actions for editing, copying, opening, or removing a Markdown link."
     },
     {
@@ -319,9 +445,9 @@
       "flow": "automation/flows/docs-en-markdown-links-images.json",
       "step": 8,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 60948,
+      "width": 1024,
+      "height": 768,
+      "bytes": 31016,
       "alt": "Markdown link address being edited in the floating link controls."
     },
     {
@@ -333,9 +459,9 @@
       "flow": "automation/flows/docs-en-markdown-links-images.json",
       "step": 23,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 2029030,
+      "width": 1024,
+      "height": 768,
+      "bytes": 647632,
       "alt": "A locally linked Markdown image opened in Plunibio's image editor."
     },
     {
@@ -347,9 +473,9 @@
       "flow": "automation/flows/docs-en-search-markdown.json",
       "step": 20,
       "scope": "element",
-      "width": 576,
-      "height": 535,
-      "bytes": 13410,
+      "width": 288,
+      "height": 267,
+      "bytes": 6004,
       "alt": "Search panel reporting an invalid regular expression."
     },
     {
@@ -361,9 +487,9 @@
       "flow": "automation/flows/docs-en-search-markdown.json",
       "step": 29,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 43178,
+      "width": 1024,
+      "height": 768,
+      "bytes": 20836,
       "alt": "Markdown document after replacing every matching occurrence."
     },
     {
@@ -375,9 +501,9 @@
       "flow": "automation/flows/docs-en-search-markdown.json",
       "step": 15,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 45144,
+      "width": 1024,
+      "height": 768,
+      "bytes": 21198,
       "alt": "Markdown search using case-sensitive and whole-word options."
     },
     {
@@ -389,9 +515,9 @@
       "flow": "automation/flows/docs-en-search-markdown.json",
       "step": 11,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 44442,
+      "width": 1024,
+      "height": 768,
+      "bytes": 21714,
       "alt": "Markdown Search panel with the current match highlighted and a match counter."
     },
     {
@@ -403,9 +529,9 @@
       "flow": "automation/flows/docs-en-search-text.json",
       "step": 25,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 37676,
+      "width": 1024,
+      "height": 768,
+      "bytes": 18866,
       "alt": "JSON file in the text and code editor after replacing all whole-word matches."
     },
     {
@@ -417,10 +543,24 @@
       "flow": "automation/flows/docs-en-search-text.json",
       "step": 11,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 37996,
+      "width": 1024,
+      "height": 768,
+      "bytes": 18916,
       "alt": "Text and code editor search panel with JSON matches highlighted."
+    },
+    {
+      "id": "en-shortcuts-troubleshooting-navigation-save-failed",
+      "language": "en",
+      "chapter": "shortcuts-troubleshooting",
+      "capture": "navigation-save-failed",
+      "path": "/assets/images/docs/en/shortcuts-troubleshooting/navigation-save-failed.webp",
+      "flow": "automation/flows/docs-en-help-recovery.json",
+      "step": 8,
+      "scope": "element",
+      "width": 400,
+      "height": 291,
+      "bytes": 9602,
+      "alt": "Save error while navigating away from an edited BMP, warning of possible data loss and offering Continue and Cancel."
     },
     {
       "id": "en-tables-code-advanced-code-block-edited",
@@ -431,9 +571,9 @@
       "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
       "step": 18,
       "scope": "element",
-      "width": 1660,
-      "height": 192,
-      "bytes": 13708,
+      "width": 830,
+      "height": 78,
+      "bytes": 2416,
       "alt": "Edited fenced code block with syntax highlighting in the Markdown editor."
     },
     {
@@ -445,9 +585,9 @@
       "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 47208,
+      "width": 1024,
+      "height": 768,
+      "bytes": 24824,
       "alt": "Language selector open above a fenced Markdown code block."
     },
     {
@@ -457,12 +597,54 @@
       "capture": "inline-block-math",
       "path": "/assets/images/docs/en/tables-code-advanced/inline-block-math.webp",
       "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
-      "step": 39,
+      "step": 45,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 48912,
+      "width": 1024,
+      "height": 768,
+      "bytes": 22410,
       "alt": "Inline and block mathematical expressions rendered in the Markdown document."
+    },
+    {
+      "id": "en-tables-code-advanced-inline-math-actions",
+      "language": "en",
+      "chapter": "tables-code-advanced",
+      "capture": "inline-math-actions",
+      "path": "/assets/images/docs/en/tables-code-advanced/inline-math-actions.webp",
+      "flow": "automation/flows/docs-en-markdown-inline-math.json",
+      "step": 5,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 37914,
+      "alt": "Inline formula with its LaTeX expression and Edit expression and Copy expression actions visible."
+    },
+    {
+      "id": "en-tables-code-advanced-inline-math-edit",
+      "language": "en",
+      "chapter": "tables-code-advanced",
+      "capture": "inline-math-edit",
+      "path": "/assets/images/docs/en/tables-code-advanced/inline-math-edit.webp",
+      "flow": "automation/flows/docs-en-markdown-inline-math.json",
+      "step": 9,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 36726,
+      "alt": "LaTeX expression field containing b^2+c^2, with OK and Cancel controls."
+    },
+    {
+      "id": "en-tables-code-advanced-math-block-edit",
+      "language": "en",
+      "chapter": "tables-code-advanced",
+      "capture": "math-block-edit",
+      "path": "/assets/images/docs/en/tables-code-advanced/math-block-edit.webp",
+      "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
+      "step": 48,
+      "scope": "element",
+      "width": 830,
+      "height": 152,
+      "bytes": 1230,
+      "alt": "Math block with E = mc^2 in the source editor and its rendered preview below."
     },
     {
       "id": "en-tables-code-advanced-mermaid-edit-preview",
@@ -473,10 +655,24 @@
       "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
       "step": 33,
       "scope": "element",
-      "width": 1660,
-      "height": 440,
-      "bytes": 15124,
+      "width": 830,
+      "height": 220,
+      "bytes": 7830,
       "alt": "Mermaid source and its rendered preview visible together while editing."
+    },
+    {
+      "id": "en-tables-code-advanced-mermaid-error",
+      "language": "en",
+      "chapter": "tables-code-advanced",
+      "capture": "mermaid-error",
+      "path": "/assets/images/docs/en/tables-code-advanced/mermaid-error.webp",
+      "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
+      "step": 36,
+      "scope": "element",
+      "width": 830,
+      "height": 174,
+      "bytes": 6078,
+      "alt": "Mermaid source containing invalid text and a preview error, while the source remains editable."
     },
     {
       "id": "en-tables-code-advanced-mermaid-preview",
@@ -487,9 +683,9 @@
       "flow": "automation/flows/docs-en-markdown-code-mermaid-math.json",
       "step": 29,
       "scope": "element",
-      "width": 1660,
-      "height": 244,
-      "bytes": 5668,
+      "width": 830,
+      "height": 122,
+      "bytes": 2716,
       "alt": "Mermaid diagram rendered as a preview inside the Markdown document."
     },
     {
@@ -501,9 +697,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 22,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 46998,
+      "width": 1024,
+      "height": 768,
+      "bytes": 22660,
       "alt": "Add-column control displayed on the right edge of a Markdown table."
     },
     {
@@ -515,9 +711,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 27,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 41366,
+      "width": 1024,
+      "height": 768,
+      "bytes": 19958,
       "alt": "Add-row control displayed below a Markdown table."
     },
     {
@@ -529,9 +725,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 47296,
+      "width": 1024,
+      "height": 768,
+      "bytes": 22582,
       "alt": "Selected table column with left, center, and right alignment controls plus the delete action."
     },
     {
@@ -543,9 +739,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 14,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 46230,
+      "width": 1024,
+      "height": 768,
+      "bytes": 21518,
       "alt": "Row and column handles visible around a selected Markdown table cell."
     },
     {
@@ -557,9 +753,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 3,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 42824,
+      "width": 1024,
+      "height": 768,
+      "bytes": 19728,
       "alt": "Markdown table with several rows and columns selected in the editor."
     },
     {
@@ -571,9 +767,9 @@
       "flow": "automation/flows/docs-en-markdown-table.json",
       "step": 33,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 47836,
+      "width": 1024,
+      "height": 768,
+      "bytes": 21336,
       "alt": "Selected table row with its row handle and delete control visible."
     },
     {
@@ -585,9 +781,9 @@
       "flow": "automation/flows/docs-en-image-adjust.json",
       "step": 5,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 967916,
+      "width": 1024,
+      "height": 768,
+      "bytes": 309380,
       "alt": "Image editor Adjust tab with brightness, contrast, saturation, grayscale, sepia, and invert controls."
     },
     {
@@ -599,9 +795,9 @@
       "flow": "automation/flows/docs-en-image-adjust.json",
       "step": 13,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 928498,
+      "width": 1024,
+      "height": 768,
+      "bytes": 294410,
       "alt": "Image after changing brightness to 75 percent, contrast to 130 percent, and saturation to 140 percent."
     },
     {
@@ -613,9 +809,9 @@
       "flow": "automation/flows/docs-en-image-transform.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1295586,
+      "width": 1024,
+      "height": 768,
+      "bytes": 581040,
       "alt": "Image displayed at 100 percent and displaced within the editor viewport."
     },
     {
@@ -627,9 +823,9 @@
       "flow": "automation/flows/docs-en-image-adjust.json",
       "step": 18,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1048808,
+      "width": 1024,
+      "height": 768,
+      "bytes": 328966,
       "alt": "Image editor Presets tab with the Vivid preset applied to the image."
     },
     {
@@ -641,9 +837,9 @@
       "flow": "automation/flows/docs-en-image-transform.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1011774,
+      "width": 1024,
+      "height": 768,
+      "bytes": 496360,
       "alt": "Image rotated 90 degrees and mirrored horizontally in the image editor."
     },
     {
@@ -655,9 +851,9 @@
       "flow": "automation/flows/docs-en-image-transform.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 972658,
+      "width": 1024,
+      "height": 768,
+      "bytes": 311586,
       "alt": "Image editor Transform tab with zoom, rotation, centering, flipping, and reset controls."
     },
     {
@@ -669,9 +865,9 @@
       "flow": "automation/flows/docs-en-image-unsupported-save.json",
       "step": 8,
       "scope": "element",
-      "width": 800,
-      "height": 536,
-      "bytes": 13564,
+      "width": 400,
+      "height": 268,
+      "bytes": 7094,
       "alt": "Error explaining that an edited BMP can be viewed but only PNG, JPEG, and WebP can be saved."
     },
     {
@@ -849,11 +1045,11 @@
       "capture": "dark-theme",
       "path": "/assets/images/docs/es/customize/dark-theme.webp",
       "flow": "automation/flows/docs-es-preferences.json",
-      "step": 32,
+      "step": 37,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 71978,
+      "width": 1024,
+      "height": 768,
+      "bytes": 38116,
       "alt": "Editor Markdown y controles de formato mostrados con el tema oscuro."
     },
     {
@@ -863,11 +1059,11 @@
       "capture": "hidden-files-after",
       "path": "/assets/images/docs/es/customize/hidden-files-after.webp",
       "flow": "automation/flows/docs-es-preferences.json",
-      "step": 64,
+      "step": 69,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 12256,
+      "width": 1024,
+      "height": 768,
+      "bytes": 18432,
       "alt": "Raíz del espacio mostrando la carpeta oculta y el archivo Markdown oculto cuyos nombres empiezan por punto."
     },
     {
@@ -877,11 +1073,11 @@
       "capture": "hidden-files-before",
       "path": "/assets/images/docs/es/customize/hidden-files-before.webp",
       "flow": "automation/flows/docs-es-preferences.json",
-      "step": 58,
+      "step": 63,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 9774,
+      "width": 1024,
+      "height": 768,
+      "bytes": 16438,
       "alt": "Raíz del espacio con los archivos ocultos desactivados; no aparecen elementos cuyo nombre empieza por punto."
     },
     {
@@ -893,9 +1089,9 @@
       "flow": "automation/flows/docs-es-preferences.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 97962,
+      "width": 1024,
+      "height": 768,
+      "bytes": 51544,
       "alt": "Menú de idioma con inglés, español, catalán, gallego y euskera."
     },
     {
@@ -907,9 +1103,9 @@
       "flow": "automation/flows/docs-es-preferences.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 85376,
+      "width": 1024,
+      "height": 768,
+      "bytes": 45968,
       "alt": "Menú de opciones generales con el tema, idioma, ajuste de archivos ocultos y tipografía Markdown actuales."
     },
     {
@@ -919,12 +1115,26 @@
       "capture": "reading-typography",
       "path": "/assets/images/docs/es/customize/reading-typography.webp",
       "flow": "automation/flows/docs-es-preferences.json",
-      "step": 23,
+      "step": 28,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 76874,
+      "width": 1024,
+      "height": 768,
+      "bytes": 39396,
       "alt": "Documento Markdown mostrado con la tipografía Lectura y el tema claro."
+    },
+    {
+      "id": "es-customize-typography-menu",
+      "language": "es",
+      "chapter": "customize",
+      "capture": "typography-menu",
+      "path": "/assets/images/docs/es/customize/typography-menu.webp",
+      "flow": "automation/flows/docs-es-preferences.json",
+      "step": 25,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 53562,
+      "alt": "Menú Tipografía con Sans Serif, Serif, Moderna y Lectura para la presentación de Markdown."
     },
     {
       "id": "es-edit-markdown-format-panel",
@@ -1039,6 +1249,76 @@
       "alt": "Cita en bloque creada mediante la regla de escritura Markdown del signo mayor que."
     },
     {
+      "id": "es-edit-text-code-folded-function",
+      "language": "es",
+      "chapter": "edit-text-code",
+      "capture": "folded-function",
+      "path": "/assets/images/docs/es/edit-text-code/folded-function.webp",
+      "flow": "automation/flows/docs-es-text-code.json",
+      "step": 6,
+      "scope": "element",
+      "width": 990,
+      "height": 164,
+      "bytes": 9796,
+      "alt": "Función JavaScript plegada en puntos suspensivos, con un salto en los números de línea que indica el cuerpo oculto."
+    },
+    {
+      "id": "es-edit-text-code-javascript-completion",
+      "language": "es",
+      "chapter": "edit-text-code",
+      "capture": "javascript-completion",
+      "path": "/assets/images/docs/es/edit-text-code/javascript-completion.webp",
+      "flow": "automation/flows/docs-es-text-code.json",
+      "step": 14,
+      "scope": "element",
+      "width": 990,
+      "height": 98,
+      "bytes": 4658,
+      "alt": "Lista de sugerencias JavaScript que ofrece districtName después de escribir districtN debajo de su declaración."
+    },
+    {
+      "id": "es-edit-text-code-javascript-editor",
+      "language": "es",
+      "chapter": "edit-text-code",
+      "capture": "javascript-editor",
+      "path": "/assets/images/docs/es/edit-text-code/javascript-editor.webp",
+      "flow": "automation/flows/docs-es-text-code.json",
+      "step": 3,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 14500,
+      "alt": "Archivo JavaScript en el editor de texto y código, con números de línea, resaltado de sintaxis y una flecha de plegado junto a la función."
+    },
+    {
+      "id": "es-edit-text-code-mermaid-file",
+      "language": "es",
+      "chapter": "edit-text-code",
+      "capture": "mermaid-file",
+      "path": "/assets/images/docs/es/edit-text-code/mermaid-file.webp",
+      "flow": "automation/flows/docs-es-text-code-mermaid.json",
+      "step": 13,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 400,
+      "bytes": 5708,
+      "alt": "Archivo Mermaid independiente abierto como código fuente resaltado, con una declaración flowchart y una flecha entre dos nodos."
+    },
+    {
+      "id": "es-edit-text-code-multiple-selection",
+      "language": "es",
+      "chapter": "edit-text-code",
+      "capture": "multiple-selection",
+      "path": "/assets/images/docs/es/edit-text-code/multiple-selection.webp",
+      "flow": "automation/flows/docs-es-text-code.json",
+      "step": 25,
+      "scope": "element",
+      "width": 990,
+      "height": 98,
+      "bytes": 5112,
+      "alt": "Tres apariciones de district seleccionadas a la vez antes de sustituirlas en el archivo JavaScript."
+    },
+    {
       "id": "es-getting-started-create-document",
       "language": "es",
       "chapter": "getting-started",
@@ -1109,6 +1389,20 @@
       "alt": "Plunibio con Atlas de Lúmina abierto en el editor Markdown y el panel de formato visible."
     },
     {
+      "id": "es-links-and-images-create-link",
+      "language": "es",
+      "chapter": "links-and-images",
+      "capture": "create-link",
+      "path": "/assets/images/docs/es/links-and-images/create-link.webp",
+      "flow": "automation/flows/docs-es-markdown-links-create.json",
+      "step": 9,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 17092,
+      "alt": "Controles de creación de enlace con README.md como dirección para el texto seleccionado Notas de campo."
+    },
+    {
       "id": "es-links-and-images-image-actions",
       "language": "es",
       "chapter": "links-and-images",
@@ -1117,9 +1411,9 @@
       "flow": "automation/flows/docs-es-markdown-links-images.json",
       "step": 14,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1604362,
+      "width": 1024,
+      "height": 768,
+      "bytes": 450106,
       "alt": "Acciones flotantes de imagen para abrir el archivo, editar el enlace y mostrar el pie."
     },
     {
@@ -1131,10 +1425,38 @@
       "flow": "automation/flows/docs-es-markdown-links-images.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1470348,
+      "width": 1024,
+      "height": 768,
+      "bytes": 449438,
       "alt": "Ruta relativa de una imagen en edición dentro de los controles de imagen Markdown."
+    },
+    {
+      "id": "es-links-and-images-image-caption",
+      "language": "es",
+      "chapter": "links-and-images",
+      "capture": "image-caption",
+      "path": "/assets/images/docs/es/links-and-images/image-caption.webp",
+      "flow": "automation/flows/docs-es-markdown-links-create.json",
+      "step": 55,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 166892,
+      "alt": "Imagen en bloque con un pie de vista panorámica y tamaño de presentación reducido en el editor Markdown."
+    },
+    {
+      "id": "es-links-and-images-insert-image",
+      "language": "es",
+      "chapter": "links-and-images",
+      "capture": "insert-image",
+      "path": "/assets/images/docs/es/links-and-images/insert-image.webp",
+      "flow": "automation/flows/docs-es-markdown-links-create.json",
+      "step": 40,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 15864,
+      "alt": "Recuadro vacío de inserción de imagen en bloque con el campo de enlace bajo el párrafo Notas de campo."
     },
     {
       "id": "es-links-and-images-link-actions",
@@ -1145,9 +1467,9 @@
       "flow": "automation/flows/docs-es-markdown-links-images.json",
       "step": 5,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 60706,
+      "width": 1024,
+      "height": 768,
+      "bytes": 33364,
       "alt": "Acciones flotantes para editar, copiar, abrir o eliminar un enlace Markdown."
     },
     {
@@ -1159,9 +1481,9 @@
       "flow": "automation/flows/docs-es-markdown-links-images.json",
       "step": 8,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 62626,
+      "width": 1024,
+      "height": 768,
+      "bytes": 32166,
       "alt": "Dirección de un enlace Markdown en edición dentro de los controles flotantes."
     },
     {
@@ -1173,9 +1495,9 @@
       "flow": "automation/flows/docs-es-markdown-links-images.json",
       "step": 23,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 2029534,
+      "width": 1024,
+      "height": 768,
+      "bytes": 647630,
       "alt": "Imagen local enlazada desde Markdown y abierta en el editor de imágenes de Plunibio."
     },
     {
@@ -1187,9 +1509,9 @@
       "flow": "automation/flows/docs-es-search-markdown.json",
       "step": 20,
       "scope": "element",
-      "width": 576,
-      "height": 535,
-      "bytes": 16060,
+      "width": 288,
+      "height": 267,
+      "bytes": 7430,
       "alt": "Panel de búsqueda que informa de una expresión regular no válida."
     },
     {
@@ -1201,9 +1523,9 @@
       "flow": "automation/flows/docs-es-search-markdown.json",
       "step": 29,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 51336,
+      "width": 1024,
+      "height": 768,
+      "bytes": 24918,
       "alt": "Documento Markdown después de reemplazar todas las coincidencias."
     },
     {
@@ -1215,9 +1537,9 @@
       "flow": "automation/flows/docs-es-search-markdown.json",
       "step": 15,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 54600,
+      "width": 1024,
+      "height": 768,
+      "bytes": 25838,
       "alt": "Búsqueda Markdown con las opciones de distinguir mayúsculas y palabra completa."
     },
     {
@@ -1229,9 +1551,9 @@
       "flow": "automation/flows/docs-es-search-markdown.json",
       "step": 11,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 54194,
+      "width": 1024,
+      "height": 768,
+      "bytes": 26248,
       "alt": "Panel Buscar de Markdown con la coincidencia actual resaltada y un contador."
     },
     {
@@ -1243,9 +1565,9 @@
       "flow": "automation/flows/docs-es-search-text.json",
       "step": 25,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 40484,
+      "width": 1024,
+      "height": 768,
+      "bytes": 20090,
       "alt": "Archivo JSON en el editor de texto y código después de reemplazar todas las palabras coincidentes."
     },
     {
@@ -1257,10 +1579,24 @@
       "flow": "automation/flows/docs-es-search-text.json",
       "step": 11,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 40940,
+      "width": 1024,
+      "height": 768,
+      "bytes": 20468,
       "alt": "Panel de búsqueda del editor de texto y código con coincidencias resaltadas en JSON."
+    },
+    {
+      "id": "es-shortcuts-troubleshooting-navigation-save-failed",
+      "language": "es",
+      "chapter": "shortcuts-troubleshooting",
+      "capture": "navigation-save-failed",
+      "path": "/assets/images/docs/es/shortcuts-troubleshooting/navigation-save-failed.webp",
+      "flow": "automation/flows/docs-es-help-recovery.json",
+      "step": 8,
+      "scope": "element",
+      "width": 400,
+      "height": 291,
+      "bytes": 9304,
+      "alt": "Error de guardado al salir de un BMP editado, con aviso de posible pérdida de datos y las opciones Continuar y Cancelar."
     },
     {
       "id": "es-tables-code-advanced-code-block-edited",
@@ -1271,9 +1607,9 @@
       "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
       "step": 18,
       "scope": "element",
-      "width": 1660,
-      "height": 192,
-      "bytes": 14178,
+      "width": 830,
+      "height": 78,
+      "bytes": 2494,
       "alt": "Bloque de código delimitado y editado con resaltado de sintaxis en el editor Markdown."
     },
     {
@@ -1285,9 +1621,9 @@
       "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 49576,
+      "width": 1024,
+      "height": 768,
+      "bytes": 26112,
       "alt": "Selector de lenguaje abierto sobre un bloque de código delimitado de Markdown."
     },
     {
@@ -1297,12 +1633,54 @@
       "capture": "inline-block-math",
       "path": "/assets/images/docs/es/tables-code-advanced/inline-block-math.webp",
       "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
-      "step": 39,
+      "step": 45,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 53320,
+      "width": 1024,
+      "height": 768,
+      "bytes": 22976,
       "alt": "Expresiones matemáticas en línea y en bloque representadas en el documento Markdown."
+    },
+    {
+      "id": "es-tables-code-advanced-inline-math-actions",
+      "language": "es",
+      "chapter": "tables-code-advanced",
+      "capture": "inline-math-actions",
+      "path": "/assets/images/docs/es/tables-code-advanced/inline-math-actions.webp",
+      "flow": "automation/flows/docs-es-markdown-inline-math.json",
+      "step": 5,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 39216,
+      "alt": "Fórmula en línea con su expresión LaTeX y las acciones Editar expresión y Copiar expresión visibles."
+    },
+    {
+      "id": "es-tables-code-advanced-inline-math-edit",
+      "language": "es",
+      "chapter": "tables-code-advanced",
+      "capture": "inline-math-edit",
+      "path": "/assets/images/docs/es/tables-code-advanced/inline-math-edit.webp",
+      "flow": "automation/flows/docs-es-markdown-inline-math.json",
+      "step": 9,
+      "scope": "viewport",
+      "width": 1024,
+      "height": 768,
+      "bytes": 38508,
+      "alt": "Campo Expresión LaTeX con b^2+c^2 y los controles OK y Cancelar."
+    },
+    {
+      "id": "es-tables-code-advanced-math-block-edit",
+      "language": "es",
+      "chapter": "tables-code-advanced",
+      "capture": "math-block-edit",
+      "path": "/assets/images/docs/es/tables-code-advanced/math-block-edit.webp",
+      "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
+      "step": 48,
+      "scope": "element",
+      "width": 830,
+      "height": 152,
+      "bytes": 1368,
+      "alt": "Bloque matemático con E = mc^2 en el editor de fuente y su vista previa debajo."
     },
     {
       "id": "es-tables-code-advanced-mermaid-edit-preview",
@@ -1313,10 +1691,24 @@
       "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
       "step": 33,
       "scope": "element",
-      "width": 1660,
-      "height": 440,
-      "bytes": 16168,
+      "width": 830,
+      "height": 220,
+      "bytes": 8520,
       "alt": "Código Mermaid y su vista previa representada visibles a la vez durante la edición."
+    },
+    {
+      "id": "es-tables-code-advanced-mermaid-error",
+      "language": "es",
+      "chapter": "tables-code-advanced",
+      "capture": "mermaid-error",
+      "path": "/assets/images/docs/es/tables-code-advanced/mermaid-error.webp",
+      "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
+      "step": 36,
+      "scope": "element",
+      "width": 830,
+      "height": 174,
+      "bytes": 6482,
+      "alt": "Fuente Mermaid con texto no válido y un error de vista previa, con el código disponible para corregirlo."
     },
     {
       "id": "es-tables-code-advanced-mermaid-preview",
@@ -1327,9 +1719,9 @@
       "flow": "automation/flows/docs-es-markdown-code-mermaid-math.json",
       "step": 29,
       "scope": "element",
-      "width": 1660,
-      "height": 244,
-      "bytes": 6114,
+      "width": 830,
+      "height": 122,
+      "bytes": 3004,
       "alt": "Diagrama Mermaid representado como vista previa dentro del documento Markdown."
     },
     {
@@ -1341,9 +1733,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 22,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 51640,
+      "width": 1024,
+      "height": 768,
+      "bytes": 24578,
       "alt": "Control para añadir una columna mostrado en el borde derecho de una tabla Markdown."
     },
     {
@@ -1355,9 +1747,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 27,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 46990,
+      "width": 1024,
+      "height": 768,
+      "bytes": 22692,
       "alt": "Control para añadir una fila mostrado debajo de una tabla Markdown."
     },
     {
@@ -1369,9 +1761,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 53130,
+      "width": 1024,
+      "height": 768,
+      "bytes": 25058,
       "alt": "Columna de tabla seleccionada con controles de alineación izquierda, centrada y derecha, además de la acción de eliminar."
     },
     {
@@ -1383,9 +1775,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 14,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 49630,
+      "width": 1024,
+      "height": 768,
+      "bytes": 23888,
       "alt": "Asas de fila y columna visibles alrededor de una celda seleccionada de la tabla Markdown."
     },
     {
@@ -1397,9 +1789,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 3,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 45822,
+      "width": 1024,
+      "height": 768,
+      "bytes": 21760,
       "alt": "Tabla Markdown con varias filas y columnas seleccionada en el editor."
     },
     {
@@ -1411,9 +1803,9 @@
       "flow": "automation/flows/docs-es-markdown-table.json",
       "step": 33,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 52562,
+      "width": 1024,
+      "height": 768,
+      "bytes": 23900,
       "alt": "Fila de tabla seleccionada con su asa y el control de eliminación visibles."
     },
     {
@@ -1425,9 +1817,9 @@
       "flow": "automation/flows/docs-es-image-adjust.json",
       "step": 5,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 970218,
+      "width": 1024,
+      "height": 768,
+      "bytes": 310172,
       "alt": "Pestaña Ajustar del editor de imágenes con controles de brillo, contraste, saturación, escala de grises, sepia e inversión."
     },
     {
@@ -1439,9 +1831,9 @@
       "flow": "automation/flows/docs-es-image-adjust.json",
       "step": 13,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 930258,
+      "width": 1024,
+      "height": 768,
+      "bytes": 294728,
       "alt": "Imagen después de ajustar el brillo al 75 %, el contraste al 130 % y la saturación al 140 %."
     },
     {
@@ -1453,9 +1845,9 @@
       "flow": "automation/flows/docs-es-image-transform.json",
       "step": 9,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1300046,
+      "width": 1024,
+      "height": 768,
+      "bytes": 582926,
       "alt": "Imagen mostrada al 100 % y desplazada dentro del área de edición."
     },
     {
@@ -1467,9 +1859,9 @@
       "flow": "automation/flows/docs-es-image-adjust.json",
       "step": 18,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1049002,
+      "width": 1024,
+      "height": 768,
+      "bytes": 329124,
       "alt": "Pestaña Preajustes del editor de imágenes con el preajuste Vívido aplicado."
     },
     {
@@ -1481,9 +1873,9 @@
       "flow": "automation/flows/docs-es-image-transform.json",
       "step": 17,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 1016332,
+      "width": 1024,
+      "height": 768,
+      "bytes": 498220,
       "alt": "Imagen girada 90 grados y reflejada horizontalmente en el editor."
     },
     {
@@ -1495,9 +1887,9 @@
       "flow": "automation/flows/docs-es-image-transform.json",
       "step": 4,
       "scope": "viewport",
-      "width": 2048,
-      "height": 1262,
-      "bytes": 976844,
+      "width": 1024,
+      "height": 768,
+      "bytes": 313280,
       "alt": "Pestaña Transformar del editor de imágenes con controles de zoom, rotación, centrado, volteo y restablecimiento."
     },
     {
@@ -1509,9 +1901,9 @@
       "flow": "automation/flows/docs-es-image-unsupported-save.json",
       "step": 8,
       "scope": "element",
-      "width": 800,
-      "height": 536,
-      "bytes": 13574,
+      "width": 400,
+      "height": 268,
+      "bytes": 7150,
       "alt": "Error que explica que un BMP editado puede visualizarse, pero solo se pueden guardar PNG, JPEG y WebP."
     },
     {

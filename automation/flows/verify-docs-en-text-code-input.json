@@ -1,0 +1,203 @@
+{
+    "name": "Docs EN: text editor input and limits",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "code/example.js",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "sidebarVisible": false,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "districtLabel"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "const sample = ",
+            "replace": true
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "("
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',@class,' '),' cm-line ') and string(.)='const sample = ()']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Backspace"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',@class,' '),' cm-line ') and string(.)='const sample = ']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "("
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "1"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "ArrowRight"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                ";"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',@class,' '),' cm-line ') and string(.)='const sample = (1);']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Escape"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Tab"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//div[contains(concat(' ',@class,' '),' cm-line ') and string(.)='const sample = (1);']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='code']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='code/example.yaml']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            },
+            "text": "published"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor'] .cm-content"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "End"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                " "
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".cm-tooltip-autocomplete"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='unknown']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='unknown/example.plunibio-unknown']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "external-file-view"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "open-external-file"
+            },
+            "text": "Open with the default application"
+        }
+    ]
+}

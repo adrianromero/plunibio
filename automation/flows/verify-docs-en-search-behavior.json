@@ -1,0 +1,392 @@
+{
+    "name": "Docs EN: verify individual replacement and Markdown scope",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "markdown/search-lab.md",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": false,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "f"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "search-panel"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "lumen",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 4"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "replace-input"
+            },
+            "text": "beacon",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-panel']//button[normalize-space(.)='Replace' and @disabled]"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Next"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "1 / 4"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Replace"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "/ 3"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "beacon"
+        },
+        {
+            "action": "keys",
+            "target": {
+                "using": "testId",
+                "value": "replace-input"
+            },
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Backspace"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "/ 2"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//p[contains(., 'A second  appears')]"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "no-match-sentinel",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "keys",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Backspace"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "lumen"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='markdown']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "folder-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='markdown/editor-lab.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "frontmatter-panel"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "f"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "search-panel"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "category",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "table-lab.md",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 0"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "visibleDistricts",
+            "replace": true
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "0 / 1"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Next"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "1 / 1"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Hide sidebar"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "search-panel"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "f"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "search-panel"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='search-input']/following-sibling::span"
+            },
+            "state": "visible",
+            "text": "1 / 1"
+        }
+    ]
+}

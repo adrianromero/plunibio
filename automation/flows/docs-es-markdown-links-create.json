@@ -1,0 +1,642 @@
+{
+    "name": "Docs ES: create links and images",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "guia-enlaces.md",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "outputDir": "website/assets/images/docs/es/links-and-images",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Notas de campo"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "waitSelection",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Enlace"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "text": "README.md",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "name": "create-link",
+            "scope": "viewport"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones del enlace'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='README.md']"
+            },
+            "state": "visible",
+            "text": "Notas de campo"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='README.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Copiar enlace"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Copiar enlace"
+            }
+        },
+        {
+            "action": "waitClipboard",
+            "text": "README.md",
+            "source": "native"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Editar enlace"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "text": "notes/notas-de-campo.md",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones del enlace'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/notas-de-campo.md']"
+            },
+            "state": "visible",
+            "text": "Notas de campo"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/notas-de-campo.md']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Eliminar enlace"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/notas-de-campo.md']"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "Notas de campo"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter"
+            ]
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "aria",
+                "value": "Imagen"
+            },
+            "block": "center"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Imagen"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "block": "center"
+        },
+        {
+            "action": "capture",
+            "name": "insert-image",
+            "scope": "viewport"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "text": "assets/atlas-de-lumina.png",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .confirm"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "block": "center"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Mostrar u ocultar pie de imagen"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Mostrar u ocultar pie de imagen"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "text": "Atlas de Lúmina, vista panorámica",
+            "replace": true
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "hover",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .image-wrapper"
+            }
+        },
+        {
+            "action": "domPointerDrag",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .image-resize-handle"
+            },
+            "x": 0,
+            "y": -40,
+            "durationMs": 400
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//img[@data-type='image-block' and number(@data-height) < number(@data-origin)]"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "image-caption",
+            "scope": "viewport"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//img[@data-type='image-block' and number(@data-height) < number(@data-origin)]"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Mostrar u ocultar pie de imagen"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Mostrar u ocultar pie de imagen"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "img[data-type='image-block'][alt='Atlas de Lúmina, vista panorámica']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:first-of-type"
+            },
+            "position": "end"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "aria",
+                "value": "Enlace"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Enlace"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Dirección del enlace"
+            },
+            "text": "file:///tmp/plunibio-documentation-example.pdf",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones del enlace'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='file:///tmp/plunibio-documentation-example.pdf']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='file:///tmp/plunibio-documentation-example.pdf']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Acciones del enlace'] button:first-of-type"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible",
+            "text": "no es una ruta de archivo relativa"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        }
+    ]
+}
