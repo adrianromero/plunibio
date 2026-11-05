@@ -9,5 +9,5 @@ layout: default
   </div>
 </header>
 <div class="shell narrow prose">
-  {{ content }}
+  {% if page.section == 'installation' %}{{ content | replace: '<pre', '<pre tabindex="0"' }}{% else %}{{ content }}{% endif %}
 </div>

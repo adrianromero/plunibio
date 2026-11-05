@@ -1,0 +1,32 @@
+es:
+  download: Descargar
+  tested: Probado por el mantenedor
+  untested: No probado
+  formats:
+    exe: Instalador EXE
+    msi: Paquete MSI
+    appimage: AppImage
+    deb: Paquete Debian
+    dmg: Imagen de disco DMG
+    app-tar: Aplicación comprimida
+  architectures:
+    x86_64: Intel / AMD de 64 bits
+    arm64: Apple Silicon
+  mac_intel: Mac con Intel
+  checksum: SHA-256
+en:
+  download: Download
+  tested: Tested by the maintainer
+  untested: Not tested
+  formats:
+    exe: EXE installer
+    msi: MSI package
+    appimage: AppImage
+    deb: Debian package
+    dmg: DMG disk image
+    app-tar: Compressed application
+  architectures:
+    x86_64: 64-bit Intel / AMD
+    arm64: Apple Silicon
+  mac_intel: Intel Mac
+  checksum: SHA-256

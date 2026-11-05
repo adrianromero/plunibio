@@ -1,0 +1,71 @@
+# Current public release; update through the documentation release checklist.
+version: "0.1.3"
+tag: "v0.1.3"
+published_on: "2026-11-05"
+docs_reviewed_on: "2026-11-05"
+url: "https://github.com/adrianromero/plunibio/releases/tag/v0.1.3"
+assets:
+  - name: "Plunibio_0.1.3_x64-setup.exe"
+    platform: windows
+    architecture: x86_64
+    format: exe
+    tested: true
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64-setup.exe"
+    size: 6188567
+    sha256: "098e0e9fd2056320ce2e67e16ac4193f09ce19aae4c77a9cea1e438ef737e99b"
+  - name: "Plunibio_0.1.3_x64_en-US.msi"
+    platform: windows
+    architecture: x86_64
+    format: msi
+    tested: true
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64_en-US.msi"
+    size: 7483392
+    sha256: "bd779232237780a6728bb2bda28342883e0236638fa086ed85aeb2dbd3ac4af7"
+  - name: "Plunibio_0.1.3_amd64.AppImage"
+    platform: linux
+    architecture: x86_64
+    format: appimage
+    tested: true
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_amd64.AppImage"
+    size: 87054840
+    sha256: "438b1ad803cd9ed55a39fa4593f1ee74bc8e74ea7d582b405ac3e1e8e716158c"
+  - name: "Plunibio_0.1.3_amd64.deb"
+    platform: linux
+    architecture: x86_64
+    format: deb
+    tested: true
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_amd64.deb"
+    size: 8931728
+    sha256: "476f750bda4681a73717abc49f320bed94cf540b4cc7ff662806411820c78307"
+  - name: "Plunibio_0.1.3_aarch64.dmg"
+    platform: macos
+    architecture: arm64
+    format: dmg
+    tested: false
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_aarch64.dmg"
+    size: 8561477
+    sha256: "e668f176553e5c4b533827da2aee8fce062853aca615331f0c959fc311364623"
+  - name: "Plunibio_0.1.3_aarch64.app.tar.gz"
+    platform: macos
+    architecture: arm64
+    format: app-tar
+    tested: false
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_aarch64.app.tar.gz"
+    size: 7934047
+    sha256: "fc7edee83bb10f5e226714f3deab08af8b72dc738445ee5f161f92b8ba4e13fb"
+  - name: "Plunibio_0.1.3_x64.dmg"
+    platform: macos
+    architecture: x86_64
+    format: dmg
+    tested: false
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64.dmg"
+    size: 8897509
+    sha256: "bcb48c2ad8724be30a6438a42e73bb9e764a5da9b6f8a0b136b513f8af8d0415"
+  - name: "Plunibio_0.1.3_x64.app.tar.gz"
+    platform: macos
+    architecture: x86_64
+    format: app-tar
+    tested: false
+    url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64.app.tar.gz"
+    size: 8243866
+    sha256: "61d82631c2fdc96ec5730ba0e65008729a07f7e021a4831126eb27d40832661e"

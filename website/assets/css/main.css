@@ -99,6 +99,27 @@ body.image-viewer-open { overflow: hidden; }
 .prose pre code { padding: 0; background: none; color: inherit; }
 .prose blockquote { margin: 28px 0; padding: 4px 0 4px 22px; border-left: 3px solid var(--gold); }
 .prose hr { margin: 50px 0; border: 0; border-top: 1px solid var(--line); }
+.page-installation .page-hero { padding: 48px 0 40px; }
+.page-installation .prose { padding-top: 40px; overflow-wrap: anywhere; }
+.release-platform-nav { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+.release-platform-nav a { padding: 8px 14px; border: 1px solid var(--line); border-radius: 99px; background: rgba(255,255,255,.5); font-size: 14px; text-decoration: none; }
+.release-platform-nav a:hover { border-color: var(--green); background: var(--green-soft); }
+.page-installation .release-notice { margin: 28px 0; padding: 20px 22px; border: 1px solid rgba(40,99,75,.28); border-left: 4px solid var(--green); border-radius: 0 12px 12px 0; background: var(--green-soft); }
+.release-notice > :first-child { margin-top: 0; }
+.release-notice > :last-child { margin-bottom: 0; }
+.release-download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; margin: 24px 0 36px; }
+.release-download { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.45); }
+.release-download h4 { margin: 0; font-size: 18px; }
+.release-download .release-architecture { margin: 6px 0 16px; font-size: 14px; }
+.release-filename { min-height: 3em; margin: 0 0 12px; font-size: 13px; }
+.release-test-status { font-size: 13px; font-weight: 700; }
+.release-download .release-untested { color: #9c2f24; }
+.release-download-link { display: inline-block; margin: 4px 0 16px; text-underline-offset: .2em; }
+.release-checksum { font-size: 12px; }
+.release-checksum summary { cursor: pointer; color: var(--green-dark); font-weight: 600; }
+.release-checksum code { display: block; margin-top: 10px; overflow-wrap: anywhere; }
+.page-installation :is(a, summary, [tabindex="0"]):focus-visible { outline-color: var(--green-dark); }
+.page-installation .skip-link:focus-visible { outline-color: var(--paper); }
 
 .docs-hero .shell { width: min(1160px, calc(100% - 40px)); }
 .docs-index,

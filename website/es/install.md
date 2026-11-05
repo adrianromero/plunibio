@@ -9,15 +9,95 @@ eyebrow: Obtén Plunibio
 intro: Instala una versión preparada para tu sistema o construye Plunibio directamente desde el código fuente.
 ---
 
-## Instaladores
+{% assign release = site.data.releases %}
+{% assign appimage = release.assets | where: 'format', 'appimage' | first %}
+{% assign deb = release.assets | where: 'format', 'deb' | first %}
 
-Los instaladores oficiales para Windows, Linux y macOS se publicarán próximamente mediante [GitHub Releases](https://github.com/adrianromero/plunibio/releases).
+## Última versión publicada
 
-- **Windows x86_64:** instalador NSIS (`.exe`) y paquete Windows Installer (`.msi`). Próximamente.
-- **Linux x86_64:** paquete Debian (`.deb`) y AppImage (`.AppImage`). Próximamente.
-- **macOS:** imagen de disco (`.dmg`) y aplicación para Apple Silicon e Intel. Próximamente.
+Plunibio **{{ release.version }}**, publicado el **{{ release.published_on }}**. Consulta las [notas de versión y todos los archivos]({{ release.url }}).
+
+<nav class="release-platform-nav" aria-label="Descargas por sistema"><a href="#descargas-windows">Windows</a><a href="#descargas-linux">Linux</a><a href="#descargas-macos">macOS</a></nav>
+
+<aside class="release-notice" aria-label="Estado y limitaciones" markdown="1">
+**Antes de descargar**
+
+Plunibio está en desarrollo y puede contener errores. Conserva copias de seguridad de tus documentos antes de editarlos o actualizar la aplicación. Se distribuye bajo la [licencia MIT]({{ site.license_url }}), que describe sus condiciones.
+
+Los paquetes no cuentan con **firma de editor verificada**, por lo que el sistema puede mostrar advertencias de seguridad. El mantenedor ha probado los cuatro paquetes de Windows y Linux indicados abajo; **los paquetes de macOS todavía no se han probado**. Esto no constituye una validación de todas las funciones ni de todas las versiones de cada sistema.
+</aside>
+
+### Windows · Intel / AMD de 64 bits
+{: #descargas-windows }
+
+Elige uno de los dos formatos: EXE ofrece un asistente de instalación; MSI es un paquete Windows Installer. No necesitas instalar ambos. El segmento `en-US` del nombre MSI no limita los idiomas disponibles dentro de Plunibio.
+
+{% include release-downloads.html platform="windows" %}
+
+### Linux · Intel / AMD de 64 bits
+{: #descargas-linux }
+
+Elige DEB para una distribución que utilice paquetes Debian, o AppImage para ejecutar la aplicación desde un archivo. `amd64`, `x64` y `x86_64` se refieren aquí a la arquitectura Intel/AMD de 64 bits. No hay paquetes Linux ARM en esta release.
+
+{% include release-downloads.html platform="linux" %}
+
+### macOS · Apple Silicon e Intel
+{: #descargas-macos }
+
+**No probado:** no disponemos de un Mac para comprobar estos paquetes. Elige Apple Silicon para chips de la serie M o Intel para un Mac con procesador Intel. DMG contiene la aplicación; `.app.tar.gz` es la alternativa comprimida.
+
+Si pruebas alguno, agradeceremos que compartas el resultado en [GitHub Issues]({{ site.github_url }}/issues): versión de macOS, procesador, nombre del paquete, pasos y resultado. Evita incluir rutas personales u otros datos privados.
+
+{% include release-downloads.html platform="macos" %}
+
+Cada descarga incluye un valor **SHA-256** publicado por GitHub. Permite comparar la integridad del archivo con ese valor; no sustituye una firma de editor ni una prueba funcional. Descarga los paquetes desde los enlaces de esta página o la release oficial.
+
+## Instalar un paquete descargado
+
+Los instaladores contienen la aplicación: no necesitas Node.js, Rust ni herramientas de compilación para utilizarlos. No se han establecido requisitos mínimos verificados de versión del sistema operativo; las pruebas de paquetes indicadas no garantizan todas las distribuciones o versiones.
+
+### Windows
+
+Abre el EXE o MSI descargado y sigue su asistente. Después, inicia **Plunibio** desde el menú Inicio. Si Windows muestra un aviso de editor desconocido, consulta la [información de Microsoft sobre SmartScreen](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation) y comprueba la procedencia del archivo antes de decidir si continúas.
+
+### Linux: AppImage
+
+En la carpeta donde descargaste el archivo, permite su ejecución y ábrelo:
+
+```bash
+chmod +x "{{ appimage.name }}"
+./{{ appimage.name }}
+```
+
+También puedes utilizar la opción de permitir ejecución de tu gestor de archivos. Consulta la [guía oficial de AppImage](https://docs.appimage.org/introduction/quickstart.html) si necesitas ayuda.
+
+### Linux: DEB
+
+En Debian o Ubuntu, desde la carpeta de descarga:
+
+```bash
+sudo apt install ./{{ deb.name }}
+```
+
+Revisa las dependencias y cambios que proponga el gestor de paquetes. Después, inicia Plunibio desde el menú de aplicaciones de tu escritorio.
+
+### macOS: procedimiento pendiente de prueba
+
+Si decides probar el DMG, ábrelo y copia **Plunibio.app** a **Aplicaciones**; la alternativa `.app.tar.gz` requiere extraer primero la aplicación. Estos pasos no se han reproducido en un Mac para esta versión. macOS puede impedir la apertura por no poder verificar el desarrollador; consulta la [guía de Apple sobre apertura segura de aplicaciones](https://support.apple.com/en-us/102445). Si aparece un error, incluye el mensaje literal en tu informe.
+
+Tras abrir Plunibio, sigue [Primeros pasos]({{ '/es/docs/primeros-pasos/' | relative_url }}) para elegir un espacio, crear un documento y guardar un cambio. El espacio es una carpeta de tu equipo, no una cuenta ni una biblioteca que debas importar.
+
+## Actualizar o desinstalar
+
+Antes de actualizar, guarda los documentos, cierra Plunibio y conserva una copia de seguridad. Descarga el paquete nuevo para tu sistema; para AppImage, utiliza el archivo nuevo en lugar del anterior. Para paquetes instalados, sigue el método de su instalador o gestor de paquetes. El cambio entre formatos de instalación no se ha verificado: no se garantiza conservar la configuración al alternarlos.
+
+Para retirar la aplicación, utiliza el desinstalador o gestor de paquetes de tu sistema; en AppImage, elimina el archivo de la aplicación cuando esté cerrada. Conserva las carpetas de tus espacios: contienen tus documentos. Borrar documentos o preferencias es una operación distinta, que no es necesaria para consultar o descargar otra versión.
+
+Si no puedes instalar o abrir un paquete, informa del sistema, arquitectura, nombre del archivo y mensaje de error en [GitHub Issues]({{ site.github_url }}/issues). Para problemas al editar o guardar, consulta [Atajos y solución de problemas]({{ '/es/docs/atajos-y-solucion-de-problemas/' | relative_url }}).
 
 ## Construir desde el código fuente
+
+Estas instrucciones construyen la versión publicada **{{ release.version }}**, desde el tag **{{ release.tag }}**, en lugar de la rama de desarrollo.
 
 Para construir Plunibio necesitas [Git](https://git-scm.com/), una versión LTS actual de [Node.js](https://nodejs.org/) con npm y la cadena estable de [Rust](https://rustup.rs/). También debes instalar las dependencias de Tauri correspondientes a tu sistema.
 
@@ -32,6 +112,7 @@ Después, abre PowerShell y ejecuta:
 ```powershell
 git clone https://github.com/adrianromero/plunibio.git
 cd plunibio
+git checkout {{ release.tag }}
 npm ci
 npm run tauri build
 ```
@@ -52,6 +133,7 @@ Después, construye Plunibio:
 ```bash
 git clone https://github.com/adrianromero/plunibio.git
 cd plunibio
+git checkout {{ release.tag }}
 npm ci
 npm run tauri build
 ```
@@ -71,6 +153,7 @@ Después, construye Plunibio desde Terminal:
 ```bash
 git clone https://github.com/adrianromero/plunibio.git
 cd plunibio
+git checkout {{ release.tag }}
 npm ci
 npm run tauri build
 ```

@@ -1,0 +1,18 @@
+{% assign release = site.data.releases %}
+{% assign labels = site.data.installation[page.lang] %}
+{% assign packages = release.assets | where: 'platform', include.platform %}
+<div class="release-download-grid">
+  {% for package in packages %}
+    <article class="release-download" data-release-asset="{{ package.name | escape }}">
+      <h4>{{ labels.formats[package.format] }}</h4>
+      <p class="release-architecture">{% if include.platform == 'macos' and package.architecture == 'x86_64' %}{{ labels.mac_intel }}{% else %}{{ labels.architectures[package.architecture] }}{% endif %}</p>
+      <p class="release-filename"><code>{{ package.name }}</code></p>
+      <p class="release-test-status{% unless package.tested %} release-untested{% endunless %}">{% if package.tested %}{{ labels.tested }}{% else %}{{ labels.untested }}{% endif %}</p>
+      <a class="release-download-link" href="{{ package.url }}">{{ labels.download }} {{ labels.formats[package.format] }}{% if include.platform == 'macos' %} · {% if package.architecture == 'arm64' %}Apple Silicon{% else %}Intel{% endif %}{% endif %}</a>
+      <details class="release-checksum">
+        <summary>{{ labels.checksum }}</summary>
+        <code>{{ package.sha256 }}</code>
+      </details>
+    </article>
+  {% endfor %}
+</div>
