@@ -1,0 +1,464 @@
+{
+    "name": "Docs ES: global preferences and persistence",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "code/example.js",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='typography']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='modern']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[data-typography='modern']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Alt",
+                "b"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='app-sidebar']"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "refresh"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[data-typography='modern']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='app-sidebar']"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-toggle']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='app-sidebar']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "refresh"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='text-editor']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='app-sidebar']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='en']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='en']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='es']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='es']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='ca']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='ca']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='gl']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='gl']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='eu']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='eu']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='language']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='es']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='es']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='breadcrumb-segment'][data-path='']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-view']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='modified']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='modified']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='modified'][data-sort-direction='desc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='typography']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='serif']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[data-typography='serif']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "refresh"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[lang='es'][data-typography='serif']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='modified'][data-sort-direction='desc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='folder-entry'][data-path='code']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='modified'][data-sort-direction='desc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='name']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-sort-attribute='name'][data-sort-direction='asc']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='main-toolbar'] > div:last-child [data-testid='toolbar-menu-trigger']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='typography']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-choice-option='sans-serif']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "html[data-typography='sans-serif']"
+            },
+            "state": "existing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        }
+    ]
+}

@@ -40,6 +40,6 @@ See [Workspaces and files]({{ '/en/docs/workspaces-and-files/' | relative_url }}
 Differences between Windows, Linux, and macOS are explained beside the relevant step when they affect a procedure.
 
 {% capture alpha_notice %}
-This manual is being updated for the next Plunibio release. The **final version number is pending confirmation**. Last reviewed: **November 4, 2026**. Plunibio is currently in alpha. You can report a problem through [GitHub Issues]({{ site.github_url }}/issues).
+This manual is being updated for the next Plunibio release. The **final version number is pending confirmation**. Last reviewed: **November 5, 2026**. Plunibio is currently in alpha. You can report a problem through [GitHub Issues]({{ site.github_url }}/issues).
 {% endcapture %}
 {% include docs-callout.html type="warning" title="Version and product status" content=alpha_notice %}

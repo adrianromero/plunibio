@@ -1,0 +1,229 @@
+{
+    "name": "Docs EN: inline math actions and editing",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        },
+        "file": "markdown/editor-lab.md",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z"
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Edit expression"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "inline-math-actions"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Edit expression"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "LaTeX expression"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "LaTeX expression"
+            },
+            "text": "b^2+c^2",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "inline-math-edit"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Inline math actions'] button[type='submit']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Edit expression"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Edit expression"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "LaTeX expression"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "LaTeX expression"
+            },
+            "text": "discarded",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Inline math actions'] button[aria-label='Cancel']"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "More options"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry='reload']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] span[data-type='math_inline']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Copy expression"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Inline math actions']"
+            },
+            "state": "visible",
+            "text": "b^2+c^2"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Copy expression"
+            }
+        },
+        {
+            "action": "waitClipboard",
+            "text": "b^2+c^2"
+        }
+    ],
+    "outputDir": "website/assets/images/docs/en/tables-code-advanced",
+    "settleMs": 500
+}

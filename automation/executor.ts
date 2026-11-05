@@ -169,6 +169,21 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
             );
             break;
         }
+        case "domPointerDrag": {
+            const element = await findTarget(step.target);
+            await element.waitForExist({ timeout: context.timeoutMs });
+            await browser.execute((node: HTMLElement, dx: number, dy: number) => {
+                const rect = node.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) throw new Error("Drag target has no dimensions");
+                const clientX = rect.left + rect.width / 2;
+                const clientY = rect.top + rect.height / 2;
+                const init = { bubbles: true, cancelable: true, pointerId: 1, pointerType: "mouse", button: 0, buttons: 1, clientX, clientY };
+                node.dispatchEvent(new PointerEvent("pointerdown", init));
+                window.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: clientX + dx, clientY: clientY + dy }));
+                window.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0, clientX: clientX + dx, clientY: clientY + dy }));
+            }, element, step.x, step.y);
+            break;
+        }
         case "pointerDrag": {
             const element = await findTarget(step.target);
             await element.waitForDisplayed({ timeout: context.timeoutMs });

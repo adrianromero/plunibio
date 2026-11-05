@@ -13,7 +13,7 @@
     </nav>
     <div class="header-actions">
       {% include language-switcher.html t=include.t %}
-      <a class="github-link" href="{{ site.github_url }}" rel="noopener noreferrer">
+      <a class="github-link" href="{{ site.github_url }}" rel="noopener noreferrer"{% if page.section == 'docs' %} aria-label="{{ include.t.github }}"{% endif %}>
         {% include icon.html name="github" %}<span>{{ include.t.github }}</span>
       </a>
     </div>

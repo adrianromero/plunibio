@@ -62,7 +62,7 @@ export type PointerMoveStep = {
 };
 
 export type PointerDragStep = {
-    action: "pointerDrag";
+    action: "pointerDrag" | "domPointerDrag";
     target: Target;
     x: number;
     y: number;

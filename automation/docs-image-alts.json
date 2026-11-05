@@ -1,4 +1,32 @@
 {
+    "shortcuts-troubleshooting/navigation-save-failed": {
+        "en": "Save error while navigating away from an edited BMP, warning of possible data loss and offering Continue and Cancel.",
+        "es": "Error de guardado al salir de un BMP editado, con aviso de posible pérdida de datos y las opciones Continuar y Cancelar."
+    },
+    "customize/typography-menu": {
+        "en": "Typography menu offering Sans Serif, Serif, Modern, and Reading for Markdown presentation.",
+        "es": "Menú Tipografía con Sans Serif, Serif, Moderna y Lectura para la presentación de Markdown."
+    },
+    "edit-text-code/javascript-editor": {
+        "en": "JavaScript file in the text and code editor, with line numbers, syntax highlighting, and a fold arrow beside the function.",
+        "es": "Archivo JavaScript en el editor de texto y código, con números de línea, resaltado de sintaxis y una flecha de plegado junto a la función."
+    },
+    "edit-text-code/folded-function": {
+        "en": "JavaScript function folded into an ellipsis, with a gap in the line numbers showing the hidden body.",
+        "es": "Función JavaScript plegada en puntos suspensivos, con un salto en los números de línea que indica el cuerpo oculto."
+    },
+    "edit-text-code/javascript-completion": {
+        "en": "JavaScript completion list offering districtName after typing districtN below its declaration.",
+        "es": "Lista de sugerencias JavaScript que ofrece districtName después de escribir districtN debajo de su declaración."
+    },
+    "edit-text-code/multiple-selection": {
+        "en": "Three occurrences of district selected together before replacing them in the JavaScript file.",
+        "es": "Tres apariciones de district seleccionadas a la vez antes de sustituirlas en el archivo JavaScript."
+    },
+    "edit-text-code/mermaid-file": {
+        "en": "Standalone Mermaid file open as highlighted source code, with a flowchart declaration and an arrow between two nodes.",
+        "es": "Archivo Mermaid independiente abierto como código fuente resaltado, con una declaración flowchart y una flecha entre dos nodos."
+    },
     "getting-started/main-interface": {
         "en": "Plunibio with Atlas of Lúmina open in the Markdown editor and the formatting sidebar visible.",
         "es": "Plunibio con Atlas de Lúmina abierto en el editor Markdown y el panel de formato visible."
@@ -47,6 +75,22 @@
         "en": "Error explaining that an edited BMP can be viewed but only PNG, JPEG, and WebP can be saved.",
         "es": "Error que explica que un BMP editado puede visualizarse, pero solo se pueden guardar PNG, JPEG y WebP."
     },
+    "tables-code-advanced/inline-math-actions": {
+        "en": "Inline formula with its LaTeX expression and Edit expression and Copy expression actions visible.",
+        "es": "Fórmula en línea con su expresión LaTeX y las acciones Editar expresión y Copiar expresión visibles."
+    },
+    "tables-code-advanced/inline-math-edit": {
+        "en": "LaTeX expression field containing b^2+c^2, with OK and Cancel controls.",
+        "es": "Campo Expresión LaTeX con b^2+c^2 y los controles OK y Cancelar."
+    },
+    "tables-code-advanced/math-block-edit": {
+        "en": "Math block with E = mc^2 in the source editor and its rendered preview below.",
+        "es": "Bloque matemático con E = mc^2 en el editor de fuente y su vista previa debajo."
+    },
+    "tables-code-advanced/mermaid-error": {
+        "en": "Mermaid source containing invalid text and a preview error, while the source remains editable.",
+        "es": "Fuente Mermaid con texto no válido y un error de vista previa, con el código disponible para corregirlo."
+    },
     "tables-code-advanced/code-language-picker": {
         "en": "Language selector open above a fenced Markdown code block.",
         "es": "Selector de lenguaje abierto sobre un bloque de código delimitado de Markdown."
@@ -78,6 +122,18 @@
     "edit-markdown/frontmatter-panel": {
         "en": "Document properties editor showing YAML front matter above the Markdown content.",
         "es": "Editor de propiedades del documento con el bloque de front matter YAML sobre el contenido Markdown."
+    },
+    "links-and-images/create-link": {
+        "en": "Link creation controls with README.md entered as the address for the selected Field notes text.",
+        "es": "Controles de creación de enlace con README.md como dirección para el texto seleccionado Notas de campo."
+    },
+    "links-and-images/insert-image": {
+        "en": "Empty block image insertion box with the image link field below the Field notes paragraph.",
+        "es": "Recuadro vacío de inserción de imagen en bloque con el campo de enlace bajo el párrafo Notas de campo."
+    },
+    "links-and-images/image-caption": {
+        "en": "Block image with a panoramic-view caption and a reduced display size in the Markdown editor.",
+        "es": "Imagen en bloque con un pie de vista panorámica y tamaño de presentación reducido en el editor Markdown."
     },
     "links-and-images/link-actions": {
         "en": "Floating actions for editing, copying, opening, or removing a Markdown link.",

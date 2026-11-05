@@ -1,0 +1,642 @@
+{
+    "name": "Docs EN: create links and images",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z",
+        "file": "links-guide.md",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "en",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        }
+    },
+    "outputDir": "website/assets/images/docs/en/links-and-images",
+    "settleMs": 500,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Field notes"
+            ]
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "a"
+            ]
+        },
+        {
+            "action": "waitSelection",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Link"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "text": "README.md",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "name": "create-link",
+            "scope": "viewport"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Link actions'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='README.md']"
+            },
+            "state": "visible",
+            "text": "Field notes"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='README.md']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Copy link"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Copy link"
+            }
+        },
+        {
+            "action": "waitClipboard",
+            "text": "README.md",
+            "source": "native"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Edit link"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "text": "notes/field-notes.md",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Link actions'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/field-notes.md']"
+            },
+            "state": "visible",
+            "text": "Field notes"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/field-notes.md']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Remove link"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='notes/field-notes.md']"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            },
+            "state": "visible",
+            "text": "Field notes"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter"
+            ]
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "aria",
+                "value": "Image"
+            },
+            "block": "center"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Image"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "block": "center"
+        },
+        {
+            "action": "capture",
+            "name": "insert-image",
+            "scope": "viewport"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .link-input-area"
+            },
+            "text": "assets/atlas-de-lumina.png",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .confirm"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "block": "center"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Show or hide image caption"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Show or hide image caption"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "text": "Atlas of Lúmina, panoramic view",
+            "replace": true
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "hover",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .image-wrapper"
+            }
+        },
+        {
+            "action": "domPointerDrag",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .image-resize-handle"
+            },
+            "x": 0,
+            "y": -40,
+            "durationMs": 400
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//img[@data-type='image-block' and number(@data-height) < number(@data-origin)]"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "name": "image-caption",
+            "scope": "viewport"
+        },
+        {
+            "action": "focus",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Unsaved changes"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "xpath",
+                "value": "//*[@data-testid='markdown-editor']//img[@data-type='image-block' and number(@data-height) < number(@data-origin)]"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Show or hide image caption"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .milkdown-image-block img[data-type='image-block']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "aria",
+                "value": "Show or hide image caption"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-image-block .caption-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "img[data-type='image-block'][alt='Atlas of Lúmina, panoramic view']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:first-of-type"
+            },
+            "position": "end"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "aria",
+                "value": "Link"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Link"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "aria",
+                "value": "Link address"
+            },
+            "text": "file:///tmp/plunibio-documentation-example.pdf",
+            "replace": true
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Link actions'] button[type='submit']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='file:///tmp/plunibio-documentation-example.pdf']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "pointerOver",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] a[href='file:///tmp/plunibio-documentation-example.pdf']"
+            }
+        },
+        {
+            "action": "domClick",
+            "target": {
+                "using": "css",
+                "value": "form[aria-label='Link actions'] button:first-of-type"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible",
+            "text": "not a relative file path"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        }
+    ]
+}

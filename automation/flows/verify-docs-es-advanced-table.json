@@ -1,0 +1,216 @@
+{
+    "name": "Docs ES: verify table creation and deletion",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "typography": "sans-serif",
+            "sidebarVisible": true,
+            "showHiddenFiles": false,
+            "folderSort": {
+                "attribute": "name",
+                "direction": "asc"
+            }
+        },
+        "file": "markdown/typing-rules.es.md",
+        "fixtureTimestamp": "2026-10-01T12:00:00Z"
+    },
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "markdown-editor"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='markdown-editor'] .ProseMirror > p:last-child"
+            },
+            "position": "end"
+        },
+        {
+            "action": "scrollIntoView",
+            "target": {
+                "using": "aria",
+                "value": "Tabla"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "aria",
+                "value": "Tabla"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3) > :nth-child(3)"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(2) > :first-child p"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Dato"
+            ]
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(2) > :first-child"
+            },
+            "xRatio": 0.5,
+            "yRatio": 0.5
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-role='row-drag-handle']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-role='row-drag-handle'] .button-group[data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-role='row-drag-handle'] .button-group button"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3)"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "pointerMove",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(2) > :first-child"
+            },
+            "xRatio": 0.5,
+            "yRatio": 0.5
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-role='col-drag-handle']"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-role='col-drag-handle'] .button-group[data-show='true']"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-role='col-drag-handle'] .button-group button:last-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :nth-child(3)"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": { "using": "aria", "value": "Más opciones" }
+        },
+        {
+            "action": "click",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry='save']" }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='message-dialog'] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(2) > :nth-child(2)"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:nth-child(3)"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": ".milkdown-table-block table.children tr:first-child > :nth-child(3)"
+            },
+            "state": "missing"
+        }
+    ]
+}

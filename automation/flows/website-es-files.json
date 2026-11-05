@@ -1,0 +1,250 @@
+{
+  "name": "Website ES: folders, search and upright image",
+  "app": {
+    "basePath": "examples/atlas-de-lumina",
+    "workspaceMode": "temporary-copy",
+    "fixtureTimestamp": "2026-10-01T12:00:00Z",
+    "width": 1024,
+    "height": 768,
+    "preferences": {
+      "locale": "es",
+      "theme": "light",
+      "typography": "serif",
+      "sidebarVisible": false,
+      "showHiddenFiles": false,
+      "folderSort": {
+        "attribute": "name",
+        "direction": "asc"
+      }
+    }
+  },
+  "outputDir": "/tmp/plunibio-website-captures/es",
+  "settleMs": 600,
+  "steps": [
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "html[lang='es']"
+      },
+      "state": "existing"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "folder-view"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='assets']"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-folders-es"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='data']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='data/distritos.json']"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='data/distritos.json']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "text-editor"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "wait",
+      "target": { "using": "testId", "value": "spinner-overlay" },
+      "state": "hidden"
+    },
+    {
+      "action": "focus",
+      "target": { "using": "css", "value": "[data-testid='text-editor'] .cm-content" }
+    },
+    {
+      "action": "keys",
+      "keys": [
+        "Control",
+        "f"
+      ]
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "search-panel"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "type",
+      "target": {
+        "using": "testId",
+        "value": "search-input"
+      },
+      "text": "light",
+      "replace": true
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "xpath",
+        "value": "//*[@data-testid='search-input']/following-sibling::span"
+      },
+      "state": "visible",
+      "text": "/ 7"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-text-search-es"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='breadcrumb-segment'][data-path='']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "folder-view"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='assets']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='assets/atlas-de-lumina.png']"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='folder-entry'][data-path='assets/atlas-de-lumina.png']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "image-view"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "image-canvas"
+      },
+      "state": "visible"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='image-action'][data-action='fit']"
+      }
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "image-viewport"
+      },
+      "state": "visible",
+      "text": "0°"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-image-transform-es"
+    },
+    {
+      "action": "click",
+      "target": {
+        "using": "css",
+        "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
+      }
+    },
+    {
+      "action": "setRange",
+      "target": {
+        "using": "css",
+        "value": "[data-control-id='brightness'] input[type='range']"
+      },
+      "value": 105
+    },
+    {
+      "action": "setRange",
+      "target": {
+        "using": "css",
+        "value": "[data-control-id='contrast'] input[type='range']"
+      },
+      "value": 108
+    },
+    {
+      "action": "setRange",
+      "target": {
+        "using": "css",
+        "value": "[data-control-id='saturation'] input[type='range']"
+      },
+      "value": 112
+    },
+    {
+      "action": "wait",
+      "target": {
+        "using": "testId",
+        "value": "image-viewport"
+      },
+      "state": "visible",
+      "text": "0°"
+    },
+    {
+      "action": "capture",
+      "scope": "viewport",
+      "name": "plunibio-features-image-adjust-es"
+    }
+  ]
+}

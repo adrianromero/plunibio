@@ -73,11 +73,11 @@ chapters:
     en:
       title: Links and images
       url: /en/docs/links-and-images/
-      description: Create links and insert images by selecting, pasting, or dragging files.
+      description: Create links and insert images by address, pasting, or dragging.
     es:
       title: Enlaces e imágenes
       url: /es/docs/enlaces-e-imagenes/
-      description: Crea enlaces e inserta imágenes seleccionando, pegando o arrastrando archivos.
+      description: Crea enlaces e inserta imágenes por dirección, pegado o arrastre.
 
   - docs_key: tables-code-advanced
     order: 5
