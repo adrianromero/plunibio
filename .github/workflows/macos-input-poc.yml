@@ -1,0 +1,50 @@
+name: Prueba de concepto de entrada en macOS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-input:
+    name: Entrada nativa en ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Apple Silicon
+            runner: macos-15
+          - name: Intel
+            runner: macos-15-intel
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+      - name: Configurar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: npm
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Restaurar la caché de Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Construir DMG de producción
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+        run: npm run tauri build -- --bundles dmg
+      - name: Probar teclado y captura
+        run: bash automation/poc/macos-native-input.sh
+      - name: Conservar resultados
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-input-poc-${{ matrix.runner }}
+          path: ${{ runner.temp }}/plunibio-input-poc/results
+          if-no-files-found: warn
