@@ -242,7 +242,7 @@ in the current AppContext source; the flow does not close the application window
 the real application arguments. Leaving it empty does not create a folder entry; returning and
 using Save creates it, and Reload reads it back without an unsaved indicator. These flows use
 temporary copies and create no captures. CLI syntax/error checks are recorded separately in
-`private/scripts/verify-documentation-cli.mjs`; every case exits before GUI startup.
+`scripts/verify-documentation-cli.mjs` (`npm run docs:cli:check`); every case exits before GUI startup.
 
 `docs-{es,en}-preferences.json` captures the general menu, all four typography choices, language
 choices, Reading typography, the dark theme, and hidden files before/after. It checks persisted
@@ -330,3 +330,50 @@ The command includes `docs-*.json` capture flows and `verify-docs-*.json` behavi
 latter cover new file management, inline math editing, and Mermaid file highlighting in ES/EN.
 They do not own image destinations or require new WebP files in the manifest. Integrate a scene into
 a capture flow only when the chapter has selected that scene and its bilingual alternative text.
+
+## Maintaining the website in a new session
+
+Start with [website/README.md](../website/README.md), the editorial contract and templates in
+`website/maintenance/`. They cover all five website sections, release metadata, bilingual writing,
+preview, validation and publication. No private planning directory is required.
+
+For an affected Docs chapter, rebuild the automation binary from the target application reference,
+run both localized flows, review the generated PNGs, then run:
+
+```bash
+npm run docs:images:optimize
+npm run docs:images:manifest
+```
+
+The optimizer replaces PNGs under the Docs asset tree with verified pixel-identical lossless WebP;
+these commands modify published assets. The manifest reads `automation/docs-image-alts.json` and
+capture ownership from the flows. Update the alternatives if a scene changes and retain existing IDs
+and filenames where possible. Use `docs-figure.html` IDs in chapters. Do not hand-edit generated
+manifests. `--verify-only` still performs flow actions, so use disposable workspaces for mutable flows.
+
+Before closing a functional release, run the affected flows and both regressions:
+
+```bash
+npm run automation:check
+npm run automation:test
+npm run docs:images:regression
+npm run website:images:regression
+```
+
+Docs regression replays capture and verification flows with captures disabled and checks fixture and
+published-image hashes. It checks capture target readiness/dimensions; it does not compare newly
+rendered screenshots pixel by pixel with the published images. Landing/Features refresh does verify
+lossless conversion against its staged source PNG. Neither result is a physical platform test.
+
+Use `viewport` or `element` for public images; exclude native decorations and absolute personal paths.
+Keep base window 1024×768, deterministic locale/preferences/timestamp, localized example content,
+explicit readiness waits and original examples unchanged. Image showcase scenes should use Fit and
+0° rotation. Inspect the generated dimensions rather than assuming a HiDPI scale.
+
+Keep browser/site QA separate from app WebDriver flows. `npm run website:check -- <preview-root>`
+validates a Jekyll build. `npm run website:qa:prepare -- <preview-root> --all-pages` creates a disposable
+axe-instrumented site covering Home, Features, Installation, Docs and About in both languages.
+It prints the temporary path to serve; open its `/qa/` page in a browser to run and export results.
+Never publish that instrumented copy. See the website README for build paths and exact procedure.
+CLI read-only checks now live in `scripts/verify-documentation-cli.mjs`; run
+`npm run docs:cli:check -- <binary>` when relevant.

@@ -23,7 +23,10 @@
         "check": "tsc --noEmit && tsc --noEmit -p .storybook/tsconfig.json",
         "serve": "vite preview",
         "test": "vitest run",
-        "tauri": "tauri"
+        "tauri": "tauri",
+        "website:check": "node scripts/validate-documentation-site.mjs",
+        "website:qa:prepare": "node scripts/prepare-documentation-browser-qa.mjs",
+        "docs:cli:check": "node scripts/verify-documentation-cli.mjs"
     },
     "author": "Adrián Romero",
     "license": "MIT",
@@ -73,6 +76,7 @@
         "@wdio/spec-reporter": "^9.32.0",
         "@wdio/tauri-plugin": "^1.5.1",
         "@wdio/tauri-service": "^1.5.1",
+        "axe-core": "4.13.0",
         "jsdom": "^28.1.0",
         "storybook": "^10.6.5",
         "storybook-solidjs-vite": "^10.7.2",
@@ -80,7 +84,8 @@
         "typescript": "~5.6.2",
         "vite": "^6.4.5",
         "vite-plugin-solid": "^2.11.0",
-        "vitest": "^5.0.5"
+        "vitest": "^5.0.5",
+        "yaml": "2.9.1"
     },
     "overrides": {
         "dompurify": "3.4.17",

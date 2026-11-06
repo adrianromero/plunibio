@@ -214,6 +214,13 @@ GitHub creates the release as a draft with generated release notes. Tags contain
 
 The macOS packages currently use an ad-hoc signature and the Windows packages are unsigned. Operating-system security warnings may therefore appear until production code signing and macOS notarization are configured. The release workflow is defined in [`.github/workflows/release.yml`](./.github/workflows/release.yml).
 
+## Website maintenance
+
+For bilingual website updates alongside a new release or feature, start with
+[website/README.md](website/README.md). It includes the editorial contract, update-plan
+and chapter templates, automated screenshot procedures, and publication checks for Home,
+Features, Installation, Docs, and About.
+
 ## Contributing
 
 Contributions and bug reports are welcome. Before submitting a pull request:

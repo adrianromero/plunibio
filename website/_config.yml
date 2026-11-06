@@ -12,6 +12,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - maintenance
 
 defaults:
   - scope:
