@@ -48,7 +48,8 @@ for _ in {1..20}; do
 done
 [[ -f "$workspace/smoke.md" ]] && cp "$workspace/smoke.md" "$results/smoke.md"
 grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"
-xdotool windowclose "$window"
+echo 'Requesting a normal X11 window close.'
+python3 automation/poc/x11-close.py "$window"
 for _ in {1..15}; do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
 if kill -0 "$pid" 2>/dev/null; then echo 'Application did not close' >&2; exit 1; fi
 wait "$pid"
