@@ -2,8 +2,10 @@ import AppKit
 import ApplicationServices
 import CoreGraphics
 import Foundation
+import ImageIO
+import Vision
 
-guard (2...3).contains(CommandLine.arguments.count), let pid = pid_t(CommandLine.arguments[1]) else {
+guard (2...4).contains(CommandLine.arguments.count), let pid = pid_t(CommandLine.arguments[1]) else {
     fatalError("Usage: macos-native-input <application-pid> [--quit]")
 }
 if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--quit" {
@@ -41,7 +43,7 @@ guard let bounds = targetBounds, let app = NSRunningApplication(processIdentifie
 app.activate()
 Thread.sleep(forTimeInterval: 3)
 
-if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about" {
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about-menu" {
     let point = CGPoint(x: bounds.maxX - 26, y: bounds.minY + 53)
     guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
           let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else {
@@ -54,22 +56,40 @@ if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about" {
     down.post(tap: .cghidEventTap)
     up.post(tap: .cghidEventTap)
     Thread.sleep(forTimeInterval: 0.5)
-    // Close the pointer-opened menu, then reopen it from the focused trigger.
-    // Keyboard opening focuses the first item; End selects the About item.
-    for code in [CGKeyCode(53), 49, 119, 36] { // Escape, Space, End, Return
-        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: true),
-              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: false) else {
-            fatalError("Could not create menu key events")
-        }
-        keyDown.flags = []
-        keyUp.flags = []
-        keyDown.post(tap: .cghidEventTap)
-        keyUp.post(tap: .cghidEventTap)
-        Thread.sleep(forTimeInterval: 0.5)
-    }
     exit(0)
 }
-if CommandLine.arguments.count == 3 { fatalError("Unknown action") }
+if CommandLine.arguments.count == 4 && CommandLine.arguments[2] == "--about-select" {
+    let imageURL = URL(fileURLWithPath: CommandLine.arguments[3]) as CFURL
+    guard let source = CGImageSourceCreateWithURL(imageURL, nil),
+          let screenshot = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+        fatalError("Could not read menu screenshot")
+    }
+    let request = VNRecognizeTextRequest()
+    request.recognitionLevel = .accurate
+    try VNImageRequestHandler(cgImage: screenshot).perform([request])
+    let candidates = (request.results ?? []).filter { observation in
+        guard let text = observation.topCandidates(1).first?.string.lowercased() else { return false }
+        return (text.contains("about") || text.contains("acerca")) && text.contains("plunibio")
+    }
+    guard candidates.count == 1, let match = candidates.first else {
+        fputs("Could not uniquely find About Plunibio in menu screenshot.\n", stderr)
+        exit(1)
+    }
+    // Vision uses normalized coordinates with the origin at the bottom left.
+    let screen = CGDisplayBounds(CGMainDisplayID())
+    let point = CGPoint(x: screen.minX + match.boundingBox.midX * screen.width,
+                        y: screen.minY + (1 - match.boundingBox.midY) * screen.height)
+    guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
+          let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else {
+        fatalError("Could not create About click")
+    }
+    down.flags = []
+    up.flags = []
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
+    exit(0)
+}
+if CommandLine.arguments.count > 2 { fatalError("Unknown action") }
 
 // The application focuses the Markdown editor after it finishes loading.
 let input = Array("Plunibio smoke test".utf16)
