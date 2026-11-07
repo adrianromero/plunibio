@@ -57,7 +57,7 @@ file "$binary" | tee "$results/architecture.txt"
 stage="compile native input helper"
 swiftc automation/poc/macos-native-input.swift -o "$task_root/native-input"
 stage="launch application"
-HOME="$task_root/home" "$binary" --base-path "$workspace" --width 1024 --height 768 smoke.md >"$results/application.log" 2>&1 &
+HOME="$task_root/home" "$binary" --base-path "$workspace" --width 850 --height 700 smoke.md >"$results/application.log" 2>&1 &
 pid=$!
 
 stage="wait for document loading"
@@ -107,6 +107,11 @@ stage="verify saved markdown"
 for _ in {1..20}; do
   if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"; then
     cp "$workspace/smoke.md" "$results/smoke.md"
+    stage="open and capture about"
+    "$task_root/native-input" "$pid" --about >>"$results/input.log" 2>&1
+    sleep 2
+    screencapture -x "$results/about.png" >>"$results/capture.log" 2>&1
+    test -s "$results/about.png"
     echo "Native input and save verified; requesting normal termination."
     "$task_root/native-input" "$pid" --quit
     for _ in {1..15}; do

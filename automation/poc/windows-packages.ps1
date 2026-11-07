@@ -47,7 +47,7 @@ try {
     $exe = Find-Installation
     $stdout = Join-Path $results 'application.log'
     $stderr = Join-Path $results 'application-error.log'
-    $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '1024', '--height', '768', 'smoke.md') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+    $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '850', '--height', '700', 'smoke.md') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
     try {
         $loaded = $false
         for ($i = 0; $i -lt 60; $i++) {
@@ -81,6 +81,35 @@ try {
         }
         if (Test-Path $file) { Copy-Item $file (Join-Path $results 'smoke.md') }
         if (!(Test-Path $file) -or !(Get-Content -Raw $file).Contains('Plunibio smoke test')) { throw 'Expected text was not saved' }
+        Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class SmokeNative {
+    [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
+    [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hwnd, out Rect rect);
+    [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint flags, uint dx, uint dy, uint data, UIntPtr extra);
+}
+'@
+        $app.Refresh()
+        $rect = [SmokeNative+Rect]::new()
+        if (![SmokeNative]::GetWindowRect($app.MainWindowHandle, [ref]$rect)) { throw 'Could not get window bounds' }
+        [SmokeNative]::SetCursorPos($rect.Right - 26, $rect.Top + 53) | Out-Null
+        [SmokeNative]::mouse_event(2, 0, 0, 0, [UIntPtr]::Zero)
+        [SmokeNative]::mouse_event(4, 0, 0, 0, [UIntPtr]::Zero)
+        Start-Sleep -Seconds 1
+        $shell.SendKeys('{ESC}')
+        $shell.SendKeys(' ')
+        Start-Sleep -Seconds 1
+        $shell.SendKeys('{END}{ENTER}')
+        Start-Sleep -Seconds 2
+        $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        try {
+            $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+            $bitmap.Save((Join-Path $results 'about.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+        } finally { $graphics.Dispose(); $bitmap.Dispose() }
+        $shell.SendKeys('{ESC}')
         if (!$app.CloseMainWindow()) { throw 'Could not request normal window close' }
         if (!$app.WaitForExit(15000)) { throw 'Application did not close' }
     } finally {

@@ -27,7 +27,7 @@ fi
 image="$task_root/apps/Plunibio.AppImage"
 cp "${images[0]}" "$image"
 chmod +x "$image"
-HOME="$task_root/home" GDK_BACKEND=x11 "$image" --base-path "$workspace" --width 1024 --height 768 smoke.md >"$results/application.log" 2>&1 &
+HOME="$task_root/home" GDK_BACKEND=x11 "$image" --base-path "$workspace" --width 850 --height 700 smoke.md >"$results/application.log" 2>&1 &
 pid=$!
 for _ in {1..60}; do
   grep -Fq 'Reading smoke.md' "$results/application.log" && break
@@ -48,6 +48,18 @@ for _ in {1..20}; do
 done
 [[ -f "$workspace/smoke.md" ]] && cp "$workspace/smoke.md" "$results/smoke.md"
 grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"
+echo 'Opening About through the toolbar menu.'
+eval "$(xdotool getwindowgeometry --shell "$window")"
+xdotool mousemove --window "$window" "$((WIDTH - 26))" 53 click 1
+sleep 1
+xdotool key Escape
+xdotool key space
+sleep 1
+xdotool key End Return
+sleep 2
+import -window root "$results/about.png"
+test -s "$results/about.png"
+xdotool key Escape
 echo 'Requesting a normal X11 window close.'
 python3 automation/poc/x11-close.py "$window"
 for _ in {1..15}; do kill -0 "$pid" 2>/dev/null || break; sleep 1; done

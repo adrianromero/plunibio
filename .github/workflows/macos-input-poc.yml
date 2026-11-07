@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 jobs:
-  native-input:
-    name: Paquetes y entrada en ${{ matrix.name }}
+  build:
+    name: Construir paquetes · ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     strategy:
@@ -45,7 +45,6 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
       - name: Construir paquetes de macOS
-        id: build_macos
         if: runner.os == 'macOS'
         uses: tauri-apps/tauri-action@v1
         env:
@@ -58,11 +57,57 @@ jobs:
       - name: Construir paquetes de Windows
         if: runner.os == 'Windows'
         run: npm run tauri build -- --bundles nsis,msi
+      - name: Conservar paquetes para las pruebas
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ matrix.runner }}
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/nsis/*-setup.exe
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/dmg/*.dmg
+            src-tauri/target/release/bundle/macos/*.app.tar.gz
+          if-no-files-found: error
+          retention-days: 3
+
+  smoke:
+    name: Pruebas de humo · ${{ matrix.name }}
+    needs: build
+    if: always()
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Apple Silicon
+            runner: macos-15
+          - name: Intel
+            runner: macos-15-intel
+          - name: Linux x86_64
+            runner: ubuntu-22.04
+          - name: Windows x86_64
+            runner: windows-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+      - name: Descargar paquetes de la misma ejecución
+        id: download
+        uses: actions/download-artifact@v8
+        with:
+          name: packages-${{ matrix.runner }}
+          path: src-tauri/target/release/bundle
+      - name: Instalar dependencias de Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-0 libappindicator3-1 librsvg2-2 xdg-utils xvfb xauth xdotool imagemagick libfuse2
       - name: Probar DMG y entrada en macOS
         if: runner.os == 'macOS'
         run: bash automation/poc/macos-native-input.sh
       - name: Probar archivo comprimido en macOS
-        if: always() && runner.os == 'macOS' && steps.build_macos.outcome == 'success'
+        if: always() && runner.os == 'macOS' && steps.download.outcome == 'success'
         run: bash automation/poc/macos-archive.sh
       - name: Probar paquetes y entrada en Linux
         if: runner.os == 'Linux'

@@ -6,8 +6,8 @@ import Foundation
 guard (2...3).contains(CommandLine.arguments.count), let pid = pid_t(CommandLine.arguments[1]) else {
     fatalError("Usage: macos-native-input <application-pid> [--quit]")
 }
-if CommandLine.arguments.count == 3 {
-    guard CommandLine.arguments[2] == "--quit", let app = NSRunningApplication(processIdentifier: pid), app.terminate() else {
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--quit" {
+    guard let app = NSRunningApplication(processIdentifier: pid), app.terminate() else {
         fputs("Could not request normal application termination.\n", stderr)
         exit(1)
     }
@@ -34,12 +34,36 @@ while Date() < deadline {
     if targetBounds != nil { break }
     Thread.sleep(forTimeInterval: 0.5)
 }
-guard targetBounds != nil, let app = NSRunningApplication(processIdentifier: pid) else {
+guard let bounds = targetBounds, let app = NSRunningApplication(processIdentifier: pid) else {
     fputs("Application window did not appear.\n", stderr)
     exit(1)
 }
 app.activate()
 Thread.sleep(forTimeInterval: 3)
+
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about" {
+    let point = CGPoint(x: bounds.maxX - 26, y: bounds.minY + 53)
+    guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
+          let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else {
+        fatalError("Could not create menu click")
+    }
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 0.5)
+    // Close the pointer-opened menu, then reopen it from the focused trigger.
+    // Keyboard opening focuses the first item; End selects the About item.
+    for code in [CGKeyCode(53), 49, 119, 36] { // Escape, Space, End, Return
+        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: false) else {
+            fatalError("Could not create menu key events")
+        }
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        Thread.sleep(forTimeInterval: 0.5)
+    }
+    exit(0)
+}
+if CommandLine.arguments.count == 3 { fatalError("Unknown action") }
 
 // The application focuses the Markdown editor after it finishes loading.
 let input = Array("Plunibio smoke test".utf16)
