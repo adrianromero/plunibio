@@ -92,6 +92,12 @@ jobs:
     steps:
       - name: Descargar el repositorio
         uses: actions/checkout@v7
+      - name: Configurar Python para las capturas
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Instalar librería de imágenes
+        run: python -m pip install Pillow==11.3.0
       - name: Descargar paquetes de la misma ejecución
         id: download
         uses: actions/download-artifact@v8

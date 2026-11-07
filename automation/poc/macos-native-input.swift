@@ -113,16 +113,22 @@ if CommandLine.arguments.count == 4 && CommandLine.arguments[2] == "--about-sele
             print("Menu OCR: \(text)")
         }
     }
+    let screen = CGDisplayBounds(CGMainDisplayID())
     let candidates = (request.results ?? []).filter { observation in
         guard let text = observation.topCandidates(1).first?.string.lowercased() else { return false }
-        return (text.contains("about") || text.contains("acerca")) && text.contains("plunibio")
+        let x = screen.minX + observation.boundingBox.midX * screen.width
+        let y = screen.minY + (1 - observation.boundingBox.midY) * screen.height
+        // Restrict the match to the menu below the toolbar, avoiding the
+        // window title while tolerating OCR mistakes in the application name.
+        return (text.hasPrefix("about ") || text.hasPrefix("acerca ")) &&
+            x >= bounds.maxX - 300 && x <= bounds.maxX &&
+            y >= bounds.minY + 70 && y <= bounds.maxY
     }
     guard candidates.count == 1, let match = candidates.first else {
         fputs("Could not uniquely find About Plunibio in menu screenshot.\n", stderr)
         exit(1)
     }
     // Vision uses normalized coordinates with the origin at the bottom left.
-    let screen = CGDisplayBounds(CGMainDisplayID())
     let point = CGPoint(x: screen.minX + match.boundingBox.midX * screen.width,
                         y: screen.minY + (1 - match.boundingBox.midY) * screen.height)
     guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),

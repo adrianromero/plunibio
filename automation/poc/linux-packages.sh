@@ -47,12 +47,11 @@ done
 sleep 5
 xdotool windowfocus --sync "$window"
 xdotool type --clearmodifiers --delay 75 'Plunibio smoke test'
-xdotool key --clearmodifiers ctrl+s
-sleep 3
 import -window root "$results/screen.png"
-for _ in {1..20}; do
+for _ in {1..10}; do
+  xdotool key --clearmodifiers ctrl+s
+  sleep 2
   if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"; then break; fi
-  sleep 1
 done
 [[ -f "$workspace/smoke.md" ]] && cp "$workspace/smoke.md" "$results/smoke.md"
 grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"

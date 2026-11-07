@@ -7,6 +7,9 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
+
+from PIL import Image, ImageEnhance, ImageOps
 
 
 def missing_dialog_text(text: str, version: str) -> list[str]:
@@ -35,24 +38,33 @@ def main() -> int:
     if not executable:
         print("Tesseract OCR is not installed or not on PATH", file=sys.stderr)
         return 1
-    result = subprocess.run(
-        [executable, str(screenshot), "stdout", "-l", "eng", "--psm", "11"],
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
-    screenshot.with_name("about-ocr.txt").write_text(result.stdout + "\n" + result.stderr, encoding="utf-8")
-    if result.returncode:
-        print(f"About screenshot OCR failed: {result.stderr}", file=sys.stderr)
+    # Small dialog text gets lost when OCR processes the full desktop at its
+    # original resolution. Enlarge it and increase contrast before recognition.
+    with tempfile.TemporaryDirectory(prefix="plunibio-about-ocr-") as tempdir:
+        prepared = Path(tempdir) / "about-enlarged.png"
+        with Image.open(screenshot) as original:
+            image = ImageOps.grayscale(original)
+            image = ImageEnhance.Contrast(image).enhance(1.5)
+            image = image.resize((image.width * 3, image.height * 3), Image.Resampling.LANCZOS)
+            image.save(prepared)
+        logs = []
+        for mode in ("11", "6"):
+            result = subprocess.run(
+                [executable, str(prepared), "stdout", "-l", "eng", "--psm", mode],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            logs.append(f"--- OCR mode {mode} (exit {result.returncode}) ---\n{result.stdout}\n{result.stderr}")
+            if result.returncode == 0 and not missing_dialog_text(result.stdout, version):
+                screenshot.with_name("about-ocr.txt").write_text("\n".join(logs), encoding="utf-8")
+                print(f"About dialog verified in screenshot (version {version}, OCR mode {mode}).")
+                return 0
+        screenshot.with_name("about-ocr.txt").write_text("\n".join(logs), encoding="utf-8")
+        print("About dialog not verified. See about.png and about-ocr.txt.", file=sys.stderr)
         return 1
-    missing = missing_dialog_text(result.stdout, version)
-    if missing:
-        print(f"About dialog not verified; missing: {', '.join(missing)}. See about.png and about-ocr.txt.", file=sys.stderr)
-        return 1
-    print(f"About dialog verified in screenshot (version {version}).")
-    return 0
 
 
 if __name__ == "__main__":
