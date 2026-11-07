@@ -1,0 +1,92 @@
+$ErrorActionPreference = 'Stop'
+$root = Join-Path $env:RUNNER_TEMP 'plunibio-input-poc'
+$results = Join-Path $root 'results'
+$workspace = Join-Path $root 'workspace'
+New-Item -ItemType Directory -Force $results, $workspace | Out-Null
+Start-Transcript -Path (Join-Path $results 'windows.log')
+
+function Get-OneFile([string]$Pattern) {
+    $files = @(Get-ChildItem -Path $Pattern -File)
+    if ($files.Count -ne 1) { throw "Expected one file matching $Pattern; found $($files.Count)" }
+    return $files[0].FullName
+}
+
+function Run-Installer([string]$Executable, [string[]]$Arguments) {
+    $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -Wait -PassThru
+    if ($process.ExitCode -ne 0) { throw "$Executable failed with exit code $($process.ExitCode)" }
+}
+
+function Find-Installation {
+    $roots = @(
+        (Join-Path $env:LOCALAPPDATA 'Plunibio'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\Plunibio'),
+        (Join-Path $env:ProgramFiles 'Plunibio'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Plunibio')
+    ) | Where-Object { Test-Path $_ }
+    $found = @(foreach ($base in $roots) {
+        Get-ChildItem -Path $base -Filter plunibio.exe -File -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notlike "$env:GITHUB_WORKSPACE*" }
+    })
+    if ($found.Count -ne 1) { throw "Expected one installed executable; found $($found.Count)" }
+    return $found[0].FullName
+}
+
+try {
+    $nsis = Get-OneFile 'src-tauri/target/release/bundle/nsis/*-setup.exe'
+    $msi = Get-OneFile 'src-tauri/target/release/bundle/msi/*.msi'
+    Write-Host 'Installing NSIS package'
+    Run-Installer $nsis @('/S')
+    $exe = Find-Installation
+    $uninstaller = Join-Path (Split-Path $exe) 'uninstall.exe'
+    if (!(Test-Path $uninstaller)) { throw "NSIS uninstaller missing: $uninstaller" }
+    Run-Installer $uninstaller @('/S')
+    if (Test-Path $exe) { throw 'NSIS application still exists after uninstall' }
+
+    Write-Host 'Installing MSI package'
+    Run-Installer 'msiexec.exe' @('/i', "`"$msi`"", '/qn', '/norestart', '/l*v', "`"$results\msi-install.log`"")
+    $exe = Find-Installation
+    $stdout = Join-Path $results 'application.log'
+    $stderr = Join-Path $results 'application-error.log'
+    $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '1024', '--height', '768', 'smoke.md') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+    try {
+        $loaded = $false
+        for ($i = 0; $i -lt 60; $i++) {
+            if ((Test-Path $stdout) -and (Select-String -Path $stdout -SimpleMatch 'Reading smoke.md' -Quiet)) { $loaded = $true; break }
+            if ($app.HasExited) { throw 'Application exited before document loaded' }
+            Start-Sleep -Seconds 1
+            $app.Refresh()
+        }
+        if (!$loaded) { throw 'Timed out waiting for document read' }
+        Start-Sleep -Seconds 5
+        $shell = New-Object -ComObject WScript.Shell
+        if (!$shell.AppActivate($app.Id)) { throw 'Could not activate application window' }
+        Start-Sleep -Seconds 2
+        $shell.SendKeys('Plunibio smoke test')
+        Start-Sleep -Seconds 1
+        $shell.SendKeys('^s')
+        Start-Sleep -Seconds 3
+        Add-Type -AssemblyName System.Windows.Forms
+        Add-Type -AssemblyName System.Drawing
+        $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+        $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        try {
+            $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+            $bitmap.Save((Join-Path $results 'screen.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+        } finally { $graphics.Dispose(); $bitmap.Dispose() }
+        $file = Join-Path $workspace 'smoke.md'
+        for ($i = 0; $i -lt 20; $i++) {
+            if ((Test-Path $file) -and (Get-Content -Raw $file).Contains('Plunibio smoke test')) { break }
+            Start-Sleep -Seconds 1
+        }
+        if (Test-Path $file) { Copy-Item $file (Join-Path $results 'smoke.md') }
+        if (!(Test-Path $file) -or !(Get-Content -Raw $file).Contains('Plunibio smoke test')) { throw 'Expected text was not saved' }
+        if (!$app.CloseMainWindow()) { throw 'Could not request normal window close' }
+        if (!$app.WaitForExit(15000)) { throw 'Application did not close' }
+    } finally {
+        if (!$app.HasExited) { Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue }
+    }
+    Run-Installer 'msiexec.exe' @('/x', "`"$msi`"", '/qn', '/norestart', '/l*v', "`"$results\msi-uninstall.log`"")
+    if (Test-Path $exe) { throw 'MSI application still exists after uninstall' }
+    Write-Host 'Windows packages and MSI input verified.'
+} finally { Stop-Transcript }

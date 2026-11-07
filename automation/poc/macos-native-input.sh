@@ -16,6 +16,9 @@ cleanup() {
     wait "$pid" 2>/dev/null || true
   fi
   hdiutil detach "$mountpoint" -quiet 2>/dev/null || true
+  if [[ -d "$task_root/apps/Plunibio.app" ]]; then
+    rm -rf "$task_root/apps/Plunibio.app"
+  fi
 }
 trap cleanup EXIT
 
@@ -104,7 +107,21 @@ stage="verify saved markdown"
 for _ in {1..20}; do
   if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"; then
     cp "$workspace/smoke.md" "$results/smoke.md"
-    echo "Native input and save verified."
+    echo "Native input and save verified; requesting normal termination."
+    "$task_root/native-input" "$pid" --quit
+    for _ in {1..15}; do
+      kill -0 "$pid" 2>/dev/null || break
+      sleep 1
+    done
+    if kill -0 "$pid" 2>/dev/null; then
+      echo "Application did not close normally." >&2
+      exit 1
+    fi
+    wait "$pid"
+    pid=""
+    rm -rf "$task_root/apps/Plunibio.app"
+    test ! -e "$task_root/apps/Plunibio.app"
+    echo "DMG application closed and removed."
     exit 0
   fi
   sleep 1

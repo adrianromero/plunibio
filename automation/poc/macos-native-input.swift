@@ -3,8 +3,15 @@ import ApplicationServices
 import CoreGraphics
 import Foundation
 
-guard CommandLine.arguments.count == 2, let pid = pid_t(CommandLine.arguments[1]) else {
-    fatalError("Usage: macos-native-input <application-pid>")
+guard (2...3).contains(CommandLine.arguments.count), let pid = pid_t(CommandLine.arguments[1]) else {
+    fatalError("Usage: macos-native-input <application-pid> [--quit]")
+}
+if CommandLine.arguments.count == 3 {
+    guard CommandLine.arguments[2] == "--quit", let app = NSRunningApplication(processIdentifier: pid), app.terminate() else {
+        fputs("Could not request normal application termination.\n", stderr)
+        exit(1)
+    }
+    exit(0)
 }
 
 guard AXIsProcessTrusted() else {

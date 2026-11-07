@@ -1,4 +1,4 @@
-name: Prueba de concepto de entrada en macOS
+name: Prueba manual de paquetes de escritorio
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   native-input:
-    name: Entrada nativa en ${{ matrix.name }}
+    name: Paquetes y entrada en ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     strategy:
@@ -19,6 +19,10 @@ jobs:
             runner: macos-15
           - name: Intel
             runner: macos-15-intel
+          - name: Linux x86_64
+            runner: ubuntu-22.04
+          - name: Windows x86_64
+            runner: windows-latest
     steps:
       - name: Descargar el repositorio
         uses: actions/checkout@v7
@@ -33,18 +37,44 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
+      - name: Instalar dependencias de Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils xvfb xauth xdotool imagemagick libfuse2
       - name: Instalar dependencias
         run: npm ci
-      - name: Construir DMG de producción
+      - name: Construir paquetes de macOS
+        id: build_macos
+        if: runner.os == 'macOS'
+        uses: tauri-apps/tauri-action@v1
         env:
           APPLE_SIGNING_IDENTITY: "-"
-        run: npm run tauri build -- --bundles dmg
-      - name: Probar teclado y captura
+        with:
+          args: --bundles app,dmg
+      - name: Construir paquetes de Linux
+        if: runner.os == 'Linux'
+        run: npm run tauri build -- --bundles deb,appimage
+      - name: Construir paquetes de Windows
+        if: runner.os == 'Windows'
+        run: npm run tauri build -- --bundles nsis,msi
+      - name: Probar DMG y entrada en macOS
+        if: runner.os == 'macOS'
         run: bash automation/poc/macos-native-input.sh
+      - name: Probar archivo comprimido en macOS
+        if: always() && runner.os == 'macOS' && steps.build_macos.outcome == 'success'
+        run: bash automation/poc/macos-archive.sh
+      - name: Probar paquetes y entrada en Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s '-screen 0 1280x800x24' bash automation/poc/linux-packages.sh
+      - name: Probar paquetes y entrada en Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./automation/poc/windows-packages.ps1
       - name: Conservar resultados
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: macos-input-poc-${{ matrix.runner }}
+          name: desktop-packages-${{ matrix.runner }}
           path: ${{ runner.temp }}/plunibio-input-poc/results
           if-no-files-found: warn
