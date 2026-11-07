@@ -57,13 +57,18 @@ file "$binary" | tee "$results/architecture.txt"
 stage="compile native input helper"
 swiftc automation/poc/macos-native-input.swift -o "$task_root/native-input"
 stage="launch application"
-HOME="$task_root/home" "$binary" --base-path "$workspace" --width 850 --height 700 smoke.md >"$results/application.log" 2>&1 &
+test ! -e "$workspace/smoke.md"
+HOME="$task_root/home" "$binary" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
 pid=$!
 
+stage="create Markdown in workspace"
+# The folder view initializes asynchronously; the helper waits for its window.
+sleep 8
+"$task_root/native-input" "$pid" --create >"$results/create.log" 2>&1
 stage="wait for document loading"
 document_loading=false
 for _ in {1..60}; do
-  if grep -Fq 'Reading smoke.md' "$results/application.log"; then
+  if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log"; then
     document_loading=true
     break
   fi
@@ -114,6 +119,7 @@ for _ in {1..20}; do
     sleep 2
     screencapture -x "$results/about.png" >>"$results/capture.log" 2>&1
     test -s "$results/about.png"
+    python3 automation/poc/verify-about.py "$results/about.png"
     echo "Native input and save verified; requesting normal termination."
     "$task_root/native-input" "$pid" --quit
     for _ in {1..15}; do

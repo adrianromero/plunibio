@@ -27,16 +27,24 @@ fi
 image="$task_root/apps/Plunibio.AppImage"
 cp "${images[0]}" "$image"
 chmod +x "$image"
-HOME="$task_root/home" GDK_BACKEND=x11 "$image" --base-path "$workspace" --width 850 --height 700 smoke.md >"$results/application.log" 2>&1 &
+test ! -e "$workspace/smoke.md"
+HOME="$task_root/home" GDK_BACKEND=x11 "$image" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
 pid=$!
+window=$(timeout 60s xdotool search --sync --onlyvisible --pid "$pid" | head -1)
+xdotool windowfocus --sync "$window"
+sleep 8
+echo 'Creating Markdown in the workspace.'
+xdotool key --clearmodifiers ctrl+shift+m
+sleep 2
+xdotool type --clearmodifiers --delay 75 'smoke'
+xdotool key --clearmodifiers Return
 for _ in {1..60}; do
-  grep -Fq 'Reading smoke.md' "$results/application.log" && break
+  [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log" && break
   kill -0 "$pid" 2>/dev/null || { cat "$results/application.log" >&2; exit 1; }
   sleep 1
 done
-grep -Fq 'Reading smoke.md' "$results/application.log" || { echo 'Editor did not load' >&2; exit 1; }
+[[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log" || { echo 'File creation or editor load failed' >&2; exit 1; }
 sleep 5
-window=$(timeout 30s xdotool search --sync --onlyvisible --pid "$pid" | head -1)
 xdotool windowfocus --sync "$window"
 xdotool type --clearmodifiers --delay 75 'Plunibio smoke test'
 xdotool key --clearmodifiers ctrl+s
@@ -60,6 +68,7 @@ xdotool key --clearmodifiers End Return
 sleep 2
 import -window root "$results/about.png"
 test -s "$results/about.png"
+python3 automation/poc/verify-about.py "$results/about.png"
 xdotool key Escape
 echo 'Requesting a normal X11 window close.'
 python3 automation/poc/x11-close.py "$window"

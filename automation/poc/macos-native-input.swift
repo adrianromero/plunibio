@@ -43,6 +43,43 @@ guard let bounds = targetBounds, let app = NSRunningApplication(processIdentifie
 app.activate()
 Thread.sleep(forTimeInterval: 3)
 
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create" {
+    // Control-Shift-M opens the folder's New Markdown dialog.
+    guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 46, keyDown: true),
+          let up = CGEvent(keyboardEventSource: nil, virtualKey: 46, keyDown: false) else {
+        fatalError("Could not create New Markdown shortcut")
+    }
+    down.flags = [.maskControl, .maskShift]
+    up.flags = []
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
+    Thread.sleep(forTimeInterval: 2)
+    // The dialog starts with .md and the caret before the extension.
+    for character in "smoke".utf16 {
+        var unit = character
+        guard let keyDown = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true),
+              let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else {
+            fatalError("Could not type file name")
+        }
+        keyDown.flags = []
+        keyUp.flags = []
+        keyDown.keyboardSetUnicodeString(stringLength: 1, unicodeString: &unit)
+        keyUp.keyboardSetUnicodeString(stringLength: 1, unicodeString: &unit)
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        Thread.sleep(forTimeInterval: 0.05)
+    }
+    guard let enterDown = CGEvent(keyboardEventSource: nil, virtualKey: 36, keyDown: true),
+          let enterUp = CGEvent(keyboardEventSource: nil, virtualKey: 36, keyDown: false) else {
+        fatalError("Could not confirm file name")
+    }
+    enterDown.flags = []
+    enterUp.flags = []
+    enterDown.post(tap: .cghidEventTap)
+    enterUp.post(tap: .cghidEventTap)
+    exit(0)
+}
+
 if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about-menu" {
     let point = CGPoint(x: bounds.maxX - 26, y: bounds.minY + 53)
     guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
@@ -66,7 +103,16 @@ if CommandLine.arguments.count == 4 && CommandLine.arguments[2] == "--about-sele
     }
     let request = VNRecognizeTextRequest()
     request.recognitionLevel = .accurate
+    // The menu label is small relative to the full desktop screenshot,
+    // particularly on the 1920×1080 Intel runner.
+    request.minimumTextHeight = 0.003
+    request.recognitionLanguages = ["en-US"]
     try VNImageRequestHandler(cgImage: screenshot).perform([request])
+    for observation in request.results ?? [] {
+        if let text = observation.topCandidates(1).first?.string {
+            print("Menu OCR: \(text)")
+        }
+    }
     let candidates = (request.results ?? []).filter { observation in
         guard let text = observation.topCandidates(1).first?.string.lowercased() else { return false }
         return (text.contains("about") || text.contains("acerca")) && text.contains("plunibio")

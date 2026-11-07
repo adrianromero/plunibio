@@ -102,7 +102,16 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-0 libappindicator3-1 librsvg2-2 xdg-utils xvfb xauth xdotool imagemagick libfuse2
+          sudo apt-get install -y libwebkit2gtk-4.1-0 libappindicator3-1 librsvg2-2 xdg-utils xvfb xauth xdotool imagemagick libfuse2 tesseract-ocr
+      - name: Instalar reconocimiento de texto en macOS
+        if: runner.os == 'macOS'
+        run: brew install tesseract
+      - name: Instalar reconocimiento de texto en Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install tesseract --no-progress --yes
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Probar DMG y entrada en macOS
         if: runner.os == 'macOS'
         run: bash automation/poc/macos-native-input.sh

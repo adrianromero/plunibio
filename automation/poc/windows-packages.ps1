@@ -47,18 +47,35 @@ try {
     $exe = Find-Installation
     $stdout = Join-Path $results 'application.log'
     $stderr = Join-Path $results 'application-error.log'
-    $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '850', '--height', '700', 'smoke.md') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+    $file = Join-Path $workspace 'smoke.md'
+    if (Test-Path $file) { throw 'Workspace is not empty before the creation test' }
+    $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '850', '--height', '700') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
     try {
+        $shell = New-Object -ComObject WScript.Shell
+        $activated = $false
+        for ($i = 0; $i -lt 60; $i++) {
+            $app.Refresh()
+            if ($app.HasExited) { throw 'Application exited before workspace opened' }
+            if ($app.MainWindowHandle -ne [IntPtr]::Zero -and $shell.AppActivate($app.Id)) { $activated = $true; break }
+            Start-Sleep -Seconds 1
+        }
+        if (!$activated) { throw 'Could not activate workspace window' }
+        Start-Sleep -Seconds 8
+        Write-Host 'Creating Markdown in the workspace'
+        $shell.SendKeys('^+m')
+        Start-Sleep -Seconds 2
+        # The dialog contains .md with the caret before the extension.
+        $shell.SendKeys('smoke')
+        $shell.SendKeys('{ENTER}')
         $loaded = $false
         for ($i = 0; $i -lt 60; $i++) {
-            if ((Test-Path $stdout) -and (Select-String -Path $stdout -SimpleMatch 'Reading smoke.md' -Quiet)) { $loaded = $true; break }
+            if ((Test-Path $file) -and (Test-Path $stdout) -and (Select-String -Path $stdout -SimpleMatch 'Reading smoke.md' -Quiet)) { $loaded = $true; break }
             if ($app.HasExited) { throw 'Application exited before document loaded' }
             Start-Sleep -Seconds 1
             $app.Refresh()
         }
-        if (!$loaded) { throw 'Timed out waiting for document read' }
+        if (!$loaded) { throw 'File creation or editor load timed out' }
         Start-Sleep -Seconds 5
-        $shell = New-Object -ComObject WScript.Shell
         if (!$shell.AppActivate($app.Id)) { throw 'Could not activate application window' }
         Start-Sleep -Seconds 2
         $shell.SendKeys('Plunibio smoke test')
@@ -74,7 +91,6 @@ try {
             $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
             $bitmap.Save((Join-Path $results 'screen.png'), [System.Drawing.Imaging.ImageFormat]::Png)
         } finally { $graphics.Dispose(); $bitmap.Dispose() }
-        $file = Join-Path $workspace 'smoke.md'
         for ($i = 0; $i -lt 20; $i++) {
             if ((Test-Path $file) -and (Get-Content -Raw $file).Contains('Plunibio smoke test')) { break }
             Start-Sleep -Seconds 1
@@ -109,6 +125,8 @@ public static class SmokeNative {
             $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
             $bitmap.Save((Join-Path $results 'about.png'), [System.Drawing.Imaging.ImageFormat]::Png)
         } finally { $graphics.Dispose(); $bitmap.Dispose() }
+        python automation/poc/verify-about.py (Join-Path $results 'about.png')
+        if ($LASTEXITCODE -ne 0) { throw "About dialog verification failed: $LASTEXITCODE" }
         $shell.SendKeys('{ESC}')
         if (!$app.CloseMainWindow()) { throw 'Could not request normal window close' }
         if (!$app.WaitForExit(15000)) { throw 'Application did not close' }
