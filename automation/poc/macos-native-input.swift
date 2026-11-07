@@ -47,6 +47,10 @@ if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about" {
           let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else {
         fatalError("Could not create menu click")
     }
+    // The previous Save shortcut uses Command. Clear modifier flags so that
+    // Space cannot be interpreted as Command-Space (Spotlight).
+    down.flags = []
+    up.flags = []
     down.post(tap: .cghidEventTap)
     up.post(tap: .cghidEventTap)
     Thread.sleep(forTimeInterval: 0.5)
@@ -57,6 +61,8 @@ if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--about" {
               let keyUp = CGEvent(keyboardEventSource: nil, virtualKey: code, keyDown: false) else {
             fatalError("Could not create menu key events")
         }
+        keyDown.flags = []
+        keyUp.flags = []
         keyDown.post(tap: .cghidEventTap)
         keyUp.post(tap: .cghidEventTap)
         Thread.sleep(forTimeInterval: 0.5)
@@ -86,6 +92,6 @@ guard let saveDown = CGEvent(keyboardEventSource: nil, virtualKey: 1, keyDown: t
     fatalError("Could not create save shortcut")
 }
 saveDown.flags = .maskCommand
-saveUp.flags = .maskCommand
+saveUp.flags = []
 saveDown.post(tap: .cghidEventTap)
 saveUp.post(tap: .cghidEventTap)

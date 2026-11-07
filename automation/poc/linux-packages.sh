@@ -50,12 +50,13 @@ done
 grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"
 echo 'Opening About through the toolbar menu.'
 eval "$(xdotool getwindowgeometry --shell "$window")"
-xdotool mousemove --window "$window" "$((WIDTH - 26))" 53 click 1
+# Under Xvfb the window has no native title bar: the toolbar is at y=25.
+xdotool mousemove --window "$window" "$((WIDTH - 26))" 25 click 1
 sleep 1
-xdotool key Escape
-xdotool key space
+xdotool key --clearmodifiers Escape
+xdotool key --clearmodifiers space
 sleep 1
-xdotool key End Return
+xdotool key --clearmodifiers End Return
 sleep 2
 import -window root "$results/about.png"
 test -s "$results/about.png"
