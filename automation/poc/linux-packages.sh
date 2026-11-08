@@ -8,6 +8,10 @@ mkdir -p "$results" "$workspace" "$task_root/apps" "$task_root/home"
 exec > >(tee -a "$results/linux.log") 2>&1
 pid=""
 cleanup() {
+  local status=$?
+  if [[ $status -ne 0 ]]; then
+    import -window root "$results/failure.png" 2>>"$results/capture.log" || echo 'Could not capture screen after failure.' >&2
+  fi
   if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
@@ -45,8 +49,9 @@ wait_event 'frontend_event=editor.focused;' 60 '"editor":"EditorMarkdown"' '"con
 test -f "$workspace/smoke.md"
 xdotool windowfocus --sync "$window"
 xdotool type --clearmodifiers --delay 75 'Plunibio smoke test'
-wait_event 'frontend_event=editor.changed;' 60 '"editor":"EditorMarkdown"' '"state":"ready"'
+sleep 1
 import -window root "$results/screen.png"
+wait_event 'frontend_event=editor.changed;' 60 '"editor":"EditorMarkdown"' '"state":"ready"'
 xdotool key --clearmodifiers ctrl+s
 wait_event 'frontend_event=editor.saved;' 60 '"editor":"EditorMarkdown"'
 [[ -f "$workspace/smoke.md" ]] && cp "$workspace/smoke.md" "$results/smoke.md"
@@ -60,6 +65,8 @@ xdotool key --clearmodifiers Escape
 xdotool key --clearmodifiers space
 sleep 1
 xdotool key --clearmodifiers End Return
+sleep 1
+import -window root "$results/about.png"
 wait_event 'frontend_event=about.opened'
 expected_version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
 wait_event 'frontend_event=about.metadata;' 60 "\"version\":\"$expected_version\""

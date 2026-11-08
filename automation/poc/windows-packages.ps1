@@ -16,6 +16,18 @@ function Run-Installer([string]$Executable, [string[]]$Arguments) {
     if ($process.ExitCode -ne 0) { throw "$Executable failed with exit code $($process.ExitCode)" }
 }
 
+function Save-Screenshot([string]$Name) {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+    $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+    $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
+    $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+    try {
+        $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+        $bitmap.Save((Join-Path $results $Name), [System.Drawing.Imaging.ImageFormat]::Png)
+    } finally { $graphics.Dispose(); $bitmap.Dispose() }
+}
+
 function Wait-AppEvent([string]$LogPath, [System.Diagnostics.Process]$Process, [string]$Event, [string[]]$Details = @()) {
     for ($i = 0; $i -lt 60; $i++) {
         $matching = @()
@@ -95,18 +107,11 @@ try {
         if (!$shell.AppActivate($app.Id)) { throw 'Could not activate application window' }
         Start-Sleep -Seconds 2
         $shell.SendKeys('Plunibio smoke test')
+        Start-Sleep -Seconds 1
+        Save-Screenshot 'screen.png'
         Wait-AppEvent $stdout $app 'frontend_event=editor.changed;' @('"editor":"EditorMarkdown"', '"state":"ready"')
         $shell.SendKeys('^s')
         Wait-AppEvent $stdout $app 'frontend_event=editor.saved;' @('"editor":"EditorMarkdown"')
-        Add-Type -AssemblyName System.Windows.Forms
-        Add-Type -AssemblyName System.Drawing
-        $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-        $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
-        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-        try {
-            $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
-            $bitmap.Save((Join-Path $results 'screen.png'), [System.Drawing.Imaging.ImageFormat]::Png)
-        } finally { $graphics.Dispose(); $bitmap.Dispose() }
         for ($i = 0; $i -lt 20; $i++) {
             if ((Test-Path $file) -and (Get-Content -Raw $file).Contains('Plunibio smoke test')) { break }
             Start-Sleep -Seconds 1
@@ -134,20 +139,20 @@ public static class SmokeNative {
         $shell.SendKeys(' ')
         Start-Sleep -Seconds 1
         $shell.SendKeys('{END}{ENTER}')
+        Start-Sleep -Seconds 1
+        Save-Screenshot 'about.png'
         Wait-AppEvent $stdout $app 'frontend_event=about.opened'
         $expectedVersion = (Get-Content 'package.json' -Raw | ConvertFrom-Json).version
         Wait-AppEvent $stdout $app 'frontend_event=about.metadata;' @("`"version`":`"$expectedVersion`"")
-        $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
-        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-        try {
-            $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
-            $bitmap.Save((Join-Path $results 'about.png'), [System.Drawing.Imaging.ImageFormat]::Png)
-        } finally { $graphics.Dispose(); $bitmap.Dispose() }
+        Save-Screenshot 'about.png'
         $shell.SendKeys('{ESC}')
         Wait-AppEvent $stdout $app 'frontend_event=about.closed'
         if (!$app.CloseMainWindow()) { throw 'Could not request normal window close' }
         if (!$app.WaitForExit(15000)) { throw 'Application did not close' }
         if (!(Select-String -Path $stdout -SimpleMatch 'lifecycle_event=app.window.closed' -Quiet)) { throw 'Application window closure was not logged' }
+    } catch {
+        try { Save-Screenshot 'failure.png' } catch { Write-Warning "Could not capture screen after failure: $_" }
+        throw
     } finally {
         if (!$app.HasExited) { Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue }
     }

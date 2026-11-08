@@ -7,10 +7,18 @@ workspace="$task_root/workspace"
 mkdir -p "$results" "$workspace" "$task_root/apps" "$task_root/home"
 exec > >(tee -a "$results/runner.log") 2>&1
 stage="initialization"
-trap 'status=$?; echo "Failed at stage: $stage (line $LINENO, exit $status)" >&2' ERR
+on_error() {
+  local status=$1 line=$2
+  echo "Failed at stage: $stage (line $line, exit $status)" >&2
+}
+trap 'on_error "$?" "$LINENO"' ERR
 mountpoint="$task_root/mounted-dmg"
 pid=""
 cleanup() {
+  local status=$?
+  if [[ $status -ne 0 ]]; then
+    screencapture -x "$results/failure.png" >>"$results/capture.log" 2>&1 || echo "Could not capture the screen after failure." >&2
+  fi
   if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
     kill "$pid" 2>/dev/null || true
     wait "$pid" 2>/dev/null || true
@@ -104,6 +112,8 @@ for _ in {1..20}; do
     "$task_root/native-input" "$pid" --about-menu >>"$results/input.log" 2>&1
     screencapture -x "$results/menu.png" >>"$results/capture.log" 2>&1
     "$task_root/native-input" "$pid" --about-select "$results/menu.png" >>"$results/input.log" 2>&1
+    sleep 1
+    screencapture -x "$results/about.png" >>"$results/capture.log" 2>&1
     wait_event 'frontend_event=about.opened'
     expected_version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
     wait_event 'frontend_event=about.metadata;' 60 "\"version\":\"$expected_version\""
