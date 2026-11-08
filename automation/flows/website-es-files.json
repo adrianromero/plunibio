@@ -200,51 +200,6 @@
       "action": "capture",
       "scope": "viewport",
       "name": "plunibio-features-image-transform-es"
-    },
-    {
-      "action": "click",
-      "target": {
-        "using": "css",
-        "value": "[data-testid='sidebar-tab'][data-tab-key='adjust']"
-      }
-    },
-    {
-      "action": "setRange",
-      "target": {
-        "using": "css",
-        "value": "[data-control-id='brightness'] input[type='range']"
-      },
-      "value": 105
-    },
-    {
-      "action": "setRange",
-      "target": {
-        "using": "css",
-        "value": "[data-control-id='contrast'] input[type='range']"
-      },
-      "value": 108
-    },
-    {
-      "action": "setRange",
-      "target": {
-        "using": "css",
-        "value": "[data-control-id='saturation'] input[type='range']"
-      },
-      "value": 112
-    },
-    {
-      "action": "wait",
-      "target": {
-        "using": "testId",
-        "value": "image-viewport"
-      },
-      "state": "visible",
-      "text": "0°"
-    },
-    {
-      "action": "capture",
-      "scope": "viewport",
-      "name": "plunibio-features-image-adjust-es"
     }
   ]
 }

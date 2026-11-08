@@ -118,25 +118,11 @@ feature_nav:
 
   <div class="feature-story">
     <div class="feature-story-copy">
-      <h3>Control preciso de la vista y la orientación</h3>
-      <p>Amplía entre el 10 % y el 500 %, ajusta la imagen al espacio disponible, vuelve al tamaño 1:1 o céntrala después de desplazarla. Gira libremente entre −180° y 180°, rota 90° en un clic y voltea horizontal o verticalmente.</p>
-      <ul class="feature-chip-list" aria-label="Controles de imagen">
-        <li>Zoom y desplazamiento</li>
-        <li>Ajustar y centrar</li>
-        <li>Rotación</li>
-        <li>Volteo</li>
-      </ul>
+      <h3>Vista, orientación y color en un solo lugar</h3>
+      <p>Amplía, desplaza y ajusta la imagen a la vista; gira y voltea su orientación. Modifica el brillo, el contraste y el color, o aplica ajustes predefinidos para hacer correcciones rápidas.</p>
+      <p>Guarda los cambios en JPEG, PNG o WebP y restablece las transformaciones o los filtros cuando lo necesites.</p>
     </div>
     {% include feature-shot.html image="plunibio-features-image-transform-es.webp" label="Transformación y zoom" alt="Visor de imágenes de Plunibio con controles de zoom, rotación y volteo." %}
-  </div>
-
-  <div class="feature-story">
-    <div class="feature-story-copy">
-      <h3>Ajustes de color y resultados inmediatos</h3>
-      <p>Modifica brillo, contraste, saturación, escala de grises, sepia e inversión con controles deslizantes. Si quieres empezar más rápido, aplica los ajustes predefinidos Normal, Monocromo, Vintage, Vívido, Dramático o Negativo y continúa afinando desde ahí.</p>
-      <p>Los cambios pueden guardarse directamente en archivos JPEG, PNG y WebP, con una opción para restablecer transformaciones o filtros cuando quieras volver al punto de partida.</p>
-    </div>
-    {% include feature-shot.html image="plunibio-features-image-adjust-es.webp" label="Ajustes y predefinidos" alt="Visor de imágenes de Plunibio mostrando controles de color y ajustes predefinidos." %}
   </div>
 </section>
 

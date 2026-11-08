@@ -31,22 +31,6 @@
     "height": 768,
     "bytes": 7652
   },
-  "plunibio-features-image-adjust-en.webp": {
-    "flow": "automation/flows/website-en-files.json",
-    "captureStep": 31,
-    "language": "en",
-    "width": 1024,
-    "height": 768,
-    "bytes": 335124
-  },
-  "plunibio-features-image-adjust-es.webp": {
-    "flow": "automation/flows/website-es-files.json",
-    "captureStep": 31,
-    "language": "es",
-    "width": 1024,
-    "height": 768,
-    "bytes": 335994
-  },
   "plunibio-features-image-transform-en.webp": {
     "flow": "automation/flows/website-en-files.json",
     "captureStep": 25,

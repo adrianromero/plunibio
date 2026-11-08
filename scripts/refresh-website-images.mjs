@@ -31,7 +31,7 @@ for(const {name,flow} of flows){
         owners.set(filename,{flow:'automation/flows/'+name,captureStep:index+1,language:flow.app.preferences.locale});
     }
 }
-assert.equal(owners.size,18);
+assert.equal(owners.size,16);
 const existing=(await readdir(images)).filter(n=>/^plunibio-(editor|features-.+)-(en|es)\.webp$/.test(n)).sort();
 assert.deepEqual([...owners.keys()].sort(),existing,'Every existing landing/features image must be owned');
 for(const filename of existing){
@@ -99,11 +99,11 @@ try{
         }
         for(const filename of existing)await copyFile(join(temporary,filename),join(images,filename));
         await writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\n');
-        console.log('Replaced 18 screenshots with pixel-identical lossless WebP; dimensions and ownership recorded.');
+        console.log('Replaced 16 screenshots with pixel-identical lossless WebP; dimensions and ownership recorded.');
     }else{
         for(const [index,filename] of existing.entries())assert.deepEqual(await readFile(join(images,filename)),publishedBefore[index]);
         assert.deepEqual(await readFile(manifestPath),manifestBefore);
-        console.log('Verified 18 capture checkpoints; published images and manifest unchanged.');
+        console.log('Verified 16 capture checkpoints; published images and manifest unchanged.');
     }
 }finally{
     try{

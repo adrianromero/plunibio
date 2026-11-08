@@ -203,11 +203,10 @@ npm run automation:test
 
 ## Landing and Features captures
 
-The four `website-{es,en}-{markdown,files}.json` flows reproduce all eighteen landing and Features
+The four `website-{es,en}-{markdown,files}.json` flows reproduce all sixteen landing and Features
 screenshots from Atlas of Lúmina, using disposable copies, fixed fixture dates, and localized UI.
 They capture the WebView viewport, excluding the native title bar and its absolute workspace path.
-The relative in-app breadcrumb remains visible, as in Docs. Image scenes use Fit and 0° rotation;
-the adjustment scene applies modest brightness/contrast/saturation changes without saving the example.
+The relative in-app breadcrumb remains visible, as in Docs. Image scenes use Fit and 0° rotation, with the transformation controls visible.
 
 After `npm run automation:build`, regenerate the complete batch with:
 
@@ -215,7 +214,7 @@ After `npm run automation:build`, regenerate the complete batch with:
 npm run website:images:refresh
 ```
 
-This command stages captures outside the repository, converts all eighteen to lossless WebP, checks
+This command stages captures outside the repository, converts all sixteen to lossless WebP, checks
 pixel equality against the source PNG, and only then replaces the existing published filenames.
 It generates `website/_data/website_images.json` with dimensions, bytes, locale, source flow and capture
 step. Landing and Features use these dimensions rather than the old native-window aspect ratio.
@@ -228,7 +227,7 @@ npm run website:images:regression
 ```
 
 Both commands protect the source examples and Docs images with SHA-256 and modification-time checks.
-The regression additionally checks that these eighteen images and their manifest remain unchanged.
+The regression additionally checks that these sixteen images and their manifest remain unchanged.
 These flows are separate from `docs:images:regression`; run both when validating the whole website.
 
 ## Chapter-specific documentation flows

@@ -118,25 +118,11 @@ feature_nav:
 
   <div class="feature-story">
     <div class="feature-story-copy">
-      <h3>Precise control over view and orientation</h3>
-      <p>Zoom from 10% to 500%, fit the image to the available space, return to 1:1 size, or recenter it after panning. Rotate freely between −180° and 180°, turn it 90° in one click, and flip it horizontally or vertically.</p>
-      <ul class="feature-chip-list" aria-label="Image controls">
-        <li>Zoom and pan</li>
-        <li>Fit and center</li>
-        <li>Rotation</li>
-        <li>Flip</li>
-      </ul>
+      <h3>View, orientation, and color in one place</h3>
+      <p>Zoom, pan, and fit the image to the view; rotate and flip its orientation. Adjust brightness, contrast, and color, or apply presets for quick corrections.</p>
+      <p>Save changes to JPEG, PNG, or WebP files and reset transformations or filters whenever you need to.</p>
     </div>
     {% include feature-shot.html image="plunibio-features-image-transform-en.webp" label="Transform and zoom" alt="Plunibio image viewer with zoom, rotation, and flip controls." %}
-  </div>
-
-  <div class="feature-story">
-    <div class="feature-story-copy">
-      <h3>Color adjustments with immediate results</h3>
-      <p>Change brightness, contrast, saturation, grayscale, sepia, and inversion with sliders. For a faster starting point, apply Normal, Monochrome, Vintage, Vivid, Dramatic, or Negative presets and continue refining from there.</p>
-      <p>Changes can be saved directly to JPEG, PNG, and WebP files, with controls to reset transformations or filters whenever you want to return to the starting point.</p>
-    </div>
-    {% include feature-shot.html image="plunibio-features-image-adjust-en.webp" label="Adjustments and presets" alt="Plunibio image viewer showing color controls and adjustment presets." %}
   </div>
 </section>
 

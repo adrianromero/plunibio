@@ -154,7 +154,7 @@ alterar `examples/` para obtener una captura.
    ```
 
 4. Inicio/Funcionalidades: `npm run website:images:refresh` ejecuta las cuatro escenas
-   localizadas, prepara fuera del repositorio, convierte/verifica y reemplaza las 18 imágenes
+   localizadas, prepara fuera del repositorio, convierte/verifica y reemplaza las 16 imágenes
    y su manifiesto. Conserva filenames y selección de escenas cuando siga siendo apropiado.
    Las imágenes de fotografía usan **Ajustar y giro 0°**; evita el antiguo giro de 45°.
    Si cambia el número de escenas, adapta también las comprobaciones explícitas del generador
