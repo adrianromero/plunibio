@@ -17,6 +17,8 @@ export type ModalDialogProps = ParentProps<{
     testId?: string;
     messageKind?: string;
     initialFocus?: () => HTMLElement | undefined;
+    onOpened?: () => void;
+    onDismissed?: () => void;
 }>;
 
 export function ModalDialog(props: ModalDialogProps): JSX.Element {
@@ -28,8 +30,16 @@ export function ModalDialog(props: ModalDialogProps): JSX.Element {
             previouslyFocusedElement = document.activeElement as HTMLElement | null;
             dialogRef.showModal();
             queueMicrotask(() => props.initialFocus?.()?.focus());
+            requestAnimationFrame(() => {
+                const style = getComputedStyle(dialogRef);
+                if (
+                    dialogRef.isConnected && dialogRef.open && dialogRef.getClientRects().length > 0 &&
+                    style.display !== "none" && style.visibility === "visible"
+                ) props.onOpened?.();
+            });
         } else if (!props.open && dialogRef.open) {
             dialogRef.close();
+            props.onDismissed?.();
             queueMicrotask(() => {
                 if (previouslyFocusedElement?.isConnected) previouslyFocusedElement.focus();
             });

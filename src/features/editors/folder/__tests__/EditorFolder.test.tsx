@@ -29,6 +29,7 @@ let showHiddenFiles: Accessor<boolean>;
 let setShowHiddenFiles: Setter<boolean>;
 
 vi.mock("@tauri-apps/api/core", () => ({ invoke: invokeMock }));
+vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 
 vi.mock("@/app/AppContext", () => ({
     useAppContext: () => ({

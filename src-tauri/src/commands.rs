@@ -15,7 +15,66 @@ use tauri::Manager;
 use tauri::Webview;
 use tauri_plugin_opener::OpenerExt;
 use tokio::io::AsyncWriteExt;
-use tracing::{info, warn};
+use tracing::{debug, error, info, trace, warn};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum FrontendLogLevel {
+    Trace,
+    Debug,
+    Info,
+    Warn,
+    Error,
+}
+
+#[derive(Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum FrontendLogFilter {
+    Off,
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
+}
+
+#[tauri::command]
+pub(crate) fn frontend_log(level: FrontendLogLevel, event: String, details: serde_json::Value) {
+    match level {
+        FrontendLogLevel::Trace => {
+            trace!(target: "plunibio::frontend", "frontend_event={event}; details={details}")
+        }
+        FrontendLogLevel::Debug => {
+            debug!(target: "plunibio::frontend", "frontend_event={event}; details={details}")
+        }
+        FrontendLogLevel::Info => {
+            info!(target: "plunibio::frontend", "frontend_event={event}; details={details}")
+        }
+        FrontendLogLevel::Warn => {
+            warn!(target: "plunibio::frontend", "frontend_event={event}; details={details}")
+        }
+        FrontendLogLevel::Error => {
+            error!(target: "plunibio::frontend", "frontend_event={event}; details={details}")
+        }
+    }
+}
+
+#[tauri::command]
+pub(crate) fn frontend_log_config() -> FrontendLogFilter {
+    if tracing::enabled!(target: "plunibio::frontend", tracing::Level::TRACE) {
+        FrontendLogFilter::Trace
+    } else if tracing::enabled!(target: "plunibio::frontend", tracing::Level::DEBUG) {
+        FrontendLogFilter::Debug
+    } else if tracing::enabled!(target: "plunibio::frontend", tracing::Level::INFO) {
+        FrontendLogFilter::Info
+    } else if tracing::enabled!(target: "plunibio::frontend", tracing::Level::WARN) {
+        FrontendLogFilter::Warn
+    } else if tracing::enabled!(target: "plunibio::frontend", tracing::Level::ERROR) {
+        FrontendLogFilter::Error
+    } else {
+        FrontendLogFilter::Off
+    }
+}
 
 pub(crate) struct AppState {
     location: Mutex<AppLocation>,

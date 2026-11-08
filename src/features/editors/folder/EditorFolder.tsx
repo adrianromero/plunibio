@@ -27,6 +27,7 @@ import EditorImage from "@/features/editors/image/EditorImage";
 import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
 import { editorForFilename } from "@/features/editors/EditorForFilename";
 import EditorText from "@/features/editors/text/EditorText";
+import { frontendLog } from "@/shared/logging/frontendLog";
 
 type DirectoryResult =
     | { entries: DirectoryEntry[]; error?: never }
@@ -98,6 +99,7 @@ export function EditorFolder(): JSX.Element {
             showSpinner();
             try {
                 const entries = await invoke<DirectoryEntry[]>("list_directory", path);
+                requestAnimationFrame(() => frontendLog("debug", "workspace.ready", { entries: entries.length }));
                 return { entries };
             } catch (error: unknown) {
                 console.error("Unable to list directory:", error);
@@ -129,6 +131,7 @@ export function EditorFolder(): JSX.Element {
                 kind === "directory" ? "create_directory" : "create_file",
                 { basepath: currentBasepath, filename: currentFilename, name }
             );
+            frontendLog("debug", "entry.created", { kind });
             if (basepath() !== currentBasepath || filename() !== currentFilename) return;
             createdFilename = entry.filename;
         } catch (error: unknown) {

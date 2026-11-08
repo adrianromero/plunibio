@@ -10,6 +10,7 @@ import { UserMessageError } from "@/shared/errors/UserMessageError";
 import type { ReadFileResult, ReadBinaryFileResult } from "@/backend/rusttypes";
 import { useI18N } from "@/i18n/Localization";
 import { useAppContext } from "./AppContext";
+import { frontendLog } from "@/shared/logging/frontendLog";
 
 export type FileEditorAdapter<Content = string> = {
     getContent: () => Promise<Content | null>;
@@ -135,6 +136,7 @@ export function createFileEditorController<Content = string>(
         showSpinner();
         try {
             await storage.write(currentBasepath, currentFilename, content, createIfEmpty);
+            frontendLog("debug", "editor.saved", { editor: editorName });
             setFileModified(false);
         } finally {
             hideSpinner();
@@ -189,7 +191,10 @@ export function createFileEditorController<Content = string>(
                 // the current content.
                 await adapter.destroy();
                 await adapter.replaceContent(result.content, currentFilename, () => {
-                    if (loadId === activeLoad) setFileModified(true);
+                    if (loadId === activeLoad) {
+                        setFileModified(true);
+                        frontendLog("debug", "editor.changed", { editor: editorName, state: state().status });
+                    }
                 });
                 if (loadId !== activeLoad) return;
 

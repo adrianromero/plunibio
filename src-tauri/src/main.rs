@@ -11,6 +11,7 @@ mod cli;
 
 fn main() {
     tracing_subscriber::fmt::init();
+    info!("lifecycle_event=app.started");
     let configuration = cli::resolve().unwrap_or_else(|error| {
         eprintln!("Error: {}", error);
         std::process::exit(2);

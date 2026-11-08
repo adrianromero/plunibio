@@ -12,6 +12,7 @@ import dialogStyles from "@/shared/ui/dialog/Dialog.module.css";
 import ModalDialog from "@/shared/ui/dialog/ModalDialog";
 import { useI18N } from "@/i18n/Localization";
 import styles from "./AboutDialog.module.css";
+import { frontendLog } from "@/shared/logging/frontendLog";
 
 const HOMEPAGE_URL = "https://adrianromero.github.io/plunibio";
 const LICENSE_URL = "https://github.com/adrianromero/plunibio/blob/main/LICENSE";
@@ -42,6 +43,7 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
                 .then(([name, version]) => {
                     setAppName(name);
                     setAppVersion(version);
+                    frontendLog("debug", "about.metadata", { name, version });
                 })
                 .catch((error: unknown) => {
                     console.error("Unable to read application metadata:", error);
@@ -58,6 +60,8 @@ export function AboutDialog(props: AboutDialogProps): JSX.Element {
             describedBy="about-dialog-details"
             onCancel={close}
             initialFocus={() => closeButtonRef}
+            onOpened={() => frontendLog("debug", "about.opened")}
+            onDismissed={() => frontendLog("debug", "about.closed")}
         >
             <div class={styles.identity}>
                 <img class={styles.appIcon} src={appIcon} alt="" aria-hidden="true" />

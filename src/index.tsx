@@ -10,6 +10,7 @@ import App from "./app/App";
 import type { InitialConfig } from "./backend/rusttypes";
 import { applyTheme, loadTheme } from "./preferences/ThemePreferences";
 import { applyTypography, loadTypography } from "./preferences/TypographyPreferences";
+import { configureFrontendLog } from "./shared/logging/frontendLog";
 import "./styles/theme.css";
 
 // Import base styles first
@@ -77,6 +78,7 @@ if (import.meta.env.PROD) {
 }
 
 async function bootstrap(): Promise<void> {
+    await configureFrontendLog();
     const config = await invoke<InitialConfig>("initial_config");
     render(
         () => <App initialBasepath={config.basepath} initialFilename={config.filename} />,

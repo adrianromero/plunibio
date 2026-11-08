@@ -9,6 +9,9 @@ import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AboutDialog from "../AboutDialog";
+import { frontendLog } from "@/shared/logging/frontendLog";
+
+vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 
 vi.mock("@tauri-apps/api/app", () => ({
     getName: vi.fn(async () => "Plunibio"),
@@ -36,6 +39,7 @@ describe("AboutDialog", () => {
         vi.mocked(getName).mockClear();
         vi.mocked(getVersion).mockClear();
         vi.mocked(openUrl).mockClear();
+        vi.mocked(frontendLog).mockClear();
 
         if (typeof HTMLDialogElement.prototype.showModal !== "function") {
             Object.defineProperties(HTMLDialogElement.prototype, {
@@ -114,5 +118,20 @@ describe("AboutDialog", () => {
         expect(cancel.defaultPrevented).toBe(true);
         expect(close).toHaveBeenCalledTimes(2);
         expect(dialog?.open).toBe(false);
+    });
+
+    it("logs opening only after the dialog is visible and logs its dismissal", async () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        const [open, setOpen] = createSignal(false);
+        dispose = render(() => <AboutDialog open={open()} onClose={() => setOpen(false)} />, root);
+        const dialog = root.querySelector("dialog")!;
+        vi.spyOn(dialog, "getClientRects").mockReturnValue([{}] as unknown as DOMRectList);
+
+        expect(frontendLog).not.toHaveBeenCalled();
+        setOpen(true);
+        await vi.waitFor(() => expect(frontendLog).toHaveBeenCalledWith("debug", "about.opened"));
+        setOpen(false);
+        expect(frontendLog).toHaveBeenCalledWith("debug", "about.closed");
     });
 });

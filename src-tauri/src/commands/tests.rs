@@ -4,6 +4,75 @@
 use super::{read_file, write_file};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[test]
+fn frontend_log_accepts_all_tracing_levels_and_arbitrary_messages() {
+    use super::{frontend_log, FrontendLogLevel};
+    for level in ["trace", "debug", "info", "warn", "error"] {
+        let parsed = serde_json::from_str::<FrontendLogLevel>(&format!("\"{level}\"")).unwrap();
+        frontend_log(
+            parsed,
+            "Frontend message / without restrictions".into(),
+            serde_json::json!({"kind": "markdown"}),
+        );
+    }
+    assert!(serde_json::from_str::<FrontendLogLevel>("\"unknown\"").is_err());
+}
+
+#[test]
+fn frontend_log_config_matches_target_filter() {
+    use super::{frontend_log_config, FrontendLogFilter};
+    use tracing_subscriber::{filter::Targets, prelude::*};
+
+    let filter = Targets::new()
+        .with_default(tracing::level_filters::LevelFilter::INFO)
+        .with_target(
+            "plunibio::frontend",
+            tracing::level_filters::LevelFilter::DEBUG,
+        );
+    let subscriber = tracing_subscriber::registry().with(filter);
+    tracing::subscriber::with_default(subscriber, || {
+        assert_eq!(frontend_log_config(), FrontendLogFilter::Debug);
+    });
+}
+
+#[test]
+fn frontend_log_config_covers_every_filter() {
+    use super::{frontend_log_config, FrontendLogFilter};
+    use tracing_subscriber::{filter::Targets, prelude::*};
+
+    for (level, expected) in [
+        (
+            tracing::level_filters::LevelFilter::OFF,
+            FrontendLogFilter::Off,
+        ),
+        (
+            tracing::level_filters::LevelFilter::ERROR,
+            FrontendLogFilter::Error,
+        ),
+        (
+            tracing::level_filters::LevelFilter::WARN,
+            FrontendLogFilter::Warn,
+        ),
+        (
+            tracing::level_filters::LevelFilter::INFO,
+            FrontendLogFilter::Info,
+        ),
+        (
+            tracing::level_filters::LevelFilter::DEBUG,
+            FrontendLogFilter::Debug,
+        ),
+        (
+            tracing::level_filters::LevelFilter::TRACE,
+            FrontendLogFilter::Trace,
+        ),
+    ] {
+        let subscriber = tracing_subscriber::registry().with(Targets::new().with_default(level));
+        tracing::subscriber::with_default(subscriber, || {
+            assert_eq!(frontend_log_config(), expected)
+        });
+    }
+}
+
 fn unique_temp_dir(label: &str) -> std::path::PathBuf {
     let unique = SystemTime::now()
         .duration_since(UNIX_EPOCH)

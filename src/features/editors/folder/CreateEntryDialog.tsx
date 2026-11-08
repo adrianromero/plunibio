@@ -12,6 +12,7 @@ import { useI18N } from "@/i18n/Localization";
 import dialogStyles from "@/shared/ui/dialog/Dialog.module.css";
 import ModalDialog from "@/shared/ui/dialog/ModalDialog";
 import styles from "./CreateEntryDialog.module.css";
+import { frontendLog } from "@/shared/logging/frontendLog";
 
 export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
 
@@ -64,6 +65,7 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
             class={styles.createDialog}
             onCancel={props.onCancel}
             initialFocus={() => inputRef}
+            onOpened={() => frontendLog("debug", "entry_dialog.opened", { kind: props.kind })}
         >
             <form
                 onSubmit={(event) => {

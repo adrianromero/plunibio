@@ -216,6 +216,7 @@ fn run_with_configuration(
                     }
                 }
                 WindowEvent::Destroyed => {
+                    info!("lifecycle_event=app.window.closed");
                     let (path, application_properties) = match event_properties.lock() {
                         Ok(state) => (state.path.clone(), state.properties.clone()),
                         Err(error) => {
@@ -241,6 +242,8 @@ fn run_with_configuration(
             }
         })
         .invoke_handler(tauri::generate_handler![
+            commands::frontend_log,
+            commands::frontend_log_config,
             commands::initial_config,
             commands::set_window_title,
             commands::set_current_filename,

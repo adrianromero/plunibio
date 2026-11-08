@@ -29,6 +29,7 @@ import { Ctx } from "@milkdown/kit/ctx";
 import type { Slice } from "@milkdown/kit/prose/model";
 import type { EditorView as MilkdownEditorView } from "@milkdown/kit/prose/view";
 import styles from "./EditorMarkdown.module.css";
+import { frontendLog } from "@/shared/logging/frontendLog";
 import EditorMarkdownSidebar from "./EditorMarkdownSidebar";
 import { createMarkdownImageProxy, type MarkdownImageProxy } from "./MarkdownImageProxy";
 import MarkdownImageActions from "./MarkdownImageActions";
@@ -446,10 +447,15 @@ export function EditorMarkdown(): JSX.Element {
             setEditorReady(true);
         },
         focus: () => {
+            let connected = false;
+            let focused = false;
             crepeInstance?.editor.action((ctx) => {
                 const editorView = ctx.get(editorViewCtx);
-                if (editorView.dom.isConnected) editorView.focus();
+                connected = editorView.dom.isConnected;
+                if (connected) editorView.focus();
+                focused = editorView.dom.contains(document.activeElement);
             });
+            frontendLog("debug", "editor.focused", { editor: "EditorMarkdown", connected, focused });
         },
         destroy: async () => {
             setEditorReady(false);
