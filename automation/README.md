@@ -15,25 +15,6 @@ The WebDriver plugins are registered only when Cargo's `automation` feature is e
 frontend bridge is included only when `VITE_PLUNIBIO_AUTOMATION=1`. Normal production release builds
 do not contain or start the WebDriver server.
 
-## Packaged application smoke checks
-
-The manual desktop workflow runs the production packages and captures the editor and About dialog.
-It uses normal native input rather than the WebDriver build above. The application writes bounded,
-non-sensitive frontend event names through the Rust tracing subscriber; the scripts redirect its
-output to a fresh `application.log` and wait for each event with a timeout. The scripts set
-`RUST_LOG=debug` and check `workspace.ready`, `entry_dialog.opened`,
-`entry.created`, `editor.focused`, `editor.changed`, `editor.saved`, `about.opened`,
-`about.metadata`, and `about.closed`. Each event includes contextual JSON fields; the smoke checks
-the entry kind, editor identity, focus state and version where relevant. Rust also emits
-`lifecycle_event=app.started` and `lifecycle_event=app.window.closed`.
-
-The frontend queries Rust's effective log threshold during startup and skips disabled events without IPC.
-An event records an application transition, not an independent proof of its effect: the scripts
-also check the saved Markdown on disk, the process exit, installation and removal, and retain
-screenshots. On macOS Vision is still used to locate the About menu item; it is not used to decide
-whether the dialog opened. The frontend event is emitted only after the dialog is open and has a
-visible layout box. These checks do not prove that every pixel is visible or unobscured.
-
 ## Targets
 
 Every action locates UI by a semantic target. Prefer `aria`, then `text`, then `testId`; use raw CSS
