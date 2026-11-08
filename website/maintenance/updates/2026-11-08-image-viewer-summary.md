@@ -26,3 +26,16 @@
   Las comprobaciones estáticas iniciales de propiedad, pares y procedencia pasaron;
   esto no acredita una regresión de aplicación completada. No se ha ejecutado una
   nueva batería responsive/axe. No se publican cambios como parte de esta tarea.
+
+## Comprobación posterior del arranque — 2026-11-08
+
+El ejecutable reutilizado en el intento anterior era un binario de desarrollo sin
+la característica `automation`: cargaba `http://localhost:1420` sin Vite en marcha
+y no incluía el servidor WebDriver. El runner solo comprobaba su existencia.
+
+Se ejecutó `npm run automation:build` correctamente y se confirmó `automation` en
+el registro de compilación del ejecutable resultante. Después, `npm run
+website:images:regression` terminó con código 0: cuatro flujos ES/EN y 16 puntos
+de captura verificados. Las imágenes publicadas, el manifiesto, los ejemplos y
+las 148 imágenes Docs permanecieron intactos. Queda resuelta la limitación de
+regresión indicada arriba; no se modificó el código de la aplicación ni del runner.
