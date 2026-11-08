@@ -24,7 +24,7 @@ Plunibio **{{ release.version }}**, published on **{{ release.published_on }}**.
 
 Plunibio is under development and may contain errors. Keep backups of your documents before editing them or updating the application. It is distributed under the [MIT License]({{ site.license_url }}), which describes its terms.
 
-The packages do not have a **verified publisher signature**, so your system may show security warnings. The maintainer has tested the four Windows and Linux packages identified below; **the macOS packages have not yet been tested**. This does not validate every feature or every version of each operating system.
+The packages do not have a **verified publisher signature**, so your system may show security warnings. All eight Windows, Linux, and macOS packages listed below have been tested using a basic workflow that includes editing documents and selecting application options. This does not validate every feature or every version of each operating system.
 </aside>
 
 ### Windows · 64-bit Intel / AMD
@@ -44,9 +44,7 @@ Choose DEB for a distribution that uses Debian packages, or AppImage to run the 
 ### macOS · Apple Silicon and Intel
 {: #macos-downloads }
 
-**Not tested:** we do not have a Mac available to check these packages. Choose Apple Silicon for M-series chips or Intel for an Intel-based Mac. The DMG contains the application; `.app.tar.gz` is the compressed alternative.
-
-If you try a package, please share the result through [GitHub Issues]({{ site.github_url }}/issues): macOS version, processor, package filename, steps, and outcome. Avoid including personal paths or other private information.
+Choose Apple Silicon for M-series chips or Intel for an Intel-based Mac. The DMG contains the application; `.app.tar.gz` is the compressed alternative.
 
 {% include release-downloads.html platform="macos" %}
 
@@ -81,9 +79,9 @@ sudo apt install ./{{ deb.name }}
 
 Review the dependencies and changes proposed by the package manager. Then launch Plunibio from your desktop's application menu.
 
-### macOS: procedure awaiting testing
+### macOS
 
-If you choose to try the DMG, open it and copy **Plunibio.app** to **Applications**; the `.app.tar.gz` alternative requires extracting the application first. These steps have not been reproduced on a Mac for this version. macOS may prevent opening because it cannot verify the developer; see [Apple's guide to opening apps safely](https://support.apple.com/en-us/102445). Include the exact message in your report if an error occurs.
+Open the DMG and copy **Plunibio.app** to **Applications**; the `.app.tar.gz` alternative requires extracting the application first. macOS may prevent opening because it cannot verify the developer; see [Apple's guide to opening apps safely](https://support.apple.com/en-us/102445). Include the exact message in your report if an error occurs.
 
 After opening Plunibio, follow [Getting started]({{ '/en/docs/getting-started/' | relative_url }}) to choose a workspace, create a document, and save a change. A workspace is a folder on your computer, rather than an account or a library you need to import.
 

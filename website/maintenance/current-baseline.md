@@ -19,27 +19,30 @@ como evidencia histórica: no acreditan automáticamente una versión posterior.
   La conservación de los criterios aquí permite eliminar el antiguo directorio privado sin
   necesitarlo como contexto de una nueva sesión.
 
-## Pruebas de paquetes comunicadas por el mantenedor
+## Pruebas de paquetes — actualización comunicada el 2026-11-08
 
 | Plataforma | Paquete de 0.1.3 | Estado |
 | --- | --- | --- |
-| Windows x86_64 | `Plunibio_0.1.3_x64-setup.exe` | Probado por el mantenedor |
-| Windows x86_64 | `Plunibio_0.1.3_x64_en-US.msi` | Probado por el mantenedor |
-| Linux x86_64 | `Plunibio_0.1.3_amd64.AppImage` | Probado por el mantenedor |
-| Linux x86_64 | `Plunibio_0.1.3_amd64.deb` | Probado por el mantenedor |
-| macOS Apple Silicon | `Plunibio_0.1.3_aarch64.dmg`, `Plunibio_0.1.3_aarch64.app.tar.gz` | No probado |
-| macOS Intel | `Plunibio_0.1.3_x64.dmg`, `Plunibio_0.1.3_x64.app.tar.gz` | No probado |
+| Windows x86_64 | `Plunibio_0.1.3_x64-setup.exe` | Probado |
+| Windows x86_64 | `Plunibio_0.1.3_x64_en-US.msi` | Probado |
+| Linux x86_64 | `Plunibio_0.1.3_amd64.AppImage` | Probado |
+| Linux x86_64 | `Plunibio_0.1.3_amd64.deb` | Probado |
+| macOS Apple Silicon | `Plunibio_0.1.3_aarch64.dmg`, `Plunibio_0.1.3_aarch64.app.tar.gz` | Probados |
+| macOS Intel | `Plunibio_0.1.3_x64.dmg`, `Plunibio_0.1.3_x64.app.tar.gz` | Probados |
 
-No se registraron versiones exactas de Windows/Linux ni recorrido detallado por paquete.
+Se han probado los ocho paquetes de v0.1.3 con un flujo básico de uso que incluye
+la edición de documentos y la selección de opciones de la aplicación, según la confirmación recibida el 2026-11-08. Esta evidencia nueva
+sustituye el estado anterior de macOS sin pruebas. No se han comunicado versiones exactas
+de los sistemas operativos ni pasos o resultados detallados por paquete.
 El usuario considera suficiente esta evidencia y **no dedicará más esfuerzos a ampliarla para
 0.1.3**. No se requiere revisión independiente, por falta de recursos. Estas decisiones cierran
 trabajo, no convierten limitaciones en resultados aprobados. No solicitar de nuevo esos trabajos
 como requisito de cierre de 0.1.3.
 
 Los paquetes no tienen firma de editor verificada. En macOS hay firma ad-hoc, que no equivale
-a Developer ID ni notarización. Instalación conserva el aviso y la petición de feedback macOS.
+a Developer ID ni notarización. Instalación conserva los avisos de firma y seguridad; se retiran los avisos de macOS sin pruebas.
 Para versiones futuras confirmar situación de firma y pruebas por paquete; no heredar `tested`
-ni quitar el aviso de macOS automáticamente.
+ni retirar avisos sin evidencia aplicable a la versión correspondiente.
 
 ## Cobertura y límites que se mantienen
 

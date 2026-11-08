@@ -41,7 +41,7 @@ assets:
     platform: macos
     architecture: arm64
     format: dmg
-    tested: false
+    tested: true
     url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_aarch64.dmg"
     size: 8561477
     sha256: "e668f176553e5c4b533827da2aee8fce062853aca615331f0c959fc311364623"
@@ -49,7 +49,7 @@ assets:
     platform: macos
     architecture: arm64
     format: app-tar
-    tested: false
+    tested: true
     url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_aarch64.app.tar.gz"
     size: 7934047
     sha256: "fc7edee83bb10f5e226714f3deab08af8b72dc738445ee5f161f92b8ba4e13fb"
@@ -57,7 +57,7 @@ assets:
     platform: macos
     architecture: x86_64
     format: dmg
-    tested: false
+    tested: true
     url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64.dmg"
     size: 8897509
     sha256: "bcb48c2ad8724be30a6438a42e73bb9e764a5da9b6f8a0b136b513f8af8d0415"
@@ -65,7 +65,7 @@ assets:
     platform: macos
     architecture: x86_64
     format: app-tar
-    tested: false
+    tested: true
     url: "https://github.com/adrianromero/plunibio/releases/download/v0.1.3/Plunibio_0.1.3_x64.app.tar.gz"
     size: 8243866
     sha256: "61d82631c2fdc96ec5730ba0e65008729a07f7e021a4831126eb27d40832661e"

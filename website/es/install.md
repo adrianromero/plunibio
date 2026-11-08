@@ -24,7 +24,7 @@ Plunibio **{{ release.version }}**, publicado el **{{ release.published_on }}**.
 
 Plunibio está en desarrollo y puede contener errores. Conserva copias de seguridad de tus documentos antes de editarlos o actualizar la aplicación. Se distribuye bajo la [licencia MIT]({{ site.license_url }}), que describe sus condiciones.
 
-Los paquetes no cuentan con **firma de editor verificada**, por lo que el sistema puede mostrar advertencias de seguridad. El mantenedor ha probado los cuatro paquetes de Windows y Linux indicados abajo; **los paquetes de macOS todavía no se han probado**. Esto no constituye una validación de todas las funciones ni de todas las versiones de cada sistema.
+Los paquetes no cuentan con **firma de editor verificada**, por lo que el sistema puede mostrar advertencias de seguridad. Se han probado los ocho paquetes de Windows, Linux y macOS indicados abajo con un flujo básico de uso que incluye la edición de documentos y la selección de opciones de la aplicación. Esto no constituye una validación de todas las funciones ni de todas las versiones de cada sistema.
 </aside>
 
 ### Windows · Intel / AMD de 64 bits
@@ -44,9 +44,7 @@ Elige DEB para una distribución que utilice paquetes Debian, o AppImage para ej
 ### macOS · Apple Silicon e Intel
 {: #descargas-macos }
 
-**No probado:** no disponemos de un Mac para comprobar estos paquetes. Elige Apple Silicon para chips de la serie M o Intel para un Mac con procesador Intel. DMG contiene la aplicación; `.app.tar.gz` es la alternativa comprimida.
-
-Si pruebas alguno, agradeceremos que compartas el resultado en [GitHub Issues]({{ site.github_url }}/issues): versión de macOS, procesador, nombre del paquete, pasos y resultado. Evita incluir rutas personales u otros datos privados.
+Elige Apple Silicon para chips de la serie M o Intel para un Mac con procesador Intel. DMG contiene la aplicación; `.app.tar.gz` es la alternativa comprimida.
 
 {% include release-downloads.html platform="macos" %}
 
@@ -81,9 +79,9 @@ sudo apt install ./{{ deb.name }}
 
 Revisa las dependencias y cambios que proponga el gestor de paquetes. Después, inicia Plunibio desde el menú de aplicaciones de tu escritorio.
 
-### macOS: procedimiento pendiente de prueba
+### macOS
 
-Si decides probar el DMG, ábrelo y copia **Plunibio.app** a **Aplicaciones**; la alternativa `.app.tar.gz` requiere extraer primero la aplicación. Estos pasos no se han reproducido en un Mac para esta versión. macOS puede impedir la apertura por no poder verificar el desarrollador; consulta la [guía de Apple sobre apertura segura de aplicaciones](https://support.apple.com/en-us/102445). Si aparece un error, incluye el mensaje literal en tu informe.
+Abre el DMG y copia **Plunibio.app** a **Aplicaciones**; la alternativa `.app.tar.gz` requiere extraer primero la aplicación. macOS puede impedir la apertura por no poder verificar el desarrollador; consulta la [guía de Apple sobre apertura segura de aplicaciones](https://support.apple.com/en-us/102445). Si aparece un error, incluye el mensaje literal en tu informe.
 
 Tras abrir Plunibio, sigue [Primeros pasos]({{ '/es/docs/primeros-pasos/' | relative_url }}) para elegir un espacio, crear un documento y guardar un cambio. El espacio es una carpeta de tu equipo, no una cuenta ni una biblioteca que debas importar.
 

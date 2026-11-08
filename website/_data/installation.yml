@@ -1,6 +1,6 @@
 es:
   download: Descargar
-  tested: Probado por el mantenedor
+  tested: Probado
   untested: No probado
   formats:
     exe: Instalador EXE
@@ -16,7 +16,7 @@ es:
   checksum: SHA-256
 en:
   download: Download
-  tested: Tested by the maintainer
+  tested: Tested
   untested: Not tested
   formats:
     exe: EXE installer
