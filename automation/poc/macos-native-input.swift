@@ -43,7 +43,7 @@ guard let bounds = targetBounds, let app = NSRunningApplication(processIdentifie
 app.activate()
 Thread.sleep(forTimeInterval: 3)
 
-if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create" {
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create-dialog" {
     // Control-Shift-M opens the folder's New Markdown dialog.
     guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 46, keyDown: true),
           let up = CGEvent(keyboardEventSource: nil, virtualKey: 46, keyDown: false) else {
@@ -53,7 +53,9 @@ if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create" {
     up.flags = []
     down.post(tap: .cghidEventTap)
     up.post(tap: .cghidEventTap)
-    Thread.sleep(forTimeInterval: 2)
+    exit(0)
+}
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create-confirm" {
     // The dialog starts with .md and the caret before the extension.
     for character in "smoke".utf16 {
         var unit = character
@@ -77,6 +79,31 @@ if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--create" {
     enterUp.flags = []
     enterDown.post(tap: .cghidEventTap)
     enterUp.post(tap: .cghidEventTap)
+    exit(0)
+}
+
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--dismiss" {
+    guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 53, keyDown: true),
+          let up = CGEvent(keyboardEventSource: nil, virtualKey: 53, keyDown: false) else {
+        fatalError("Could not create Escape events")
+    }
+    down.flags = []
+    up.flags = []
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
+    exit(0)
+}
+
+if CommandLine.arguments.count == 3 && CommandLine.arguments[2] == "--save" {
+    // macOS hardware key code 1 is S. Send the normal Save shortcut.
+    guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 1, keyDown: true),
+          let up = CGEvent(keyboardEventSource: nil, virtualKey: 1, keyDown: false) else {
+        fatalError("Could not create save shortcut")
+    }
+    down.flags = .maskCommand
+    up.flags = []
+    down.post(tap: .cghidEventTap)
+    up.post(tap: .cghidEventTap)
     exit(0)
 }
 
@@ -131,6 +158,13 @@ if CommandLine.arguments.count == 4 && CommandLine.arguments[2] == "--about-sele
     // Vision uses normalized coordinates with the origin at the bottom left.
     let point = CGPoint(x: screen.minX + match.boundingBox.midX * screen.width,
                         y: screen.minY + (1 - match.boundingBox.midY) * screen.height)
+    print("Clicking About at \(point) in screen \(screen)")
+    CGWarpMouseCursorPosition(point)
+    if let move = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left) {
+        move.flags = []
+        move.post(tap: .cghidEventTap)
+    }
+    Thread.sleep(forTimeInterval: 0.3)
     guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
           let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else {
         fatalError("Could not create About click")
@@ -157,13 +191,3 @@ for character in input {
     keyUp.post(tap: .cghidEventTap)
     Thread.sleep(forTimeInterval: 0.05)
 }
-Thread.sleep(forTimeInterval: 1)
-// macOS hardware key code 1 is S. Send the application's normal Save shortcut.
-guard let saveDown = CGEvent(keyboardEventSource: nil, virtualKey: 1, keyDown: true),
-      let saveUp = CGEvent(keyboardEventSource: nil, virtualKey: 1, keyDown: false) else {
-    fatalError("Could not create save shortcut")
-}
-saveDown.flags = .maskCommand
-saveUp.flags = []
-saveDown.post(tap: .cghidEventTap)
-saveUp.post(tap: .cghidEventTap)

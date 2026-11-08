@@ -16,6 +16,26 @@ function Run-Installer([string]$Executable, [string[]]$Arguments) {
     if ($process.ExitCode -ne 0) { throw "$Executable failed with exit code $($process.ExitCode)" }
 }
 
+function Wait-AppEvent([string]$LogPath, [System.Diagnostics.Process]$Process, [string]$Event, [string[]]$Details = @()) {
+    for ($i = 0; $i -lt 60; $i++) {
+        $matching = @()
+        if (Test-Path $LogPath) {
+            $matching = @(Select-String -Path $LogPath -SimpleMatch $Event | Where-Object {
+                $line = $_.Line
+                @($Details | Where-Object { !$line.Contains($_) }).Count -eq 0
+            })
+        }
+        if ($matching.Count -gt 0) {
+            Write-Host "Verified event: $Event"
+            return
+        }
+        $Process.Refresh()
+        if ($Process.HasExited) { throw "Application exited while waiting for $Event" }
+        Start-Sleep -Seconds 1
+    }
+    throw "Timed out waiting for $Event"
+}
+
 function Find-Installation {
     $roots = @(
         (Join-Path $env:LOCALAPPDATA 'Plunibio'),
@@ -49,6 +69,7 @@ try {
     $stderr = Join-Path $results 'application-error.log'
     $file = Join-Path $workspace 'smoke.md'
     if (Test-Path $file) { throw 'Workspace is not empty before the creation test' }
+    $env:RUST_LOG = 'debug'
     $app = Start-Process -FilePath $exe -ArgumentList @('--base-path', "`"$workspace`"", '--width', '850', '--height', '700') -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
     try {
         $shell = New-Object -ComObject WScript.Shell
@@ -60,28 +81,23 @@ try {
             Start-Sleep -Seconds 1
         }
         if (!$activated) { throw 'Could not activate workspace window' }
-        Start-Sleep -Seconds 8
+        Wait-AppEvent $stdout $app 'lifecycle_event=app.started'
+        Wait-AppEvent $stdout $app 'frontend_event=workspace.ready'
         Write-Host 'Creating Markdown in the workspace'
         $shell.SendKeys('^+m')
-        Start-Sleep -Seconds 2
+        Wait-AppEvent $stdout $app 'frontend_event=entry_dialog.opened;' @('"kind":"markdown"')
         # The dialog contains .md with the caret before the extension.
         $shell.SendKeys('smoke')
         $shell.SendKeys('{ENTER}')
-        $loaded = $false
-        for ($i = 0; $i -lt 60; $i++) {
-            if ((Test-Path $file) -and (Test-Path $stdout) -and (Select-String -Path $stdout -SimpleMatch 'Reading smoke.md' -Quiet)) { $loaded = $true; break }
-            if ($app.HasExited) { throw 'Application exited before document loaded' }
-            Start-Sleep -Seconds 1
-            $app.Refresh()
-        }
-        if (!$loaded) { throw 'File creation or editor load timed out' }
-        Start-Sleep -Seconds 5
+        Wait-AppEvent $stdout $app 'frontend_event=entry.created;' @('"kind":"markdown"')
+        Wait-AppEvent $stdout $app 'frontend_event=editor.focused;' @('"editor":"EditorMarkdown"', '"connected":true', '"focused":true')
+        if (!(Test-Path $file)) { throw 'Markdown file was not created' }
         if (!$shell.AppActivate($app.Id)) { throw 'Could not activate application window' }
         Start-Sleep -Seconds 2
         $shell.SendKeys('Plunibio smoke test')
-        Start-Sleep -Seconds 1
+        Wait-AppEvent $stdout $app 'frontend_event=editor.changed;' @('"editor":"EditorMarkdown"', '"state":"ready"')
         $shell.SendKeys('^s')
-        Start-Sleep -Seconds 3
+        Wait-AppEvent $stdout $app 'frontend_event=editor.saved;' @('"editor":"EditorMarkdown"')
         Add-Type -AssemblyName System.Windows.Forms
         Add-Type -AssemblyName System.Drawing
         $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
@@ -118,18 +134,20 @@ public static class SmokeNative {
         $shell.SendKeys(' ')
         Start-Sleep -Seconds 1
         $shell.SendKeys('{END}{ENTER}')
-        Start-Sleep -Seconds 2
+        Wait-AppEvent $stdout $app 'frontend_event=about.opened'
+        $expectedVersion = (Get-Content 'package.json' -Raw | ConvertFrom-Json).version
+        Wait-AppEvent $stdout $app 'frontend_event=about.metadata;' @("`"version`":`"$expectedVersion`"")
         $bitmap = [System.Drawing.Bitmap]::new($bounds.Width, $bounds.Height)
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
         try {
             $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
             $bitmap.Save((Join-Path $results 'about.png'), [System.Drawing.Imaging.ImageFormat]::Png)
         } finally { $graphics.Dispose(); $bitmap.Dispose() }
-        python automation/poc/verify-about.py (Join-Path $results 'about.png')
-        if ($LASTEXITCODE -ne 0) { throw "About dialog verification failed: $LASTEXITCODE" }
         $shell.SendKeys('{ESC}')
+        Wait-AppEvent $stdout $app 'frontend_event=about.closed'
         if (!$app.CloseMainWindow()) { throw 'Could not request normal window close' }
         if (!$app.WaitForExit(15000)) { throw 'Application did not close' }
+        if (!(Select-String -Path $stdout -SimpleMatch 'lifecycle_event=app.window.closed' -Quiet)) { throw 'Application window closure was not logged' }
     } finally {
         if (!$app.HasExited) { Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue }
     }

@@ -58,34 +58,19 @@ stage="compile native input helper"
 swiftc automation/poc/macos-native-input.swift -o "$task_root/native-input"
 stage="launch application"
 test ! -e "$workspace/smoke.md"
-HOME="$task_root/home" "$binary" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
+HOME="$task_root/home" RUST_LOG=debug "$binary" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
 pid=$!
+source automation/poc/wait-events.sh
 
 stage="create Markdown in workspace"
-# The folder view initializes asynchronously; the helper waits for its window.
-sleep 8
-"$task_root/native-input" "$pid" --create >"$results/create.log" 2>&1
-stage="wait for document loading"
-document_loading=false
-for _ in {1..60}; do
-  if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log"; then
-    document_loading=true
-    break
-  fi
-  if ! kill -0 "$pid" 2>/dev/null; then
-    echo "Application exited before starting to load the document." >&2
-    exit 1
-  fi
-  sleep 1
-done
-if [[ "$document_loading" != true ]]; then
-  echo "Timed out waiting for the application to load smoke.md." >&2
-  exit 1
-fi
-# The read log precedes Milkdown initialization. Allow it to finish before typing;
-# this is a POC heuristic, not an editor-ready signal.
-echo "Document read started; allowing time for the editor to initialize."
-sleep 5
+wait_event 'lifecycle_event=app.started'
+wait_event 'frontend_event=workspace.ready'
+"$task_root/native-input" "$pid" --create-dialog >"$results/create.log" 2>&1
+wait_event 'frontend_event=entry_dialog.opened;' 60 '"kind":"markdown"'
+"$task_root/native-input" "$pid" --create-confirm >>"$results/create.log" 2>&1
+wait_event 'frontend_event=entry.created;' 60 '"kind":"markdown"'
+wait_event 'frontend_event=editor.focused;' 60 '"editor":"EditorMarkdown"' '"connected":true' '"focused":true'
+test -f "$workspace/smoke.md"
 
 stage="send native input"
 set +e
@@ -104,6 +89,9 @@ if [[ $input_status -ne 0 ]]; then
   cat "$results/input.log" >&2
   exit "$input_status"
 fi
+wait_event 'frontend_event=editor.changed;' 60 '"editor":"EditorMarkdown"' '"state":"ready"'
+"$task_root/native-input" "$pid" --save >>"$results/input.log" 2>&1
+wait_event 'frontend_event=editor.saved;' 60 '"editor":"EditorMarkdown"'
 if [[ $capture_status -ne 0 ]]; then
   exit "$capture_status"
 fi
@@ -116,10 +104,13 @@ for _ in {1..20}; do
     "$task_root/native-input" "$pid" --about-menu >>"$results/input.log" 2>&1
     screencapture -x "$results/menu.png" >>"$results/capture.log" 2>&1
     "$task_root/native-input" "$pid" --about-select "$results/menu.png" >>"$results/input.log" 2>&1
-    sleep 2
+    wait_event 'frontend_event=about.opened'
+    expected_version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
+    wait_event 'frontend_event=about.metadata;' 60 "\"version\":\"$expected_version\""
     screencapture -x "$results/about.png" >>"$results/capture.log" 2>&1
     test -s "$results/about.png"
-    python3 automation/poc/verify-about.py "$results/about.png"
+    "$task_root/native-input" "$pid" --dismiss >>"$results/input.log" 2>&1
+    wait_event 'frontend_event=about.closed'
     echo "Native input and save verified; requesting normal termination."
     "$task_root/native-input" "$pid" --quit
     for _ in {1..15}; do
@@ -132,6 +123,7 @@ for _ in {1..20}; do
     fi
     wait "$pid"
     pid=""
+    grep -Fq 'lifecycle_event=app.window.closed' "$results/application.log"
     rm -rf "$task_root/apps/Plunibio.app"
     test ! -e "$task_root/apps/Plunibio.app"
     echo "DMG application closed and removed."

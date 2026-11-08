@@ -28,31 +28,27 @@ image="$task_root/apps/Plunibio.AppImage"
 cp "${images[0]}" "$image"
 chmod +x "$image"
 test ! -e "$workspace/smoke.md"
-HOME="$task_root/home" GDK_BACKEND=x11 "$image" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
+HOME="$task_root/home" GDK_BACKEND=x11 RUST_LOG=debug "$image" --base-path "$workspace" --width 850 --height 700 >"$results/application.log" 2>&1 &
 pid=$!
+source automation/poc/wait-events.sh
 window=$(timeout 60s xdotool search --sync --onlyvisible --pid "$pid" | head -1)
 xdotool windowfocus --sync "$window"
-sleep 8
+wait_event 'lifecycle_event=app.started'
+wait_event 'frontend_event=workspace.ready'
 echo 'Creating Markdown in the workspace.'
 xdotool key --clearmodifiers ctrl+shift+m
-sleep 2
+wait_event 'frontend_event=entry_dialog.opened;' 60 '"kind":"markdown"'
 xdotool type --clearmodifiers --delay 75 'smoke'
 xdotool key --clearmodifiers Return
-for _ in {1..60}; do
-  [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log" && break
-  kill -0 "$pid" 2>/dev/null || { cat "$results/application.log" >&2; exit 1; }
-  sleep 1
-done
-[[ -f "$workspace/smoke.md" ]] && grep -Fq 'Reading smoke.md' "$results/application.log" || { echo 'File creation or editor load failed' >&2; exit 1; }
-sleep 5
+wait_event 'frontend_event=entry.created;' 60 '"kind":"markdown"'
+wait_event 'frontend_event=editor.focused;' 60 '"editor":"EditorMarkdown"' '"connected":true' '"focused":true'
+test -f "$workspace/smoke.md"
 xdotool windowfocus --sync "$window"
 xdotool type --clearmodifiers --delay 75 'Plunibio smoke test'
+wait_event 'frontend_event=editor.changed;' 60 '"editor":"EditorMarkdown"' '"state":"ready"'
 import -window root "$results/screen.png"
-for _ in {1..10}; do
-  xdotool key --clearmodifiers ctrl+s
-  sleep 2
-  if [[ -f "$workspace/smoke.md" ]] && grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"; then break; fi
-done
+xdotool key --clearmodifiers ctrl+s
+wait_event 'frontend_event=editor.saved;' 60 '"editor":"EditorMarkdown"'
 [[ -f "$workspace/smoke.md" ]] && cp "$workspace/smoke.md" "$results/smoke.md"
 grep -Fq 'Plunibio smoke test' "$workspace/smoke.md"
 echo 'Opening About through the toolbar menu.'
@@ -64,17 +60,20 @@ xdotool key --clearmodifiers Escape
 xdotool key --clearmodifiers space
 sleep 1
 xdotool key --clearmodifiers End Return
-sleep 2
+wait_event 'frontend_event=about.opened'
+expected_version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
+wait_event 'frontend_event=about.metadata;' 60 "\"version\":\"$expected_version\""
 import -window root "$results/about.png"
 test -s "$results/about.png"
-python3 automation/poc/verify-about.py "$results/about.png"
 xdotool key Escape
+wait_event 'frontend_event=about.closed'
 echo 'Requesting a normal X11 window close.'
 python3 automation/poc/x11-close.py "$window"
 for _ in {1..15}; do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
 if kill -0 "$pid" 2>/dev/null; then echo 'Application did not close' >&2; exit 1; fi
 wait "$pid"
 pid=""
+grep -Fq 'lifecycle_event=app.window.closed' "$results/application.log"
 rm -f "$image"
 test ! -e "$image"
 echo 'AppImage input, save, close and removal verified.'
