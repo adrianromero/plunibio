@@ -50,6 +50,17 @@ Elige Apple Silicon para chips de la serie M o Intel para un Mac con procesador 
 
 Cada descarga incluye un valor **SHA-256** publicado por GitHub. Permite comparar la integridad del archivo con ese valor; no sustituye una firma de editor ni una prueba funcional. Descarga los paquetes desde los enlaces de esta página o la release oficial.
 
+## Problemas conocidos
+
+Se han reportado los siguientes problemas en Ubuntu. Consulta cada issue para ver los detalles y seguir su evolución.
+
+- **[#1 — [Ubuntu] Markdown editor scrollbar intermittently becomes invisible while scrolling remains functional](https://github.com/adrianromero/plunibio/issues/1)**
+
+  La barra de desplazamiento del editor Markdown puede desaparecer de forma intermitente, aunque el desplazamiento sigue funcionando.
+- **[#2 — [Ubuntu] Blurry or excessively heavy text rendering persists despite font-smoothing mitigation](https://github.com/adrianromero/plunibio/issues/2)**
+
+  El texto puede verse borroso o con un grosor excesivo, especialmente las negritas.
+
 ## Instalar un paquete descargado
 
 Los instaladores contienen la aplicación: no necesitas Node.js, Rust ni herramientas de compilación para utilizarlos. No se han establecido requisitos mínimos verificados de versión del sistema operativo; las pruebas de paquetes indicadas no garantizan todas las distribuciones o versiones.

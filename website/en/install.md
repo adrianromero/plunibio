@@ -50,6 +50,17 @@ Choose Apple Silicon for M-series chips or Intel for an Intel-based Mac. The DMG
 
 Each download includes a **SHA-256** value published by GitHub. It lets you compare the file's integrity against that value; it does not replace a publisher signature or functional testing. Download packages through this page or the official release.
 
+## Known issues
+
+The following issues have been reported on Ubuntu. See each issue for details and progress.
+
+- **[#1 — [Ubuntu] Markdown editor scrollbar intermittently becomes invisible while scrolling remains functional](https://github.com/adrianromero/plunibio/issues/1)**
+
+  The Markdown editor scrollbar may disappear intermittently, although scrolling continues to work.
+- **[#2 — [Ubuntu] Blurry or excessively heavy text rendering persists despite font-smoothing mitigation](https://github.com/adrianromero/plunibio/issues/2)**
+
+  Text may appear blurry or excessively heavy, particularly bold text.
+
 ## Install a downloaded package
 
 The installers contain the application: you do not need Node.js, Rust, or build tools to use them. Verified minimum operating-system versions have not been established; the reported package tests do not guarantee every distribution or version.
