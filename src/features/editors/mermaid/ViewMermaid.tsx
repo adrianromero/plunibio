@@ -17,7 +17,6 @@ let diagramId = 0;
 export function ViewMermaid(): JSX.Element {
     const host = useEditorTextView();
     const { t } = useI18N();
-    let viewRef!: HTMLElement;
     let previewRef!: HTMLDivElement;
     let content: string | null = null;
     let generation = 0;
@@ -60,7 +59,6 @@ export function ViewMermaid(): JSX.Element {
             previewRef.replaceChildren();
             refresh();
         },
-        focus: () => (error() ? viewRef : previewRef).focus(),
         destroy: async () => {
             generation += 1;
             content = null;
@@ -72,8 +70,6 @@ export function ViewMermaid(): JSX.Element {
 
     return (
         <section
-            ref={viewRef}
-            tabIndex={-1}
             class={styles.studio}
             data-testid="mermaid-view"
             style={{ display: host.active() ? undefined : "none" }}
@@ -82,7 +78,7 @@ export function ViewMermaid(): JSX.Element {
             <Show when={error()}>
                 <MessageView>{error()}</MessageView>
             </Show>
-            <div class="scrollingView" style={{ display: error() ? "none" : undefined }}>
+            <div class="scrollingView" tabIndex={-1} style={{ display: error() ? "none" : undefined }}>
                 <div class="contentView">
                     <Show when={loading()}>
                         <div class="mermaid-preview">
@@ -95,7 +91,6 @@ export function ViewMermaid(): JSX.Element {
                         ref={previewRef}
                         class={`mermaid-preview ${styles.preview}`}
                         data-testid="mermaid-preview"
-                        tabIndex={0}
                         role="region"
                         aria-label={t("markdownToolbar.mermaidBlock")}
                         aria-busy={loading()}
