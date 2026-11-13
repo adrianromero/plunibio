@@ -4,7 +4,7 @@
  */
 
 import { Show } from "solid-js";
-import Code from "lucide-solid/icons/code";
+import SquareCode from "lucide-solid/icons/square-code";
 import PanelRight from "lucide-solid/icons/panel-right";
 import Moon from "lucide-solid/icons/moon";
 import Sun from "lucide-solid/icons/sun";
@@ -73,9 +73,11 @@ export function Toolbar() {
                         aria-label={t(sourceMode() ? "toolbar.showView" : "toolbar.showSource")}
                         title={`${t(sourceMode() ? "toolbar.showView" : "toolbar.showSource")} (Ctrl/Cmd+Alt+E)`}
                         aria-pressed={sourceMode()}
-                        onClick={() => { void toggleSourceMode()?.(); }}
+                        onClick={() => {
+                            void toggleSourceMode()?.();
+                        }}
                     >
-                        <Code aria-hidden="true" />
+                        <SquareCode aria-hidden="true" />
                     </button>
                 </Show>
                 <Show when={toggleSidebar()}>
@@ -231,23 +233,17 @@ export function Toolbar() {
                                         {
                                             value: "serif",
                                             label: t("toolbar.serifTypography"),
-                                            description: t(
-                                                "toolbar.serifTypographyDescription"
-                                            ),
+                                            description: t("toolbar.serifTypographyDescription"),
                                         },
                                         {
                                             value: "modern",
                                             label: t("toolbar.modernTypography"),
-                                            description: t(
-                                                "toolbar.modernTypographyDescription"
-                                            ),
+                                            description: t("toolbar.modernTypographyDescription"),
                                         },
                                         {
                                             value: "reading",
                                             label: t("toolbar.readingTypography"),
-                                            description: t(
-                                                "toolbar.readingTypographyDescription"
-                                            ),
+                                            description: t("toolbar.readingTypographyDescription"),
                                         },
                                     ],
                                     onChange: (nextTypography): void => {
