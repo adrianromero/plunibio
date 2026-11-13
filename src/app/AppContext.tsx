@@ -46,6 +46,7 @@ export type NavigateFileHandler = () => Promise<void>;
 export type RenameEntryHandler = () => void | Promise<void>;
 export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
 export type CreateEntryHandler = (kind: CreateEntryKind) => void;
+export type ToggleSourceModeHandler = () => Promise<void>;
 export type ToggleSidebarHandler = () => void;
 export type ToggleThemeHandler = () => void;
 export type OnunloadHandler = () => Promise<void>;
@@ -83,6 +84,12 @@ export type AppContextValues = {
         setSpinnerParams: (text: string) => void;
     };
     editor: {
+        sourceMode: Accessor<boolean>;
+        setSourceMode: Setter<boolean>;
+        sourceModeAvailable: Accessor<boolean>;
+        setSourceModeAvailable: Setter<boolean>;
+        toggleSourceMode: Accessor<ToggleSourceModeHandler | null>;
+        setToggleSourceMode: (handler: ToggleSourceModeHandler | null) => void;
         saveFile: Accessor<SaveFileHandler | null>;
         setSaveFile: (handler: SaveFileHandler | null) => void;
         reloadFile: Accessor<ReloadFileHandler | null>;
@@ -134,6 +141,12 @@ export function AppProvider(props: {
         });
     });
 
+    const [sourceMode, setSourceMode] = createSignal(false);
+    const [sourceModeAvailable, setSourceModeAvailable] = createSignal(false);
+    const [toggleSourceMode, setToggleSourceModeSignal] = createSignal<ToggleSourceModeHandler | null>(null);
+    const setToggleSourceMode = (handler: ToggleSourceModeHandler | null): void => {
+        setToggleSourceModeSignal(() => handler);
+    };
     const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
     const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
@@ -242,6 +255,14 @@ export function AppProvider(props: {
         }
     };
     const shortcuts = [
+        {
+            id: "toggle-source-mode",
+            key: "e",
+            alt: true,
+            phase: "capture",
+            preventDefaultWhenUnavailable: false,
+            getHandler: toggleSourceMode,
+        },
         {
             id: "rename-entry",
             key: "F2",
@@ -517,6 +538,12 @@ export function AppProvider(props: {
                     setSpinnerParams,
                 },
                 editor: {
+                    sourceMode,
+                    setSourceMode,
+                    sourceModeAvailable,
+                    setSourceModeAvailable,
+                    toggleSourceMode,
+                    setToggleSourceMode,
                     saveFile,
                     setSaveFile,
                     reloadFile,

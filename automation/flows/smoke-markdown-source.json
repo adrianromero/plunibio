@@ -1,0 +1,260 @@
+{
+    "name": "Markdown: edición visual y código fuente",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "file": "README.md",
+        "width": 1100,
+        "height": 800,
+        "preferences": {
+            "locale": "es",
+            "theme": "light",
+            "sidebarVisible": true
+        }
+    },
+    "outputDir": "automation/output/smoke-markdown-source",
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "source-mode-toggle"
+            },
+            "state": "enabled"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"markdown-editor\"] h1"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "01-markdown"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "testId",
+                "value": "source-mode-toggle"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .cm-content"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .tok-heading"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "02-source"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "f"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "type",
+            "target": {
+                "using": "testId",
+                "value": "search-input"
+            },
+            "text": "Lúmina",
+            "replace": true
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "03-source-search"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "testId",
+                "value": "source-mode-toggle"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"markdown-editor\"] h1"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"markdown-editor\"] h1"
+            }
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Alt",
+                "e"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .cm-content"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "caret",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .cm-content"
+            },
+            "position": "end"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Enter",
+                "Enter",
+                "Texto añadido desde CodeMirror."
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "Alt",
+                "e"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"markdown-editor\"] .ProseMirror"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "markdown-editor"
+            },
+            "text": "Texto añadido desde CodeMirror."
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "04-edited-markdown"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "s"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "aria",
+                "value": "Cambios sin guardar"
+            },
+            "state": "missing"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "testId",
+                "value": "source-mode-toggle"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .cm-content"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "keys",
+            "keys": [
+                "Control",
+                "r"
+            ]
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"message-dialog\"] button:first-child"
+            }
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "message-dialog"
+            },
+            "state": "hidden"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-testid=\"text-editor\"] .cm-content"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "capture",
+            "scope": "viewport",
+            "name": "05-reloaded-source"
+        }
+    ]
+}

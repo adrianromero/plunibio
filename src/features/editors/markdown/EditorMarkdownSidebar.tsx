@@ -90,6 +90,7 @@ import { canReplaceEmptyParagraphWithImageBlock } from "./MarkdownTransferInsert
 type EditorMarkdownSidebarProps = {
     getEditor: () => Editor | null;
     disabled?: boolean;
+    active?: boolean;
     frontmatterVisible: boolean;
     onToggleFrontmatter: () => void;
     searchController: SearchController | null;
@@ -601,7 +602,7 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
     });
 
     return (
-        <AppSidebar disabled={props.disabled}>
+        <AppSidebar disabled={props.disabled} active={props.active}>
             <SidebarTab
                 selectedKey={props.selectedTab}
                 onSelectedKeyChange={(key) => key && props.onSelectedTabChange(key)}

@@ -19,7 +19,7 @@ vi.mock("@tauri-apps/api/core", () => ({
     }),
 }));
 
-describe("EditorText", () => {
+describe("EditorTextView source focus", () => {
     let dispose: (() => void) | undefined;
     let root: HTMLDivElement | undefined;
 

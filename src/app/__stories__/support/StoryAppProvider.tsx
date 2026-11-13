@@ -9,6 +9,7 @@ import {
     type SaveFileHandler,
     type SearchFileHandler,
     type ToggleSidebarHandler,
+    type ToggleSourceModeHandler,
 } from "../../AppContext";
 import { applyTheme } from "@/preferences/ThemePreferences";
 import {
@@ -43,6 +44,12 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
     const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(
         props.reloadAvailable === false ? null : defaultReloadFile
     );
+    const [sourceMode, setSourceMode] = createSignal(false);
+    const [sourceModeAvailable, setSourceModeAvailable] = createSignal(false);
+    const [toggleSourceMode, setToggleSourceModeSignal] = createSignal<ToggleSourceModeHandler | null>(null);
+    const setToggleSourceMode = (handler: ToggleSourceModeHandler | null): void => {
+        setToggleSourceModeSignal(() => handler);
+    };
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
     const [sidebarVisible, setSidebarVisible] = createSignal(true);
     const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
@@ -112,6 +119,12 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             setSpinnerParams: () => undefined,
         },
         editor: {
+            sourceMode,
+            setSourceMode,
+            sourceModeAvailable,
+            setSourceModeAvailable,
+            toggleSourceMode,
+            setToggleSourceMode,
             saveFile,
             setSaveFile,
             reloadFile,

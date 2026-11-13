@@ -50,6 +50,7 @@ vi.mock("@/app/AppContext", () => ({
         editor: {
             sidebarVisible: () => true,
             setSidebarVisible: vi.fn(),
+            toggleSidebar: () => null,
             setToggleSidebar: vi.fn(),
             setReloadFile: (handler: ReloadFileHandler | null) => {
                 reloadFile = handler;

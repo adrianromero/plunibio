@@ -4,6 +4,8 @@
         "saving": "{{ filename }} gordetzen..."
     },
     "toolbar": {
+        "showSource": "Erakutsi iturburu-kodea",
+        "showView": "Erakutsi dokumentuaren ikuspegia",
         "back": "Atzera",
         "forward": "Aurrera",
         "reload": "Birkargatu",

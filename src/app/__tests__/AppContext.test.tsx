@@ -97,6 +97,32 @@ describe("AppProvider workspace changes", () => {
         expect(restored.editor.folderSort()).toEqual({ attribute: "size", direction: "desc" });
     });
 
+    it("routes Ctrl/Cmd+Alt+E to the source toggle and respects blocked interactions", async () => {
+        const context = renderProvider();
+        const toggle = vi.fn(async () => undefined);
+        expect(pressShortcut("e", "KeyE").defaultPrevented).toBe(false);
+        context.editor.setToggleSourceMode(toggle);
+        expect(pressShortcut("e", "KeyE").defaultPrevented).toBe(true);
+        await Promise.resolve();
+        expect(toggle).toHaveBeenCalledTimes(1);
+        context.spinner.showSpinner();
+        pressShortcut("e", "KeyE");
+        expect(toggle).toHaveBeenCalledTimes(1);
+        context.spinner.hideSpinner();
+        const editorInput = document.createElement("input");
+        document.body.append(editorInput);
+        const editorKeyHandler = vi.fn((event: KeyboardEvent) => event.preventDefault());
+        editorInput.addEventListener("keydown", editorKeyHandler);
+        editorInput.dispatchEvent(new KeyboardEvent("keydown", {
+            key: "e", code: "KeyE", metaKey: true, altKey: true, bubbles: true, cancelable: true,
+        }));
+        expect(editorKeyHandler).not.toHaveBeenCalled();
+        await Promise.resolve();
+        expect(toggle).toHaveBeenCalledTimes(2);
+        context.editor.setToggleSourceMode(null);
+        expect(pressShortcut("e", "KeyE").defaultPrevented).toBe(false);
+    });
+
     it("routes navigation and sidebar shortcuts only to registered handlers", () => {
         const context = renderProvider();
         const navigateBack = vi.fn(() => Promise.resolve());

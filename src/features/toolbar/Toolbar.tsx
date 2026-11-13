@@ -4,6 +4,7 @@
  */
 
 import { Show } from "solid-js";
+import Code from "lucide-solid/icons/code";
 import PanelRight from "lucide-solid/icons/panel-right";
 import Moon from "lucide-solid/icons/moon";
 import Sun from "lucide-solid/icons/sun";
@@ -26,6 +27,9 @@ export function Toolbar() {
     const {
         main: { openWorkspace, showAbout },
         editor: {
+            sourceMode,
+            sourceModeAvailable,
+            toggleSourceMode,
             saveFile,
             reloadFile,
             toggleSidebar,
@@ -60,6 +64,20 @@ export function Toolbar() {
                 </Show>
             </div>
             <div class={styles.toolbarActions}>
+                <Show when={sourceModeAvailable()}>
+                    <button
+                        class={`stdButton mainbar ${sourceMode() ? "selected" : ""}`}
+                        data-testid="source-mode-toggle"
+                        type="button"
+                        disabled={!toggleSourceMode()}
+                        aria-label={t(sourceMode() ? "toolbar.showView" : "toolbar.showSource")}
+                        title={`${t(sourceMode() ? "toolbar.showView" : "toolbar.showSource")} (Ctrl/Cmd+Alt+E)`}
+                        aria-pressed={sourceMode()}
+                        onClick={() => { void toggleSourceMode()?.(); }}
+                    >
+                        <Code aria-hidden="true" />
+                    </button>
+                </Show>
                 <Show when={toggleSidebar()}>
                     <button
                         class={`stdButton mainbar ${sidebarVisible() ? "selected" : ""}`}

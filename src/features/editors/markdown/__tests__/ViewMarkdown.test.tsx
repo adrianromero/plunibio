@@ -82,7 +82,7 @@ vi.mock("@tauri-apps/api/window", () => ({
 
 const invokeMock = vi.mocked(invoke);
 
-describe("EditorMarkdown", () => {
+describe("ViewMarkdown", () => {
     let dispose: (() => void) | undefined;
     let root: HTMLDivElement | undefined;
 
@@ -751,7 +751,7 @@ describe("EditorMarkdown", () => {
             configurable: true,
             value: () => new DOMRect(10, layerTop, 800, 0),
         });
-        root.querySelector<HTMLElement>(".scrollingView")?.dispatchEvent(new Event("scroll"));
+        root.querySelector<HTMLElement>('[data-testid="markdown-view"] .scrollingView')?.dispatchEvent(new Event("scroll"));
         await vi.waitFor(() => {
             expect(positioner.style.left).toBe("30px");
             expect(positioner.style.top).toBe("-174px");
@@ -760,7 +760,7 @@ describe("EditorMarkdown", () => {
         const callsBeforeScroll = rangeRect.mock.calls.length;
         anchorTop -= 40;
         layerTop -= 40;
-        root.querySelector<HTMLElement>(".scrollingView")?.dispatchEvent(new Event("scroll"));
+        root.querySelector<HTMLElement>('[data-testid="markdown-view"] .scrollingView')?.dispatchEvent(new Event("scroll"));
         await vi.waitFor(() => {
             expect(rangeRect.mock.calls.length).toBeGreaterThan(callsBeforeScroll);
             expect(positioner.style.left).toBe("30px");
@@ -1076,7 +1076,7 @@ describe("EditorMarkdown", () => {
                 "./updated-logo.png"
             );
         });
-        const scrollContainer = root.querySelector<HTMLElement>(".scrollingView")!;
+        const scrollContainer = root.querySelector<HTMLElement>('[data-testid="markdown-view"] .scrollingView')!;
         const nativeCaptionButton = root.querySelector<HTMLElement>(
             ".milkdown-image-block > .image-wrapper > .operation > .operation-item"
         )!;

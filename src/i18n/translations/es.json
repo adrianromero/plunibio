@@ -4,6 +4,8 @@
         "saving": "Guardando {{ filename }}..."
     },
     "toolbar": {
+        "showSource": "Mostrar código fuente",
+        "showView": "Mostrar vista del documento",
         "back": "Atrás",
         "forward": "Adelante",
         "reload": "Recargar",

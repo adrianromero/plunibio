@@ -3,25 +3,18 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { LanguageSupport } from "@codemirror/language";
 import type { Component } from "solid-js";
 import type { PathKind } from "@/backend/rusttypes";
 import EditorFolder from "./folder/EditorFolder";
-import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
-import EditorText from "./text/EditorText";
 import { editorForFilename } from "./EditorForFilename";
 
 export type PathResult = { kind: PathKind; error?: never } | { kind: "error"; error: string };
 
-type ContentProps = {
-    extensions?: readonly LanguageSupport[];
-};
-
 export type ContentSelection =
     | {
           kind: "content";
-          component: Component<ContentProps>;
-          props: ContentProps;
+          component: Component;
+          props: Record<string, never>;
       }
     | {
           kind: "unsupported";
@@ -31,33 +24,17 @@ export type ContentSelection =
           error: string;
       };
 
-function contentForFile(filename: string): ContentSelection {
-    const normalizedFilename = filename.toLowerCase();
-    const editor = editorForFilename(normalizedFilename);
-
-    const editorTextExtensions = editorTextExtensionsForFilename(normalizedFilename);
-    if (editor === EditorText && editorTextExtensions) {
-        return {
-            kind: "content",
-            component: editor,
-            props: { extensions: editorTextExtensions },
-        };
-    }
-
-    return {
-        kind: "content",
-        component: editor,
-        props: {},
-    };
-}
-
 export function contentForPath(
     filename: string,
     pathResult: PathResult | undefined
 ): ContentSelection | undefined {
     switch (pathResult?.kind) {
         case "file":
-            return contentForFile(filename);
+            return {
+                kind: "content",
+                component: editorForFilename(filename),
+                props: {},
+            };
         case "directory":
             return {
                 kind: "content",

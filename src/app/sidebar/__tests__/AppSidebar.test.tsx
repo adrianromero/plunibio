@@ -11,6 +11,7 @@ import AppSidebar from "../AppSidebar";
 
 let sidebarContext: {
     sidebarVisible: () => boolean;
+    toggleSidebar: () => ToggleSidebarHandler | null;
     setSidebarVisible: (value: boolean | ((visible: boolean) => boolean)) => boolean;
     setToggleSidebar: (handler: ToggleSidebarHandler | null) => void;
 };
@@ -28,6 +29,7 @@ describe("AppSidebar", () => {
         toggleSidebar = null;
         sidebarContext = {
             sidebarVisible,
+            toggleSidebar: () => toggleSidebar,
             setSidebarVisible,
             setToggleSidebar: (handler) => {
                 toggleSidebar = handler;

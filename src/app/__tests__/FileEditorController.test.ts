@@ -102,6 +102,12 @@ describe("createFileEditorController", () => {
                 setSpinnerParams: vi.fn(),
             },
             editor: {
+                sourceMode: () => false,
+                setSourceMode: vi.fn(),
+                sourceModeAvailable: () => false,
+                setSourceModeAvailable: vi.fn(),
+                toggleSourceMode: () => null,
+                setToggleSourceMode: vi.fn(),
                 saveFile: () => saveFile,
                 setSaveFile: (handler) => {
                     saveFile = handler;

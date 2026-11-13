@@ -9,6 +9,7 @@ machine.
 ```bash
 npm run automation:build
 npm run automation:run -- automation/flows/smoke-atlas.json
+npm run automation:run -- automation/flows/smoke-markdown-source.json
 ```
 
 The WebDriver plugins are registered only when Cargo's `automation` feature is enabled, and the
@@ -81,7 +82,7 @@ of the automation contract and should not be renamed without updating the flows.
 | Application | `app-main`, `main-toolbar`, `spinner-overlay`, `message-view` | `data-message-kind` |
 | Navigation | `navigate-back`, `navigate-forward`, `file-breadcrumb`, `breadcrumb-segment` | `data-path` |
 | Sidebar | `sidebar-toggle`, `app-sidebar`, `sidebar-tabs`, `sidebar-tab`, `sidebar-panel` | `data-tab-key` |
-| Editors | `markdown-view`, `markdown-editor`, `frontmatter-panel`, `frontmatter-editor`, `text-view`, `text-editor` | — |
+| Editors | `source-mode-toggle`, `markdown-view`, `markdown-editor`, `frontmatter-panel`, `frontmatter-editor`, `text-view`, `text-editor` | — |
 | Image editor | `image-view`, `image-viewport`, `image-canvas`, `image-action`, `image-preset`, `control` | `data-action`, `data-preset`, `data-control-id` |
 | Folders | `folder-view`, `folder-entry` | `data-path`, `data-entry-kind`, `data-create-kind`, `data-sort-attribute`, `data-sort-direction` |
 | Search | `search-panel`, `search-input`, `replace-input`, `search-match-case`, `search-whole-word`, `search-regexp` | — |

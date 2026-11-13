@@ -18,6 +18,7 @@ describe("contentForPath", () => {
             expect(selection?.kind).toBe("content");
             if (selection?.kind !== "content") return;
             expect(selection.component).toBe(EditorMarkdown);
+            expect(selection.props).toEqual({});
         }
     );
 
@@ -27,7 +28,7 @@ describe("contentForPath", () => {
         expect(selection?.kind).toBe("content");
         if (selection?.kind !== "content") return;
         expect(selection.component).toBe(EditorText);
-        expect(selection.props.extensions).toHaveLength(1);
+        expect(selection.props).toEqual({});
     });
 
     it("selects EditorFolder from the path kind even if its name has a Markdown extension", () => {

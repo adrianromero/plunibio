@@ -4,6 +4,8 @@
         "saving": "S'està desant {{ filename }}..."
     },
     "toolbar": {
+        "showSource": "Mostra el codi font",
+        "showView": "Mostra la vista del document",
         "back": "Enrere",
         "forward": "Endavant",
         "reload": "Torna a carregar",

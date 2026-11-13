@@ -65,6 +65,12 @@ describe("Toolbar", () => {
 
         const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
         editorContext = {
+                sourceMode: () => false,
+                setSourceMode: vi.fn(),
+                sourceModeAvailable: () => false,
+                setSourceModeAvailable: vi.fn(),
+                toggleSourceMode: () => null,
+                setToggleSourceMode: vi.fn(),
             folderSort,
             setFolderSort,
             saveFile,

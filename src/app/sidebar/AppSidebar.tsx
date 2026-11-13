@@ -3,30 +3,43 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { onCleanup, onMount, type JSX } from "solid-js";
+import { createEffect, onCleanup, Show, type JSX } from "solid-js";
 import { useAppContext } from "@/app/AppContext";
 import Sidebar from "@/shared/ui/sidebar/Sidebar";
 
 export type AppSidebarProps = {
     children: JSX.Element;
     disabled?: boolean;
+    active?: boolean;
 };
 
 export function AppSidebar(props: AppSidebarProps): JSX.Element {
     const {
-        editor: { sidebarVisible, setSidebarVisible, setToggleSidebar },
+        editor: {
+            sidebarVisible,
+            setSidebarVisible,
+            toggleSidebar: registeredToggleSidebar,
+            setToggleSidebar,
+        },
     } = useAppContext();
     const toggleSidebar = (): void => {
         setSidebarVisible((visible) => !visible);
     };
 
-    onMount(() => setToggleSidebar(toggleSidebar));
-    onCleanup(() => setToggleSidebar(null));
+    createEffect(() => {
+        if (props.active === false) return;
+        setToggleSidebar(toggleSidebar);
+        onCleanup(() => {
+            if (registeredToggleSidebar() === toggleSidebar) setToggleSidebar(null);
+        });
+    });
 
     return (
-        <Sidebar visible={sidebarVisible()} disabled={props.disabled}>
-            {props.children}
-        </Sidebar>
+        <Show when={props.active !== false}>
+            <Sidebar visible={sidebarVisible()} disabled={props.disabled}>
+                {props.children}
+            </Sidebar>
+        </Show>
     );
 }
 

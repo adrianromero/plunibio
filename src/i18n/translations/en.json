@@ -4,6 +4,8 @@
         "saving": "Saving {{ filename }}..."
     },
     "toolbar": {
+        "showSource": "Show source code",
+        "showView": "Show document view",
         "back": "Back",
         "forward": "Forward",
         "reload": "Reload",
