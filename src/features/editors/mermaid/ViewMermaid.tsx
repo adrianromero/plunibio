@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { createSignal, onCleanup, Show, type JSX } from "solid-js";
+import { createSignal, onCleanup, onMount, Show, type JSX } from "solid-js";
 import { useI18N } from "@/i18n/Localization";
 import MessageView from "@/shared/errors/MessageView";
 import { renderMermaid, mermaidErrorMessage } from "../shared/MermaidRenderer";
 import "../shared/MermaidPreview.css";
+import { observeMermaidTheme } from "../shared/MermaidTheme";
 import { useEditorTextView } from "../text/EditorTextViewContext";
 import styles from "./ViewMermaid.module.css";
 
@@ -22,29 +23,42 @@ export function ViewMermaid(): JSX.Element {
     let generation = 0;
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
-    onCleanup(() => { generation += 1; });
+    let stopObserving: (() => void) | undefined;
+    const refresh = (): void => {
+        const version = ++generation;
+        const source = content;
+        const theme = document.documentElement.dataset.theme;
+        setError(null);
+        setLoading(Boolean(source?.trim()));
+        if (!source?.trim()) {
+            previewRef.replaceChildren();
+            return;
+        }
+        void renderMermaid(`plunibio-mermaid-view-${++diagramId}`, source).then(
+            (svg) => {
+                if (version !== generation || theme !== document.documentElement.dataset.theme) return;
+                previewRef.innerHTML = svg;
+                setLoading(false);
+            },
+            (reason: unknown) => {
+                if (version !== generation || theme !== document.documentElement.dataset.theme) return;
+                setError(mermaidErrorMessage(t("markdownToolbar.codePreviewMermaidError"), reason));
+                setLoading(false);
+            }
+        );
+    };
+    onMount(() => { stopObserving = observeMermaidTheme(() => previewRef, refresh); });
+    onCleanup(() => {
+        generation += 1;
+        stopObserving?.();
+    });
 
     host.register({
         getContent: () => Promise.resolve(content),
         replaceContent: async (source) => {
-            const version = ++generation;
             content = source;
-            setError(null);
-            setLoading(Boolean(source.trim()));
             previewRef.replaceChildren();
-            if (!source.trim()) return;
-            void renderMermaid(`plunibio-mermaid-view-${++diagramId}`, source).then(
-                (svg) => {
-                    if (version !== generation) return;
-                    previewRef.innerHTML = svg;
-                    setLoading(false);
-                },
-                (reason: unknown) => {
-                    if (version !== generation) return;
-                    setError(mermaidErrorMessage(t("markdownToolbar.codePreviewMermaidError"), reason));
-                    setLoading(false);
-                }
-            );
+            refresh();
         },
         focus: () => (error() ? viewRef : previewRef).focus(),
         destroy: async () => {

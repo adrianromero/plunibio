@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { mermaidThemeConfig } from "./MermaidTheme";
+
 export type MermaidApi = typeof import("mermaid")["default"];
 export type MermaidLoader = () => Promise<MermaidApi>;
 
@@ -11,15 +13,7 @@ let renderQueue: Promise<void> = Promise.resolve();
 
 async function loadMermaid(): Promise<MermaidApi> {
     if (!mermaidInstance) {
-        mermaidInstance = import("mermaid").then(({ default: mermaid }) => {
-            mermaid.initialize({
-                startOnLoad: false,
-                securityLevel: "strict",
-                suppressErrorRendering: true,
-                theme: "neutral",
-            });
-            return mermaid;
-        });
+        mermaidInstance = import("mermaid").then(({ default: mermaid }) => mermaid);
     }
 
     return mermaidInstance;
@@ -41,6 +35,9 @@ export function renderMermaid(
 ): Promise<string> {
     return enqueueRender(async () => {
         const mermaid = await load();
+        // initialize changes Mermaid's global configuration. Keep it in the same
+        // queue as render so simultaneous previews cannot use each other's theme.
+        mermaid.initialize(mermaidThemeConfig());
         const { svg } = await mermaid.render(id, content);
         return svg;
     });

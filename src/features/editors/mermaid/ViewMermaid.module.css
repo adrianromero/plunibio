@@ -15,7 +15,7 @@
     min-height: 4rem;
     margin-block: 0.5rem;
     padding: 1rem;
-    background: var(--color-surface-subtle);
+    --mermaid-label-background: var(--color-surface);
     border-radius: var(--radius-small);
 }
 

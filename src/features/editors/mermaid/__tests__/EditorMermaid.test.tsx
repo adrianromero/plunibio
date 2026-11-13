@@ -47,6 +47,7 @@ describe("EditorMermaid", () => {
     const writes = () => vi.mocked(invoke).mock.calls.filter(([command]) => command === "write_file");
 
     beforeEach(() => {
+        document.documentElement.dataset.theme = "light";
         diskContent = "%% original spacing\nflowchart LR\n  A --> B\n";
         vi.mocked(invoke).mockReset();
         vi.mocked(invoke).mockImplementation(async (command) => (
@@ -70,7 +71,7 @@ describe("EditorMermaid", () => {
         await context.editor.saveFile()?.();
         expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: diskContent });
         expect(mermaid.initialize).toHaveBeenCalledWith(expect.objectContaining({
-            securityLevel: "strict", theme: "neutral", suppressErrorRendering: true,
+            securityLevel: "strict", theme: "base", suppressErrorRendering: true,
         }));
     });
 
@@ -117,6 +118,25 @@ describe("EditorMermaid", () => {
         expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
         await toggle();
         expect(source().state.doc.toString()).toBe(diskContent);
+    });
+
+    it("updates the diagram theme without changing its source or marking it modified", async () => {
+        await mount();
+        await vi.waitFor(() => expect(root.querySelector('[data-testid="mermaid-preview"] svg')).not.toBeNull());
+        const sourceBefore = diskContent;
+        context.editor.setTheme("dark");
+        await vi.waitFor(() => expect(mermaid.initialize).toHaveBeenLastCalledWith(expect.objectContaining({
+            theme: "base", themeVariables: expect.objectContaining({ darkMode: true }),
+        })));
+        expect(mermaid.render).toHaveBeenCalledTimes(2);
+        expect(context.editor.fileModified()).toBe(false);
+        await context.editor.saveFile()?.();
+        expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: sourceBefore });
+        context.editor.setTheme("light");
+        await vi.waitFor(() => expect(mermaid.initialize).toHaveBeenLastCalledWith(expect.objectContaining({
+            themeVariables: expect.objectContaining({ darkMode: false }),
+        })));
+        expect(context.editor.fileModified()).toBe(false);
     });
 
     it("ignores a pending diagram after replacing the document", async () => {

@@ -23,15 +23,19 @@
     margin: 0 auto;
 }
 
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) > svg {
+    background: transparent !important;
+}
+
 /* Mermaid inyecta blanco en las etiquetas de las conexiones dentro del SVG. */
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel,
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel p,
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .labelBkg {
-    background-color: var(--color-surface-subtle) !important;
+    background-color: var(--mermaid-label-background, var(--color-surface-subtle)) !important;
 }
 
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel rect {
-    fill: var(--color-surface-subtle) !important;
-    background-color: var(--color-surface-subtle) !important;
+    fill: var(--mermaid-label-background, var(--color-surface-subtle)) !important;
+    background-color: var(--mermaid-label-background, var(--color-surface-subtle)) !important;
     opacity: 1 !important;
 }

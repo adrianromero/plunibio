@@ -5,6 +5,7 @@
 
 import "../shared/MermaidPreview.css";
 import { renderMermaid, mermaidErrorMessage, type MermaidLoader } from "../shared/MermaidRenderer";
+import { observeMermaidTheme } from "../shared/MermaidTheme";
 import type { CodeBlockConfig } from "@milkdown/kit/component/code-block";
 
 type PreviewRenderer = CodeBlockConfig["renderPreview"];
@@ -19,14 +20,18 @@ let previewId = 0;
 function createPlaceholder(id: string, loading: PreviewContent): HTMLDivElement {
     const placeholder = document.createElement("div");
     placeholder.id = id;
-    placeholder.className = "mermaid-preview-loading";
+    placeholder.className = "mermaid-preview";
+    const message = document.createElement("div");
+    message.className = "mermaid-preview-loading";
+    message.setAttribute("role", "status");
 
     if (typeof loading === "string") {
-        placeholder.textContent = loading;
+        message.textContent = loading;
     } else {
-        placeholder.append(loading.cloneNode(true));
+        message.append(loading.cloneNode(true));
     }
 
+    placeholder.append(message);
     return placeholder;
 }
 
@@ -37,10 +42,6 @@ function createError(errorText: string, error: unknown): HTMLDivElement {
 
     element.textContent = mermaidErrorMessage(errorText, error);
     return element;
-}
-
-function isCurrentPreview(id: string): boolean {
-    return document.getElementById(id)?.classList.contains("mermaid-preview-loading") ?? false;
 }
 
 export function createMermaidPreviewRenderer(
@@ -59,21 +60,35 @@ export function createMermaidPreviewRenderer(
 
         const id = ++previewId;
         const placeholderId = `plunibio-mermaid-preview-${id}`;
-        const diagramId = `plunibio-mermaid-diagram-${id}`;
         const placeholder = createPlaceholder(placeholderId, options.loading);
-
-        void (async () => {
-            try {
-                const svg = await renderMermaid(diagramId, content, load);
-                if (isCurrentPreview(placeholderId)) {
-                    applyPreview(svg);
+        let generation = 0;
+        const current = (): HTMLElement | null => document.getElementById(placeholderId);
+        const refresh = (): void => {
+            const version = ++generation;
+            const theme = document.documentElement.dataset.theme;
+            void (async () => {
+                try {
+                    const svg = await renderMermaid(`plunibio-mermaid-diagram-${id}-${version}`, content, load);
+                    if (!current()) { stopObserving(); return; }
+                    if (version !== generation || theme !== document.documentElement.dataset.theme) return;
+                    const result = document.createElement("div");
+                    result.id = placeholderId;
+                    result.className = "mermaid-preview";
+                    result.innerHTML = svg;
+                    applyPreview(result);
+                } catch (error: unknown) {
+                    if (!current()) { stopObserving(); return; }
+                    if (version !== generation || theme !== document.documentElement.dataset.theme) return;
+                    const result = document.createElement("div");
+                    result.id = placeholderId;
+                    result.className = "mermaid-preview";
+                    result.append(createError(options.errorText, error));
+                    applyPreview(result);
                 }
-            } catch (error: unknown) {
-                if (isCurrentPreview(placeholderId)) {
-                    applyPreview(createError(options.errorText, error));
-                }
-            }
-        })();
+            })();
+        };
+        const stopObserving = observeMermaidTheme(current, refresh);
+        refresh();
 
         return placeholder;
     };
