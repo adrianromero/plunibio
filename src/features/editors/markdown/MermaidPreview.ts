@@ -3,47 +3,18 @@
  * SPDX-License-Identifier: MIT
  */
 
+import "../shared/MermaidPreview.css";
+import { renderMermaid, mermaidErrorMessage, type MermaidLoader } from "../shared/MermaidRenderer";
 import type { CodeBlockConfig } from "@milkdown/kit/component/code-block";
 
 type PreviewRenderer = CodeBlockConfig["renderPreview"];
 type PreviewContent = string | HTMLElement;
-type MermaidApi = typeof import("mermaid")["default"];
-
 type MermaidPreviewOptions = {
     loading: PreviewContent;
     errorText: string;
 };
 
-type MermaidLoader = () => Promise<MermaidApi>;
-
-let mermaidInstance: Promise<MermaidApi> | null = null;
-let renderQueue: Promise<void> = Promise.resolve();
 let previewId = 0;
-
-async function loadMermaid(): Promise<MermaidApi> {
-    if (!mermaidInstance) {
-        mermaidInstance = import("mermaid").then(({ default: mermaid }) => {
-            mermaid.initialize({
-                startOnLoad: false,
-                securityLevel: "strict",
-                suppressErrorRendering: true,
-                theme: "neutral",
-            });
-            return mermaid;
-        });
-    }
-
-    return mermaidInstance;
-}
-
-function enqueueRender<T>(render: () => Promise<T>): Promise<T> {
-    const result = renderQueue.then(render, render);
-    renderQueue = result.then(
-        () => undefined,
-        () => undefined
-    );
-    return result;
-}
 
 function createPlaceholder(id: string, loading: PreviewContent): HTMLDivElement {
     const placeholder = document.createElement("div");
@@ -64,8 +35,7 @@ function createError(errorText: string, error: unknown): HTMLDivElement {
     element.className = "mermaid-preview-error";
     element.setAttribute("role", "alert");
 
-    const details = error instanceof Error ? error.message.split("\n", 1)[0]?.trim() : "";
-    element.textContent = details ? `${errorText}: ${details}` : errorText;
+    element.textContent = mermaidErrorMessage(errorText, error);
     return element;
 }
 
@@ -76,7 +46,7 @@ function isCurrentPreview(id: string): boolean {
 export function createMermaidPreviewRenderer(
     fallback: PreviewRenderer,
     options: MermaidPreviewOptions,
-    load: MermaidLoader = loadMermaid
+    load?: MermaidLoader
 ): PreviewRenderer {
     return (language, content, applyPreview) => {
         if (language.trim().toLowerCase() !== "mermaid") {
@@ -92,10 +62,9 @@ export function createMermaidPreviewRenderer(
         const diagramId = `plunibio-mermaid-diagram-${id}`;
         const placeholder = createPlaceholder(placeholderId, options.loading);
 
-        void enqueueRender(async () => {
+        void (async () => {
             try {
-                const mermaid = await load();
-                const { svg } = await mermaid.render(diagramId, content);
+                const svg = await renderMermaid(diagramId, content, load);
                 if (isCurrentPreview(placeholderId)) {
                     applyPreview(svg);
                 }
@@ -104,7 +73,7 @@ export function createMermaidPreviewRenderer(
                     applyPreview(createError(options.errorText, error));
                 }
             }
-        });
+        })();
 
         return placeholder;
     };

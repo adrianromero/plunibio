@@ -172,38 +172,6 @@
 .milkdown .milkdown-code-block .tools-button-group > button:hover {
     background: var(--crepe-color-hover);
 }
-.milkdown .milkdown-code-block .preview .mermaid-preview-loading {
-    padding: 1rem;
-    color: var(--color-text-muted);
-}
-.milkdown .milkdown-code-block .preview .mermaid-preview-error {
-    padding: 1rem;
-    color: var(--color-error-text);
-    background: var(--color-error-background);
-    border: 1px solid var(--color-error-border);
-    border-radius: var(--radius-small);
-    text-align: left;
-    white-space: pre-wrap;
-}
-.milkdown .milkdown-code-block .preview svg {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto;
-}
-
-/* Mermaid inyecta blanco en las etiquetas de las conexiones dentro del SVG. */
-.milkdown .milkdown-code-block .preview svg .edgeLabel,
-.milkdown .milkdown-code-block .preview svg .edgeLabel p,
-.milkdown .milkdown-code-block .preview svg .labelBkg {
-    background-color: var(--color-surface-subtle) !important;
-}
-
-.milkdown .milkdown-code-block .preview svg .edgeLabel rect {
-    fill: var(--color-surface-subtle) !important;
-    background-color: var(--color-surface-subtle) !important;
-    opacity: 1 !important;
-}
 
 .milkdown span[data-type="math_inline"] {
     color: var(--crepe-color-on-background);

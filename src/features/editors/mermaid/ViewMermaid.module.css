@@ -1,0 +1,25 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+.studio {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.preview {
+    min-height: 4rem;
+    margin-block: 0.5rem;
+    padding: 1rem;
+    background: var(--color-surface-subtle);
+    border-radius: var(--radius-small);
+}
+
+.preview:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}

@@ -8,6 +8,7 @@ import {
 } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
+import FileChartLine from "lucide-solid/icons/file-chart-line";
 import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
@@ -25,6 +26,7 @@ import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
 import MessageView from "@/shared/errors/MessageView";
 import EditorImage from "@/features/editors/image/EditorImage";
 import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
+import EditorMermaid from "@/features/editors/mermaid/EditorMermaid";
 import { editorForFilename } from "@/features/editors/EditorForFilename";
 import EditorText from "@/features/editors/text/EditorText";
 import { frontendLog } from "@/shared/logging/frontendLog";
@@ -42,6 +44,7 @@ const FILE_SIZE_UNITS = [
 export function fileIconForFilename(filename: string): typeof File {
     const editor = editorForFilename(filename);
     if (editor === EditorMarkdown) return FilePen;
+    if (editor === EditorMermaid) return FileChartLine;
     if (editor === EditorText) return FileText;
     if (editor === EditorImage) return FileImage;
     return File;

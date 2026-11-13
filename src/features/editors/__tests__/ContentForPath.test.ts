@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { contentForPath } from "../ContentForPath";
 import EditorFolder from "../folder/EditorFolder";
 import EditorMarkdown from "../markdown/EditorMarkdown";
+import EditorMermaid from "../mermaid/EditorMermaid";
 import EditorText from "../text/EditorText";
 
 describe("contentForPath", () => {
@@ -19,6 +20,16 @@ describe("contentForPath", () => {
             if (selection?.kind !== "content") return;
             expect(selection.component).toBe(EditorMarkdown);
             expect(selection.props).toEqual({});
+        }
+    );
+
+    it.each(["diagram.mmd", "diagram.mermaid", "diagram.MMD", "diagram.MERMAID"])(
+        "opens %s with EditorMermaid",
+        (filename) => {
+            const selection = contentForPath(filename, { kind: "file" });
+            expect(selection?.kind).toBe("content");
+            if (selection?.kind !== "content") return;
+            expect(selection.component).toBe(EditorMermaid);
         }
     );
 

@@ -6,11 +6,13 @@
 import EditorExternalFile from "./external/EditorExternalFile";
 import EditorImage from "./image/EditorImage";
 import EditorMarkdown from "./markdown/EditorMarkdown";
+import EditorMermaid from "./mermaid/EditorMermaid";
 import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
 import EditorText from "./text/EditorText";
 
 export type EditorForFilename =
     | typeof EditorMarkdown
+    | typeof EditorMermaid
     | typeof EditorText
     | typeof EditorImage
     | typeof EditorExternalFile;
@@ -26,6 +28,9 @@ export function editorForFilename(filename: string): EditorForFilename {
         case ".mdown":
         case ".mkd":
             return EditorMarkdown;
+        case ".mmd":
+        case ".mermaid":
+            return EditorMermaid;
         case ".avif":
         case ".bmp":
         case ".gif":

@@ -22,6 +22,14 @@
     "steps": [
         {
             "action": "wait",
+            "target": { "using": "testId", "value": "source-mode-toggle" }
+        },
+        {
+            "action": "click",
+            "target": { "using": "testId", "value": "source-mode-toggle" }
+        },
+        {
+            "action": "wait",
             "target": {
                 "using": "testId",
                 "value": "text-editor"

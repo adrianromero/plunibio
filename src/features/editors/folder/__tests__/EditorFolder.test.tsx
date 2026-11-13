@@ -7,6 +7,7 @@ import { createSignal, type Accessor, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import File from "lucide-solid/icons/file";
+import FileChartLine from "lucide-solid/icons/file-chart-line";
 import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
@@ -348,6 +349,8 @@ describe("EditorFolder", () => {
     it("uses distinct icons for Markdown, plain text and other files", () => {
         expect(fileIconForFilename("notes.md")).toBe(FilePen);
         expect(fileIconForFilename("notes.MARKDOWN")).toBe(FilePen);
+        expect(fileIconForFilename("diagram.mmd")).toBe(FileChartLine);
+        expect(fileIconForFilename("diagram.MERMAID")).toBe(FileChartLine);
         expect(fileIconForFilename("notes.txt")).toBe(FileText);
         expect(fileIconForFilename("server.log")).toBe(FileText);
         expect(fileIconForFilename("photo.png")).toBe(FileImage);

@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) .mermaid-preview-loading {
+    padding: 1rem;
+    color: var(--color-text-muted);
+}
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) .mermaid-preview-error {
+    padding: 1rem;
+    color: var(--color-error-text);
+    background: var(--color-error-background);
+    border: 1px solid var(--color-error-border);
+    border-radius: var(--radius-small);
+    text-align: left;
+    white-space: pre-wrap;
+}
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* Mermaid inyecta blanco en las etiquetas de las conexiones dentro del SVG. */
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel,
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel p,
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .labelBkg {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg .edgeLabel rect {
+    fill: var(--color-surface-subtle) !important;
+    background-color: var(--color-surface-subtle) !important;
+    opacity: 1 !important;
+}
