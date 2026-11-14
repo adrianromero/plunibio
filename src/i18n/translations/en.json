@@ -38,8 +38,6 @@
     },
     "folder": {
         "actions": "Actions",
-        "createFolder": "Create folder",
-        "createFile": "Create file",
         "sortBy": "Sort by",
         "sortName": "Name",
         "sortSize": "Size",

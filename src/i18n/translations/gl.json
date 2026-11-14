@@ -38,8 +38,6 @@
     },
     "folder": {
         "actions": "Accións",
-        "createFolder": "Crear cartafol",
-        "createFile": "Crear ficheiro",
         "sortBy": "Ordenar por",
         "sortName": "Nome",
         "sortSize": "Tamaño",

@@ -38,8 +38,6 @@
     },
     "folder": {
         "actions": "Ekintzak",
-        "createFolder": "Sortu karpeta",
-        "createFile": "Sortu fitxategia",
         "sortBy": "Ordenatu honen arabera",
         "sortName": "Izena",
         "sortSize": "Tamaina",
