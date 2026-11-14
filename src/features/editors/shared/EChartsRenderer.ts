@@ -105,7 +105,7 @@ export function mountECharts(
         try {
             if (!chart) {
                 chart = api.init(container, theme(), { renderer: "svg", width: nextWidth, height: nextHeight });
-                chart.setOption({ backgroundColor: "transparent", ...option }, { notMerge: true });
+                chart.setOption({ backgroundColor: "transparent", animationDuration: 0, ...option }, { notMerge: true });
             } else if (width !== nextWidth || height !== nextHeight) {
                 chart.resize({ width: nextWidth, height: nextHeight });
             }
