@@ -202,28 +202,35 @@ SOFTWARE.
 | `@milkdown/crepe` | 7.21.2 | `MIT` |
 | `@milkdown/kit` | 7.21.2 | `MIT` |
 | `@solid-primitives/i18n` | 2.2.1 | `MIT` |
-| `@tauri-apps/api` | 2.11.1 | `Apache-2.0 OR MIT` |
+| `@tauri-apps/api` | 2.12.4 | `Apache-2.0 OR MIT` |
+| `@tauri-apps/plugin-clipboard-manager` | 2.5.0 | `MIT OR Apache-2.0` |
 | `@tauri-apps/plugin-opener` | 2.5.4 | `MIT OR Apache-2.0` |
 | `codemirror` | 6.0.2 | `MIT` |
+| `echarts` | 6.1.0 | `Apache-2.0` |
 | `lucide-solid` | 1.47.0 | `ISC` |
-| `mermaid` | 11.17.2 | `MIT` |
+| `mermaid` | 12.2.0 | `MIT` |
 | `prosemirror-search` | 1.1.1 | `MIT` |
-| `solid-js` | 1.9.13 | `MIT` |
+| `solid-js` | 1.9.17 | `MIT` |
 
 ## Direct Rust runtime and build dependencies
 
 | Component | Version | Declared license |
 | --- | ---: | --- |
 | `clap` | 4.6.6 | `MIT OR Apache-2.0` |
+| `gtk` | 0.18.2 | `MIT` |
+| `image` | 0.25.10 | `MIT OR Apache-2.0` |
+| `percent-encoding` | 2.3.2 | `MIT OR Apache-2.0` |
 | `serde` | 1.0.228 | `MIT OR Apache-2.0` |
 | `serde_json` | 1.0.150 | `MIT OR Apache-2.0` |
-| `tauri` | 2.11.3 | `Apache-2.0 OR MIT` |
-| `tauri-build` | 2.6.3 | `Apache-2.0 OR MIT` |
+| `tauri` | 2.12.5 | `Apache-2.0 OR MIT` |
+| `tauri-build` | 2.7.4 | `Apache-2.0 OR MIT` |
+| `tauri-plugin-clipboard-manager` | 2.5.0 | `Apache-2.0 OR MIT` |
 | `tauri-plugin-opener` | 2.5.4 | `Apache-2.0 OR MIT` |
 | `tokio` | 1.52.3 | `MIT` |
 | `toml` | 0.9.12+spec-1.1.0 | `MIT OR Apache-2.0` |
 | `tracing` | 0.1.44 | `MIT` |
 | `tracing-subscriber` | 0.3.23 | `MIT` |
+| `url` | 2.5.8 | `MIT OR Apache-2.0` |
 
 ## Direct development and build tools
 
@@ -232,16 +239,27 @@ normally shipped as JavaScript runtime code in the desktop application.
 
 | Component | Version | Declared license |
 | --- | ---: | --- |
-| `@storybook/addon-a11y` | 10.6.1 | `MIT` |
-| `@storybook/addon-docs` | 10.6.1 | `MIT` |
-| `@tauri-apps/cli` | 2.11.3 | `Apache-2.0 OR MIT` |
+| `@storybook/addon-a11y` | 10.6.5 | `MIT` |
+| `@storybook/addon-docs` | 10.6.5 | `MIT` |
+| `@tauri-apps/cli` | 2.12.4 | `Apache-2.0 OR MIT` |
+| `@types/node` | 26.6.5 | `MIT` |
+| `@wdio/cli` | 9.32.0 | `MIT` |
+| `@wdio/globals` | 9.31.3 | `MIT` |
+| `@wdio/local-runner` | 9.32.0 | `MIT` |
+| `@wdio/mocha-framework` | 9.32.0 | `MIT` |
+| `@wdio/spec-reporter` | 9.32.0 | `MIT` |
+| `@wdio/tauri-plugin` | 1.5.1 | `MIT` |
+| `@wdio/tauri-service` | 1.5.1 | `MIT` |
+| `axe-core` | 4.13.0 | `MPL-2.0` |
 | `jsdom` | 28.1.0 | `MIT` |
-| `storybook` | 10.6.1 | `MIT` |
+| `storybook` | 10.6.5 | `MIT` |
 | `storybook-solidjs-vite` | 10.7.2 | `MIT` |
+| `tsx` | 4.23.15 | `MIT` |
 | `typescript` | 5.6.3 | `Apache-2.0` |
-| `vite` | 6.4.3 | `MIT` |
+| `vite` | 6.4.5 | `MIT` |
 | `vite-plugin-solid` | 2.11.12 | `MIT` |
-| `vitest` | 5.0.2 | `MIT` |
+| `vitest` | 5.0.5 | `MIT` |
+| `yaml` | 2.9.1 | `ISC` |
 
 ## License references
 

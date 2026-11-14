@@ -8,6 +8,7 @@ import { contentForPath } from "../ContentForPath";
 import EditorFolder from "../folder/EditorFolder";
 import EditorMarkdown from "../markdown/EditorMarkdown";
 import EditorMermaid from "../mermaid/EditorMermaid";
+import EditorECharts from "../echarts/EditorECharts";
 import EditorText from "../text/EditorText";
 
 describe("contentForPath", () => {
@@ -32,6 +33,17 @@ describe("contentForPath", () => {
             expect(selection.component).toBe(EditorMermaid);
         }
     );
+
+    it.each(["chart.echarts.json", "chart.ECHARTS.JSON", "folder/chart.echarts.json"])("opens %s with EditorECharts", filename => {
+        const selection = contentForPath(filename, { kind: "file" });
+        expect(selection?.kind).toBe("content");
+        if (selection?.kind === "content") expect(selection.component).toBe(EditorECharts);
+    });
+
+    it.each(["chart.json", "chart.echarts.json.bak.json"])("keeps ordinary JSON in EditorText: %s", filename => {
+        const selection = contentForPath(filename, { kind: "file" });
+        if (selection?.kind === "content") expect(selection.component).toBe(EditorText);
+    });
 
     it("opens LaTeX files with EditorText", () => {
         const selection = contentForPath("formula.tex", { kind: "file" });

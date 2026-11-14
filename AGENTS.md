@@ -2,6 +2,12 @@
 
 This document defines the context, conventions, and rules for any AI agent or assistant (Gemini, Cursor, Copilot, etc.) interacting with this repository.
 
+## Documentation and examples scope
+
+During feature development, bug fixes, refactoring, and other coding tasks, do not create, modify, delete, or regenerate files under `website/` or `examples/` unless the user explicitly requests changes to those directories. A change in application behavior does not authorize documentation, example, fixture, or screenshot updates there. Read-only consultation is allowed; run any checks that would write to these directories against temporary copies instead.
+
+Website and example updates are deferred to a dedicated documentation task when preparing a new release, after features are frozen. Starting release preparation alone does not authorize these updates: the user must explicitly request them. Preserve any existing changes in both directories. See the root [README.md](README.md#documentation-and-examples-policy).
+
 ## 🎯 Project Purpose
 This is a lightweight desktop Markdown editor application built using Tauri 2.0.
 

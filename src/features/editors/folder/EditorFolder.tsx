@@ -9,6 +9,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import File from "lucide-solid/icons/file";
 import FileChartLine from "lucide-solid/icons/file-chart-line";
+import FileChartColumn from "lucide-solid/icons/file-chart-column";
 import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
@@ -27,6 +28,7 @@ import MessageView from "@/shared/errors/MessageView";
 import EditorImage from "@/features/editors/image/EditorImage";
 import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
 import EditorMermaid from "@/features/editors/mermaid/EditorMermaid";
+import EditorECharts from "@/features/editors/echarts/EditorECharts";
 import { editorForFilename } from "@/features/editors/EditorForFilename";
 import EditorText from "@/features/editors/text/EditorText";
 import { frontendLog } from "@/shared/logging/frontendLog";
@@ -45,6 +47,7 @@ export function fileIconForFilename(filename: string): typeof File {
     const editor = editorForFilename(filename);
     if (editor === EditorMarkdown) return FilePen;
     if (editor === EditorMermaid) return FileChartLine;
+    if (editor === EditorECharts) return FileChartColumn;
     if (editor === EditorText) return FileText;
     if (editor === EditorImage) return FileImage;
     return File;

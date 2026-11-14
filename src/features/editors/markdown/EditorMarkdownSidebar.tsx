@@ -78,6 +78,7 @@ import SquareSigma from "lucide-solid/icons/square-sigma";
 import Strikethrough from "lucide-solid/icons/strikethrough";
 import Table2 from "lucide-solid/icons/table-2";
 import Workflow from "lucide-solid/icons/workflow";
+import ChartColumn from "lucide-solid/icons/chart-column";
 import { useI18N } from "@/i18n/Localization";
 import AppSidebar from "@/app/sidebar/AppSidebar";
 import { useSidebarDisabled } from "@/shared/ui/sidebar/Sidebar";
@@ -863,6 +864,12 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                             icon={Workflow}
                             label={t("markdownToolbar.mermaidBlock")}
                             onRun={(ctx) => insertTypedCodeBlock(ctx, "Mermaid")}
+                        />
+                        <SidebarButton
+                            getEditor={props.getEditor}
+                            icon={ChartColumn}
+                            label={t("markdownToolbar.echartsBlock")}
+                            onRun={(ctx) => insertTypedCodeBlock(ctx, "ECharts")}
                         />
                     </section>
                 </SidebarTabSection>

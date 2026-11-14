@@ -148,10 +148,12 @@ for(const [index,chapter] of catalogue.chapters.entries()){
 // The language catalogue includes Markdown, which is routed to its visual editor.
 const languageSource=fs.readFileSync('src/features/editors/text/CodeLanguages.ts','utf8');
 const sourceExtensions=new Set([...languageSource.matchAll(/extensions:\s*\[([\s\S]*?)\]/g)].flatMap(m=>[...m[1].matchAll(/"([^"\n]+)"/g)].map(v=>'.'+v[1])));
+const filenameSource=fs.readFileSync('src/features/editors/EditorForFilename.ts','utf8');
+for(const match of filenameSource.matchAll(/normalizedFilename\.endsWith\("(\.[^"]+)"\)/g))sourceExtensions.add(match[1]);
 for(const lang of ['es','en']){
  const entry=catalogue.chapters.find(c=>c.docs_key==='edit-text-code');
  const doc=read(built(base+entry[lang].url));
- const published=new Set([...doc.querySelectorAll('article code')].map(e=>e.textContent).filter(v=>/^\.[a-z0-9]+$/.test(v)));
+ const published=new Set([...doc.querySelectorAll('article code')].map(e=>e.textContent).filter(v=>/^\.[a-z0-9]+(?:\.[a-z0-9]+)*$/.test(v)));
  assert.deepEqual([...published].sort(),[...sourceExtensions].sort(),lang+': extension catalogue');
  const help=catalogue.chapters.find(c=>c.docs_key==='shortcuts-troubleshooting');
  const table=read(built(base+help[lang].url)).querySelector('article table');

@@ -1,8 +1,22 @@
 # Mantener el sitio web de Plunibio
 
+## Cuándo modificar este directorio
+
+Durante sesiones de nuevas funcionalidades, correcciones, refactorizaciones u otras tareas de
+codificación, **no crees, modifiques, elimines ni regeneres archivos de `website/` o `examples/`
+salvo petición expresa del usuario**. Esto incluye documentación, planes, fichas de impacto,
+ejemplos, fixtures, capturas y manifiestos. Un cambio de comportamiento de la aplicación no
+autoriza estas actualizaciones. Puedes consultar estos directorios; las comprobaciones que
+escriban en ellos deben ejecutarse sobre copias temporales. Conserva los cambios ya existentes.
+
+El mantenimiento se reserva para una tarea específica de documentación al preparar una nueva
+versión, con las funcionalidades congeladas. Preparar una versión no autoriza por sí solo a
+modificar estos directorios: también se necesita la petición expresa del usuario. El flujo
+descrito a continuación se aplica cuando esa tarea se haya solicitado explícitamente.
+
 Este archivo es el punto de entrada para actualizar **Inicio (landing page), Funcionalidades,
-Instalación, Docs y Acerca de**, en español e inglés, después de un cambio funcional o una
-nueva versión. Permite crear y ejecutar un plan nuevo sin el antiguo directorio `private/`
+Instalación, Docs y Acerca de**, en español e inglés, al preparar una
+nueva versión con las funcionalidades congeladas. Permite crear y ejecutar un plan nuevo sin el antiguo directorio `private/`
 ni el historial de un chat. No requiere reconstruir el manual desde cero.
 
 ## Inicio de una sesión nueva
@@ -19,7 +33,7 @@ ni el historial de un chat. No requiere reconstruir el manual desde cero.
    trabajo independiente.
 4. Copia [la plantilla de plan](maintenance/update-plan.template.md) a
    `website/maintenance/updates/<version>-plan.md` (crea `updates/` si no existe). Completa la matriz de impacto y la evidencia
-   antes de redactar. Para cambios durante el desarrollo usa
+   antes de redactar. Para detallar el impacto de los cambios durante esta tarea documental usa
    [la ficha de impacto](maintenance/impact-entry.template.md).
 5. Ejecuta el plan por parejas ES/EN: investiga, reproduce tareas afectadas, modifica texto,
    flujos y capturas, valida y registra resultados. No publiques prestaciones de una candidata
@@ -35,8 +49,8 @@ Petición reutilizable para el agente:
 > pertinentes, conserva las limitaciones no verificadas y registra el resultado y la nueva
 > referencia documental. Respeta el estado de publicación y la autorización de esta sesión.
 
-El mantenimiento forma parte del desarrollo, incluso si se trabaja directamente con ramas y
-merges: **no exige adoptar pull requests ni añadir una nueva integración CI**. Los planes
+El mantenimiento se realiza en la tarea documental de preparación de versión, incluso si se
+trabaja directamente con ramas y merges: **no exige adoptar pull requests ni añadir una nueva integración CI**. Los planes
 son registros de trabajo, no páginas del sitio. `maintenance/` está excluido de Jekyll.
 
 ## Mapa de fuentes y responsabilidades
@@ -241,8 +255,9 @@ se exige en la candidata revisada; durante desarrollo el sitio puede seguir cubr
 
 ## Preparación y publicación de una nueva versión
 
-1. Durante el desarrollo, registra cambios de tareas, UI, atajos, formatos, preferencias,
-   dependencias, CLI e imágenes. Cada una de las cinco secciones recibe «actualizar» o
+1. Al iniciar la tarea documental solicitada, recopila del código y del historial los cambios
+   de tareas, UI, atajos, formatos, preferencias, dependencias, CLI e imágenes acumulados durante
+   el desarrollo. Cada una de las cinco secciones recibe «actualizar» o
    «sin impacto» con justificación. Acerca de también se revisa si cambia tecnología/licencia.
 2. Al congelar funcionalidad, fija tag/commit y alcance. Comprueba versiones según el README
    raíz; concilia el diff con el plan y las tareas realmente reproducidas.

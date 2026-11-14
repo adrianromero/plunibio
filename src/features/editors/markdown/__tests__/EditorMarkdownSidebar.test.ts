@@ -140,6 +140,11 @@ describe("acciones de EditorMarkdownSidebar", () => {
         expect(result).toContain("```Mermaid\n[[]]\n```");
     });
 
+    it("inserta un bloque ECharts desde la barra lateral", async () => {
+        const result = await runCrepeMarkdownAction("Antes[[]]", ctx => insertTypedCodeBlock(ctx, "ECharts"));
+        expect(result).toContain("```ECharts\n[[]]\n```");
+    });
+
     it("inserta una imagen en línea dentro de un párrafo con contenido", async () => {
         const result = await runCrepeMarkdownAction("Antes [[texto]] después", insertImage);
 

@@ -21,6 +21,7 @@ import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { codeBlockConfig } from "@milkdown/kit/component/code-block";
 import type { Ctx } from "@milkdown/kit/ctx";
 import { createMermaidPreviewRenderer } from "../markdown/MermaidPreview";
+import { createEChartsPreviewRenderer } from "../markdown/EChartsPreview";
 import { mermaidLanguageSupport } from "./MermaidLanguage";
 
 const PLAIN_TEXT_LANGUAGE_NAME = "Text";
@@ -90,6 +91,7 @@ export const CODE_LANGUAGES: readonly LanguageDescription[] = [
     }),
     LanguageDescription.of({ name: "CSS", extensions: ["css"], support: css() }),
     LanguageDescription.of({ name: "JSON", extensions: ["json"], support: json() }),
+    LanguageDescription.of({ name: "ECharts", alias: ["echarts"], support: json() }),
     LanguageDescription.of({
         name: "Mermaid",
         alias: ["mmd"],
@@ -149,15 +151,20 @@ export function editorTextExtensionsForFilename(
     return language.support ? [language.support] : null;
 }
 
-export function configureCodeLanguages(previewErrorText: string): (ctx: Ctx) => void {
+type EChartsPreviewMessages = { errorText: string; objectError: string; label: string };
+
+export function configureCodeLanguages(
+    previewErrorText: string,
+    echartsMessages: EChartsPreviewMessages
+): (ctx: Ctx) => void {
     return (ctx) => {
         ctx.update(codeBlockConfig.key, (config) => ({
             ...config,
             languages: [...CODE_LANGUAGES],
-            renderPreview: createMermaidPreviewRenderer(config.renderPreview, {
+            renderPreview: createEChartsPreviewRenderer(createMermaidPreviewRenderer(config.renderPreview, {
                 loading: config.previewLoading,
                 errorText: previewErrorText,
-            }),
+            }), { loading: config.previewLoading, ...echartsMessages }),
         }));
     };
 }

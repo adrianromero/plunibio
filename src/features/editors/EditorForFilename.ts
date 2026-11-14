@@ -7,18 +7,21 @@ import EditorExternalFile from "./external/EditorExternalFile";
 import EditorImage from "./image/EditorImage";
 import EditorMarkdown from "./markdown/EditorMarkdown";
 import EditorMermaid from "./mermaid/EditorMermaid";
+import EditorECharts from "./echarts/EditorECharts";
 import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
 import EditorText from "./text/EditorText";
 
 export type EditorForFilename =
     | typeof EditorMarkdown
     | typeof EditorMermaid
+    | typeof EditorECharts
     | typeof EditorText
     | typeof EditorImage
     | typeof EditorExternalFile;
 
 export function editorForFilename(filename: string): EditorForFilename {
     const normalizedFilename = filename.toLowerCase();
+    if (normalizedFilename.endsWith(".echarts.json")) return EditorECharts;
     const extensionIndex = normalizedFilename.lastIndexOf(".");
     const extension = extensionIndex >= 0 ? normalizedFilename.slice(extensionIndex) : "";
 

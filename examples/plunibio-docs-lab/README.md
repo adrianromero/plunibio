@@ -17,6 +17,8 @@ creates and removes mutable copies automatically.
 ## Contents
 
 - `markdown/editor-lab.md` and `markdown/editor-lab.es.md`: bilingual representative Markdown blocks and renderers.
+- `ventas.echarts.json`: standalone ECharts chart with JSON source, SVG preview, and native light/dark themes.
+- `markdown/echarts.md`: bar and pie charts embedded in Markdown code blocks.
 - `markdown/typing-rules.md` and `markdown/typing-rules.es.md`: bilingual stable targets for mutable input-rule flows.
 - `markdown/search-lab.md` and `markdown/search-lab.es.md`: bilingual repeated terms for search options, invalid expressions, and replacement.
 - `tables/table-lab.md` and `tables/table-lab.es.md`: localized tables large enough to exercise

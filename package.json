@@ -59,6 +59,7 @@
         "@tauri-apps/plugin-clipboard-manager": "^2.5.0",
         "@tauri-apps/plugin-opener": "^2",
         "codemirror": "^6.0.2",
+        "echarts": "^6.1.0",
         "lucide-solid": "^1.47.0",
         "mermaid": "^12.2.0",
         "prosemirror-search": "^1.1.1",

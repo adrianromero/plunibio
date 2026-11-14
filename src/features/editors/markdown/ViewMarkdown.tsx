@@ -358,7 +358,11 @@ export function ViewMarkdown(): JSX.Element {
                 }));
             });
             nextCrepe.editor.config(
-                configureCodeLanguages(t("markdownToolbar.codePreviewMermaidError"))
+                configureCodeLanguages(t("markdownToolbar.codePreviewMermaidError"), {
+                    errorText: t("markdownToolbar.codePreviewEChartsError"),
+                    objectError: t("markdownToolbar.codePreviewEChartsObjectError"),
+                    label: t("markdownToolbar.echartsBlock"),
+                })
             );
             nextCrepe.editor.config(disableNativeInlineMathTooltip);
             nextCrepe.editor.config(configureMarkdownSerialization);

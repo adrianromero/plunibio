@@ -140,6 +140,12 @@ npm run build
 
 ## Development
 
+### Documentation and examples policy
+
+During feature development, bug fixes, refactoring, and other coding tasks, **do not change `website/` or `examples/` unless the user explicitly requests it**. This applies to agents such as Codex and includes creating, editing, deleting, or regenerating documentation, examples, fixtures, and screenshots. Application behavior changes do not automatically authorize updates to these directories.
+
+These updates are reserved for a dedicated documentation task when preparing a new release, once features are frozen, and still require an explicit request. Reading the directories is allowed; checks that would write to them must use temporary copies. Preserve any changes already present in the working tree.
+
 The main source directories are:
 
 ```text
@@ -216,10 +222,10 @@ The macOS packages currently use an ad-hoc signature and the Windows packages ar
 
 ## Website maintenance
 
-For bilingual website updates alongside a new release or feature, start with
+When explicitly asked to update the bilingual website, start with
 [website/README.md](website/README.md). It includes the editorial contract, update-plan
 and chapter templates, automated screenshot procedures, and publication checks for Home,
-Features, Installation, Docs, and About.
+Features, Installation, Docs, and About. Follow the [documentation and examples policy](#documentation-and-examples-policy): these updates are deferred until release preparation with frozen features.
 
 ## Contributing
 
@@ -227,7 +233,7 @@ Contributions and bug reports are welcome. Before submitting a pull request:
 
 1. Open an issue for substantial changes so the approach can be discussed first.
 2. Keep changes focused and follow the existing TypeScript and Rust style.
-3. Add or update documentation when behavior changes.
+3. Update documentation as appropriate, respecting the [documentation and examples policy](#documentation-and-examples-policy): changes to `website/` and `examples/` require an explicit request and are deferred until release preparation with frozen features.
 4. Run the validation commands listed above.
 5. Describe what changed and how it was tested in the pull request.
 

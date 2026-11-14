@@ -29,6 +29,7 @@ describe("CodeLanguages", () => {
             "HTML",
             "CSS",
             "JSON",
+            "ECharts",
             "Mermaid",
             "Markdown",
             "LaTeX",
@@ -104,7 +105,7 @@ describe("CodeLanguages", () => {
         const root = document.createElement("div");
         document.body.append(root);
         const crepe = new Crepe({ root });
-        crepe.editor.config(configureCodeLanguages("No se ha podido generar el diagrama"));
+        crepe.editor.config(configureCodeLanguages("No se ha podido generar el diagrama", { errorText: "Gráfico no válido", objectError: "Se requiere un objeto JSON", label: "Gráfico ECharts" }));
 
         try {
             await crepe.create();
@@ -117,12 +118,15 @@ describe("CodeLanguages", () => {
         }
     });
 
-    it("conserva los bloques Mermaid como bloques de código cercados", async () => {
+    it.each([
+        ["mermaid", "graph TD;\n    A-->B;"],
+        ["echarts", '{"series":[{"type":"pie","data":[1,2]}]}'],
+    ])("conserva los bloques %s como bloques de código cercados", async (language, source) => {
         const root = document.createElement("div");
         document.body.append(root);
-        const markdown = "```mermaid\ngraph TD;\n    A-->B;\n```";
+        const markdown = `\`\`\`${language}\n${source}\n\`\`\``;
         const crepe = new Crepe({ root, defaultValue: markdown });
-        crepe.editor.config(configureCodeLanguages("No se ha podido generar el diagrama"));
+        crepe.editor.config(configureCodeLanguages("No se ha podido generar el diagrama", { errorText: "Gráfico no válido", objectError: "Se requiere un objeto JSON", label: "Gráfico ECharts" }));
 
         try {
             await crepe.create();
