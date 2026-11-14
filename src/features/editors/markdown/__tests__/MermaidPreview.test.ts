@@ -73,8 +73,9 @@ describe("MermaidPreview", () => {
         const error = applyPreview.mock.calls[0]?.[0];
         expect(error).toBeInstanceOf(HTMLElement);
         expect((error as HTMLElement).textContent).toContain(
-            "Diagrama no válido: Unexpected <script>alert(1)</script>"
+            "Diagrama no válido"
         );
+        expect((error as HTMLElement).textContent).not.toContain("Unexpected");
         expect((error as HTMLElement).querySelector("script")).toBeNull();
     });
 

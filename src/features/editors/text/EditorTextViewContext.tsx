@@ -8,6 +8,8 @@ import type { FileEditorAdapter } from "@/app/FileEditorController";
 export type EditorTextViewContextValue = {
     active: Accessor<boolean>;
     ready: Accessor<boolean>;
+    reportEmpty: (message: string | null) => void;
+    reportError: (message: string | null) => void;
     register: (adapter: FileEditorAdapter) => void;
 };
 

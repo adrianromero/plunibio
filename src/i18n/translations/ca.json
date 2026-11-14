@@ -1,5 +1,7 @@
 {
     "editor": {
+        "emptyMermaid": "El document és buit. Afegeix codi Mermaid en el mode de codi per generar un diagrama.",
+        "emptyECharts": "El document és buit. Afegeix una configuració ECharts en el mode de codi per generar un gràfic.",
         "loading": "S'està carregant {{ filename }}...",
         "saving": "S'està desant {{ filename }}..."
     },
@@ -241,6 +243,7 @@
     "errors": {
         "unknown": "Error desconegut",
         "loadFileFailed": "No s'ha pogut carregar el fitxer.",
+        "renderViewFailed": "No s’ha pogut generar la vista del document.",
         "unsupportedPathType": "Tipus de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

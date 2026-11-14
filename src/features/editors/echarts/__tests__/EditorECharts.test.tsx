@@ -8,9 +8,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { useAppContext, type AppContextValues } from "@/app/AppContext";
 import { StoryAppProvider } from "@/app/__stories__/support/StoryAppProvider";
 import I18NProvider from "@/i18n/Localization";
+import { frontendLog } from "@/shared/logging/frontendLog";
 import EditorECharts from "../EditorECharts";
 
 const chart = vi.hoisted(() => ({ setOption: vi.fn(), setTheme: vi.fn(), dispose: vi.fn(), resize: vi.fn(), flush: vi.fn() }));
+vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 vi.mock("echarts", () => ({ init: vi.fn(() => ({ ...chart, getZr: () => ({ flush: chart.flush }) })) }));
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 
@@ -105,7 +107,11 @@ describe("EditorECharts", () => {
     it.each(["setOption", "flush"] as const)("shows MessageView when ECharts %s fails", async stage => {
         chart[stage].mockImplementationOnce(() => { throw new Error("Render <script>bad()</script>\nDetails"); });
         await mount();
-        await vi.waitFor(() => expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("Render <script>bad()</script>"));
+        await vi.waitFor(() => expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("The chart could not be rendered"));
+        expect(root.querySelector('[data-testid="message-view"]')?.textContent).not.toContain("Render <script>");
+        expect(frontendLog).toHaveBeenCalledWith("error", "echarts.render.failed", {
+            error: expect.stringContaining("Render <script>bad()</script>\nDetails"),
+        });
         expect(root.querySelector("script")).toBeNull();
         expect(chart.dispose).toHaveBeenCalled();
         expect(context.editor.fileModified()).toBe(false);
@@ -121,10 +127,31 @@ describe("EditorECharts", () => {
         expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: diskContent });
     });
 
-    it("leaves an empty document blank", async () => {
-        diskContent = " \n";
+    it.each(["", " \n\t"])("shows an informational empty state for %j and renders after editing", async empty => {
+        diskContent = empty;
         await mount();
+        const message = root.querySelector('[data-testid="message-view"]');
+        expect(message?.getAttribute("data-message-kind")).toBe("status");
+        expect(message?.textContent).toContain("Add an ECharts configuration in code mode");
+        expect(root.querySelector<HTMLElement>('[data-testid="echarts-view"]')?.style.display).toBe("none");
         expect(chart.setOption).not.toHaveBeenCalled();
+        expect(frontendLog).not.toHaveBeenCalledWith("error", expect.anything(), expect.anything());
+        expect(context.editor.fileModified()).toBe(false);
+        await context.editor.saveFile()?.();
+        expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: empty });
+        await toggle();
+        expect(source().state.doc.toString()).toBe(empty);
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        source().dispatch({ changes: { from: 0, to: source().state.doc.length, insert: "{}" } });
+        await toggle();
+        await vi.waitFor(() => expect(chart.setOption).toHaveBeenCalled());
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        diskContent = empty;
+        await context.editor.reloadFile()?.();
+        expect(root.querySelector('[data-testid="message-view"]')?.getAttribute("data-message-kind")).toBe("status");
+        diskContent = "{}";
+        context.main.setFilename("another.echarts.json");
+        await vi.waitFor(() => expect(context.editor.toggleSourceMode()).not.toBeNull());
         expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
     });
 });

@@ -6,7 +6,9 @@ import { createSignal, type Component } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { invoke } from "@tauri-apps/api/core";
+import { frontendLog } from "@/shared/logging/frontendLog";
 import { EditorView } from "@codemirror/view";
+import { Editor as MilkdownEditor } from "@milkdown/kit/core";
 import { undo, undoDepth } from "@codemirror/commands";
 import { useAppContext, type AppContextValues } from "@/app/AppContext";
 import { StoryAppProvider } from "@/app/__stories__/support/StoryAppProvider";
@@ -16,6 +18,8 @@ import ViewMarkdown from "../../markdown/ViewMarkdown";
 import { editorTextExtensionsForFilename } from "../CodeLanguages";
 import EditorTextView from "../EditorTextView";
 import { useEditorTextView } from "../EditorTextViewContext";
+
+vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 
 let diskContent = "";
 let failRead = false;
@@ -317,7 +321,7 @@ describe("EditorTextView mode and document lifecycle", () => {
         expect(context.editor.fileModified()).toBe(false);
     });
 
-    it("keeps source content and actions available after a failed view creation, then permits retry", async () => {
+    it("shows a view error, preserves unsaved source and permits correction and retry", async () => {
         let content = "";
         let fail = false;
         const TestView: Component = () => {
@@ -340,9 +344,17 @@ describe("EditorTextView mode and document lifecycle", () => {
         const text = source().state.doc.toString();
         fail = true;
         await toggle();
+        expect(context.editor.sourceMode()).toBe(false);
+        expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("The document view could not be generated.");
+        expect(root.querySelector('[role="dialog"]')).toBeNull();
+        expect(context.editor.fileModified()).toBe(true);
+        expect(context.editor.searchFile()).toBeNull();
+        await context.editor.saveFile()?.();
+        expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: text });
+        await toggle();
         expect(context.editor.sourceMode()).toBe(true);
         expect(source().state.doc.toString()).toBe(text);
-        expect(context.editor.fileModified()).toBe(true);
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
         expect(context.editor.searchFile()).not.toBeNull();
         expect(context.editor.toggleSidebar()).not.toBeNull();
         fail = false;
@@ -350,6 +362,97 @@ describe("EditorTextView mode and document lifecycle", () => {
         expect(context.editor.sourceMode()).toBe(false);
         expect(content).toBe(text);
         expect(context.editor.toggleSidebar()).toBeNull();
+    });
+
+    it("shows Markdown creation failures in MessageView and retries with the exact unsaved source", async () => {
+        await mount();
+        await toggle();
+        source().dispatch({ changes: { from: 0, insert: "Unsaved Markdown\n\n" } });
+        const text = source().state.doc.toString();
+        const editor = MilkdownEditor.make();
+        const make = vi.spyOn(MilkdownEditor, "make").mockReturnValueOnce(editor);
+        const create = vi.spyOn(editor, "create").mockRejectedValueOnce(new Error("Markdown creation failed"));
+        try {
+            await toggle();
+            expect(context.editor.sourceMode()).toBe(false);
+            expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("The document view could not be generated.");
+            expect(root.querySelector('[role="dialog"]')).toBeNull();
+            expect(root.querySelector('[data-testid="message-view"]')?.textContent).not.toContain("Markdown creation failed");
+            expect(frontendLog).toHaveBeenCalledWith("error", "editor.view.failed", {
+                error: expect.stringContaining("Markdown creation failed"),
+            });
+            expect(context.editor.fileModified()).toBe(true);
+            await toggle();
+            expect(source().state.doc.toString()).toBe(text);
+            await toggle();
+            expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+            expect(root.querySelector('[data-testid="markdown-view"] .ProseMirror')?.textContent).toContain("Unsaved Markdown");
+            expect(context.editor.fileModified()).toBe(true);
+        } finally {
+            create.mockRestore();
+            make.mockRestore();
+        }
+    });
+
+    it("keeps an initially failed view recoverable and clears its error on reload", async () => {
+        let fail = true;
+        const TestView: Component = () => {
+            const host = useEditorTextView();
+            let content = "";
+            host.register({
+                getContent: async () => content,
+                replaceContent: async (text) => {
+                    if (fail) throw new Error("Initial view failed");
+                    content = text;
+                },
+                destroy: () => { content = ""; host.reportError(null); },
+            });
+            return null;
+        };
+        await mount(true, TestView);
+        expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("The document view could not be generated.");
+        expect(context.editor.fileModified()).toBe(false);
+        await toggle();
+        expect(source().state.doc.toString()).toBe(diskContent);
+        await toggle();
+        expect(root.querySelector('[data-testid="message-view"]')).not.toBeNull();
+        fail = false;
+        await context.editor.reloadFile()?.();
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        await toggle();
+        expect(source().state.doc.toString()).toBe(diskContent);
+    });
+
+    it("ignores error callbacks from replaced and disposed views", async () => {
+        const reports: Array<(message: string | null) => void> = [];
+        const emptyReports: Array<(message: string | null) => void> = [];
+        const TestView: Component = () => {
+            const host = useEditorTextView();
+            reports.push(host.reportError);
+            emptyReports.push(host.reportEmpty);
+            let content = "";
+            host.register({
+                getContent: async () => content,
+                replaceContent: async (text) => { content = text; },
+                destroy: () => { content = ""; },
+            });
+            return null;
+        };
+        await mount(true, TestView);
+        const oldReport = reports[reports.length - 1]!;
+        await toggle();
+        await toggle();
+        oldReport("Obsolete error");
+        emptyReports[emptyReports.length - 2]?.("Obsolete empty state");
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        const report = reports[reports.length - 1]!;
+        report("Current error");
+        expect(root.querySelector('[data-testid="message-view"]')?.textContent).toContain("Current error");
+        context.main.setFilename("another.md");
+        await vi.waitFor(() => expect(context.editor.toggleSourceMode()).not.toBeNull());
+        report("Previous document error");
+        emptyReports[emptyReports.length - 2]?.("Previous document empty state");
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
     });
 
     it("discards an obsolete mode transition when another document starts loading", async () => {

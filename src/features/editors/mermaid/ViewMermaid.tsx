@@ -5,7 +5,6 @@
 
 import { createSignal, onCleanup, onMount, Show, type JSX } from "solid-js";
 import { useI18N } from "@/i18n/Localization";
-import MessageView from "@/shared/errors/MessageView";
 import { renderMermaid, mermaidErrorMessage } from "../shared/MermaidRenderer";
 import "../shared/MermaidPreview.css";
 import { observeMermaidTheme } from "../shared/MermaidTheme";
@@ -21,13 +20,13 @@ export function ViewMermaid(): JSX.Element {
     let content: string | null = null;
     let generation = 0;
     const [loading, setLoading] = createSignal(false);
-    const [error, setError] = createSignal<string | null>(null);
     let stopObserving: (() => void) | undefined;
     const refresh = (): void => {
         const version = ++generation;
         const source = content;
         const theme = document.documentElement.dataset.theme;
-        setError(null);
+        host.reportError(null);
+        host.reportEmpty(source !== null && !source.trim() ? t("editor.emptyMermaid") : null);
         setLoading(Boolean(source?.trim()));
         if (!source?.trim()) {
             previewRef.replaceChildren();
@@ -41,7 +40,7 @@ export function ViewMermaid(): JSX.Element {
             },
             (reason: unknown) => {
                 if (version !== generation || theme !== document.documentElement.dataset.theme) return;
-                setError(mermaidErrorMessage(t("markdownToolbar.codePreviewMermaidError"), reason));
+                host.reportError(mermaidErrorMessage(t("markdownToolbar.codePreviewMermaidError"), reason));
                 setLoading(false);
             }
         );
@@ -63,7 +62,8 @@ export function ViewMermaid(): JSX.Element {
             generation += 1;
             content = null;
             setLoading(false);
-            setError(null);
+            host.reportError(null);
+            host.reportEmpty(null);
             previewRef.replaceChildren();
         },
     });
@@ -75,10 +75,7 @@ export function ViewMermaid(): JSX.Element {
             style={{ display: host.active() ? undefined : "none" }}
             inert={!host.active() || !host.ready()}
         >
-            <Show when={error()}>
-                <MessageView>{error()}</MessageView>
-            </Show>
-            <div class="scrollingView" tabIndex={-1} style={{ display: error() ? "none" : undefined }}>
+            <div class="scrollingView" tabIndex={-1}>
                 <div class="contentView">
                     <Show when={loading()}>
                         <div class="mermaid-preview">

@@ -1,5 +1,7 @@
 {
     "editor": {
+        "emptyMermaid": "The document is empty. Add Mermaid code in code mode to generate a diagram.",
+        "emptyECharts": "The document is empty. Add an ECharts configuration in code mode to generate a chart.",
         "loading": "Loading {{ filename }}...",
         "saving": "Saving {{ filename }}..."
     },
@@ -241,6 +243,7 @@
     "errors": {
         "unknown": "Unknown error",
         "loadFileFailed": "The file could not be loaded.",
+        "renderViewFailed": "The document view could not be generated.",
         "unsupportedPathType": "Unsupported path type: {{ filename }}"
     },
     "backendErrors": {

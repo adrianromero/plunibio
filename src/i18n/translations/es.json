@@ -1,5 +1,7 @@
 {
     "editor": {
+        "emptyMermaid": "El documento está vacío. Añade código Mermaid en el modo código para generar un diagrama.",
+        "emptyECharts": "El documento está vacío. Añade una configuración ECharts en el modo código para generar un gráfico.",
         "loading": "Cargando {{ filename }}...",
         "saving": "Guardando {{ filename }}..."
     },
@@ -241,6 +243,7 @@
     "errors": {
         "unknown": "Error desconocido",
         "loadFileFailed": "No se ha podido cargar el archivo.",
+        "renderViewFailed": "No se ha podido generar la vista del documento.",
         "unsupportedPathType": "Tipo de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

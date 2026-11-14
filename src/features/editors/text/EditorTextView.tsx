@@ -25,6 +25,7 @@ import {
     externalCodeMirrorSearch,
 } from "@/features/search/CodeMirrorSearchController";
 import type { SearchController } from "@/features/search/SearchController";
+import { frontendLog } from "@/shared/logging/frontendLog";
 import MessageView from "@/shared/errors/MessageView";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 import { EditorTextViewContext } from "./EditorTextViewContext";
@@ -51,6 +52,8 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     let pendingSwitch: Promise<void> | null = null;
     let disposed = false;
     const [sourceMode, setSourceMode] = createSignal(!props.view);
+    const [emptyMessage, setEmptyMessage] = createSignal<string | null>(null);
+    const [viewError, setViewError] = createSignal<string | null>(null);
     const [switching, setSwitching] = createSignal(false);
     const [viewRevision, setViewRevision] = createSignal(1);
     const [searchController, setSearchController] = createSignal<SearchController | null>(null);
@@ -106,21 +109,37 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     };
     const replaceView = async (content: string): Promise<void> => {
         if (!view) return;
-        viewContent = null;
-        await view.destroy();
-        // Remount every destination view so its local UI state resets consistently,
-        // independently of the document text and without a view-specific reset API.
-        setViewRevision((revision) => revision + 1);
         const version = generation;
-        await view.replaceContent(content, currentFilename, () => markModified(false, version));
         viewContent = content;
         viewEdited = false;
+        setViewError(null);
+        setEmptyMessage(null);
+        try {
+            await view.destroy();
+            if (version !== generation || disposed) return;
+            // Remount destination views to reset their local UI and error callbacks.
+            setViewRevision((revision) => revision + 1);
+            await view.replaceContent(content, currentFilename, () => markModified(false, version));
+        } catch (err: unknown) {
+            if (version !== generation || disposed) return;
+            try {
+                await view.destroy();
+            } catch (cleanupError: unknown) {
+                console.error("Unable to clean up the failed view:", cleanupError);
+            }
+            if (version === generation && !disposed) {
+                frontendLog("error", "editor.view.failed", {
+                    error: err instanceof Error ? err.stack ?? err.message : String(err),
+                });
+                setViewError(t("errors.renderViewFailed"));
+            }
+        }
     };
     const focus = (): void | Promise<void> => {
         if (sourceMode()) {
             editorView?.requestMeasure();
             editorView?.focus();
-        } else {
+        } else if (!viewError() && !emptyMessage()) {
             return view?.focus?.();
         }
     };
@@ -129,7 +148,7 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
             await pendingSwitch;
             return sourceMode()
                 ? editorView?.state.doc.toString() ?? null
-                : await view?.getContent() ?? null;
+                : viewError() ? viewContent : await view?.getContent() ?? null;
         },
         replaceContent: async (content, filename, onModified) => {
             const nextKey = JSON.stringify([basepath(), filename]);
@@ -144,6 +163,8 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
         destroy: async () => {
             generation += 1;
             await pendingSwitch;
+            setViewError(null);
+            setEmptyMessage(null);
             destroySource();
             await view?.destroy();
             viewContent = null;
@@ -152,7 +173,7 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     };
     const { state } = createFileEditorController("EditorTextView", adapter, textFileStorage);
     const ready = (): boolean => !disposed && state().status === "ready" && !switching();
-    const viewActive = (): boolean => Boolean(props.view) && !sourceMode() && !error();
+    const viewActive = (): boolean => Boolean(props.view) && !sourceMode() && !error() && !viewError() && !emptyMessage();
     const error = (): string | null => {
         const current = state();
         return current.status === "error" ? current.message : null;
@@ -171,24 +192,18 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
                 if (wasSource) {
                     await replaceView(editorView?.state.doc.toString() ?? "");
                 } else {
-                    const content = viewEdited ? await currentView.getContent() : viewContent;
+                    const content = viewEdited && !viewError() ? await currentView.getContent() : viewContent;
                     if (content === null) throw new Error("The view has no document content");
                     if (version !== generation || disposed) return;
                     replaceSource(content);
                     viewContent = content;
                     viewEdited = false;
+                    setViewError(null);
+                    setEmptyMessage(null);
                 }
                 if (version !== generation || disposed) return;
                 setSourceMode(!wasSource);
             } catch (err: unknown) {
-                if (wasSource) {
-                    viewContent = null;
-                    try {
-                        await view?.destroy();
-                    } catch (cleanupError: unknown) {
-                        console.error("Unable to clean up the failed view:", cleanupError);
-                    }
-                }
                 if (version === generation && !disposed) {
                     await showAppMessage(translateAppError(err, t), "error");
                 }
@@ -235,8 +250,10 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
 
     return (
         <section class={styles.studio} data-testid="text-view">
-            <Show when={error()}>
-                <MessageView>{error() ?? t("errors.unknown")}</MessageView>
+            <Show when={error() || (!sourceMode() && (viewError() || emptyMessage()))}>
+                <MessageView info={error() || viewError() ? "error" : "status"}>
+                    {error() ?? viewError() ?? emptyMessage() ?? t("errors.unknown")}
+                </MessageView>
             </Show>
             <section
                 class={styles.studio}
@@ -264,15 +281,28 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
                     </SidebarTab>
                 </AppSidebar>
             </section>
-            <EditorTextViewContext.Provider value={{
-                active: viewActive,
-                ready,
-                register: (adapter) => { view = adapter; },
-            }}>
-                <Show when={viewRevision()} keyed>
-                    {(_revision) => <Dynamic component={props.view ?? undefined} />}
-                </Show>
-            </EditorTextViewContext.Provider>
+            <Show when={viewRevision()} keyed>
+                {(revision) => {
+                    const version = generation;
+                    return <EditorTextViewContext.Provider value={{
+                        active: viewActive,
+                        ready,
+                        reportEmpty: (message) => {
+                            if (!disposed && version === generation && revision === viewRevision()) {
+                                setEmptyMessage(message);
+                            }
+                        },
+                        reportError: (message) => {
+                            if (!disposed && version === generation && revision === viewRevision()) {
+                                setViewError(message);
+                            }
+                        },
+                        register: (adapter) => { view = adapter; },
+                    }}>
+                        <Dynamic component={props.view ?? undefined} />
+                    </EditorTextViewContext.Provider>;
+                }}
+            </Show>
         </section>
     );
 }

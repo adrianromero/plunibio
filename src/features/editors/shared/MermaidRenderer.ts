@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { frontendLog } from "@/shared/logging/frontendLog";
 import { mermaidThemeConfig } from "./MermaidTheme";
 
 export type MermaidApi = typeof import("mermaid")["default"];
@@ -44,6 +45,8 @@ export function renderMermaid(
 }
 
 export function mermaidErrorMessage(errorText: string, error: unknown): string {
-    const details = error instanceof Error ? error.message.split("\n", 1)[0]?.trim() : "";
-    return details ? `${errorText}: ${details}` : errorText;
+    frontendLog("error", "mermaid.render.failed", {
+        error: error instanceof Error ? error.stack ?? error.message : String(error),
+    });
+    return errorText;
 }

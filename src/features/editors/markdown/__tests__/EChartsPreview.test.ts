@@ -54,7 +54,7 @@ describe("EChartsPreview", () => {
     it.each(['{"bad":', "[]"])("shows a parse error for %s without losing the code block", async source => {
         const placeholder = renderer()("echarts", source, vi.fn()) as HTMLElement;
         document.body.append(placeholder.cloneNode(true));
-        await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain("Chart error:"));
+        await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain("Chart error"));
         expect(init).not.toHaveBeenCalled();
         expect(document.querySelector(".echarts-preview")).not.toBeNull();
     });
@@ -62,7 +62,8 @@ describe("EChartsPreview", () => {
     it("shows render failures as text and cleans up the broken chart", async () => {
         chart.setOption.mockImplementationOnce(() => { throw new Error("bad <script>alert(1)</script>"); });
         document.body.append(renderer()("echarts", "{}", vi.fn()) as HTMLElement);
-        await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain("bad <script>"));
+        await vi.waitFor(() => expect(document.querySelector('[role="alert"]')?.textContent).toContain("Chart error"));
+        expect(document.querySelector('[role="alert"]')?.textContent).not.toContain("bad <script>");
         expect(document.querySelector("script")).toBeNull();
         expect(chart.dispose).toHaveBeenCalledOnce();
     });

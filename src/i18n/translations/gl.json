@@ -1,5 +1,7 @@
 {
     "editor": {
+        "emptyMermaid": "O documento está baleiro. Engade código Mermaid no modo código para xerar un diagrama.",
+        "emptyECharts": "O documento está baleiro. Engade unha configuración ECharts no modo código para xerar un gráfico.",
         "loading": "Cargando {{ filename }}...",
         "saving": "Gardando {{ filename }}..."
     },
@@ -241,6 +243,7 @@
     "errors": {
         "unknown": "Erro descoñecido",
         "loadFileFailed": "Non se puido cargar o ficheiro.",
+        "renderViewFailed": "Non se puido xerar a vista do documento.",
         "unsupportedPathType": "Tipo de ruta non compatible: {{ filename }}"
     },
     "backendErrors": {

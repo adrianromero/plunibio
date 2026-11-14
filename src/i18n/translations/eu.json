@@ -1,5 +1,7 @@
 {
     "editor": {
+        "emptyMermaid": "Dokumentua hutsik dago. Gehitu Mermaid kodea kode moduan diagrama bat sortzeko.",
+        "emptyECharts": "Dokumentua hutsik dago. Gehitu ECharts konfigurazio bat kode moduan grafiko bat sortzeko.",
         "loading": "{{ filename }} kargatzen...",
         "saving": "{{ filename }} gordetzen..."
     },
@@ -241,6 +243,7 @@
     "errors": {
         "unknown": "Errore ezezaguna",
         "loadFileFailed": "Ezin izan da fitxategia kargatu.",
+        "renderViewFailed": "Ezin izan da dokumentuaren ikuspegia sortu.",
         "unsupportedPathType": "Onartzen ez den bide mota: {{ filename }}"
     },
     "backendErrors": {

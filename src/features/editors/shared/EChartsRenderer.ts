@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { frontendLog } from "@/shared/logging/frontendLog";
 import type { EChartsOption, EChartsType } from "echarts";
 
 export type EChartsApi = Pick<typeof import("echarts"), "init">;
@@ -18,8 +19,10 @@ function loadECharts(): Promise<EChartsApi> {
 }
 
 export function echartsErrorMessage(label: string, error: unknown): string {
-    const details = error instanceof Error ? error.message.split("\n", 1)[0]?.trim() : "";
-    return details ? `${label}: ${details}` : label;
+    frontendLog("error", "echarts.render.failed", {
+        error: error instanceof Error ? error.stack ?? error.message : String(error),
+    });
+    return label;
 }
 
 export function parseEChartsOption(source: string, objectError: string): EChartsOption {
@@ -102,7 +105,7 @@ export function mountECharts(
         try {
             if (!chart) {
                 chart = api.init(container, theme(), { renderer: "svg", width: nextWidth, height: nextHeight });
-                chart.setOption(option, { notMerge: true });
+                chart.setOption({ backgroundColor: "transparent", ...option }, { notMerge: true });
             } else if (width !== nextWidth || height !== nextHeight) {
                 chart.resize({ width: nextWidth, height: nextHeight });
             }

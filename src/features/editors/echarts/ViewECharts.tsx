@@ -3,7 +3,6 @@
 
 import { createSignal, onCleanup, onMount, Show, type JSX } from "solid-js";
 import { useI18N } from "@/i18n/Localization";
-import MessageView from "@/shared/errors/MessageView";
 import { echartsErrorMessage, mountECharts } from "../shared/EChartsRenderer";
 import "../shared/EChartsPreview.css";
 import { useEditorTextView } from "../text/EditorTextViewContext";
@@ -17,15 +16,15 @@ export function ViewECharts(): JSX.Element {
     let mounted = false;
     let stop: (() => void) | undefined;
     const [loading, setLoading] = createSignal(false);
-    const [error, setError] = createSignal<string | null>(null);
     const refresh = (): void => {
         stop?.();
-        setError(null);
+        host.reportError(null);
+        host.reportEmpty(content !== null && !content.trim() ? t("editor.emptyECharts") : null);
         if (!mounted) return;
         stop = mountECharts(previewRef, content ?? "", {
             objectError: t("markdownToolbar.codePreviewEChartsObjectError"),
             loading: setLoading,
-            error: (reason) => setError(echartsErrorMessage(t("markdownToolbar.codePreviewEChartsError"), reason)),
+            error: (reason) => host.reportError(echartsErrorMessage(t("markdownToolbar.codePreviewEChartsError"), reason)),
         });
     };
     onMount(() => { mounted = true; refresh(); });
@@ -37,7 +36,8 @@ export function ViewECharts(): JSX.Element {
             stop?.();
             content = null;
             setLoading(false);
-            setError(null);
+            host.reportError(null);
+            host.reportEmpty(null);
             previewRef?.replaceChildren();
         },
     });
@@ -46,8 +46,7 @@ export function ViewECharts(): JSX.Element {
         <section class={styles.studio} data-testid="echarts-view"
             style={{ display: host.active() ? undefined : "none" }}
             inert={!host.active() || !host.ready()}>
-            <Show when={error()}><MessageView>{error()}</MessageView></Show>
-            <div class="scrollingView" tabIndex={-1} style={{ display: error() ? "none" : undefined }}>
+            <div class="scrollingView" tabIndex={-1}>
                 <div class="contentView">
                     <Show when={loading()}>
                         <div class="echarts-preview-loading" role="status">{t("markdownToolbar.codePreviewLoading")}</div>

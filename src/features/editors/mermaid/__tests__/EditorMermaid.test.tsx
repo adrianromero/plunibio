@@ -10,9 +10,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { useAppContext, type AppContextValues } from "@/app/AppContext";
 import { StoryAppProvider } from "@/app/__stories__/support/StoryAppProvider";
 import I18NProvider from "@/i18n/Localization";
+import { frontendLog } from "@/shared/logging/frontendLog";
 import EditorMermaid from "../EditorMermaid";
 
 const mermaid = vi.hoisted(() => ({ initialize: vi.fn(), render: vi.fn() }));
+vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 vi.mock("mermaid", () => ({ default: mermaid }));
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 
@@ -53,12 +55,14 @@ describe("EditorMermaid", () => {
         vi.mocked(invoke).mockImplementation(async (command) => (
             command === "read_file" ? { content: diskContent, isNew: false } : undefined
         ));
+        vi.mocked(frontendLog).mockClear();
         mermaid.render.mockReset();
         mermaid.render.mockResolvedValue({ svg: '<svg aria-label="diagram"></svg>' });
     });
     afterEach(async () => {
         dispose?.();
         root?.remove();
+        localStorage.removeItem("plunibio.locale");
         await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
@@ -95,12 +99,20 @@ describe("EditorMermaid", () => {
         expect(source().state.doc.toString()).toBe(diskContent);
     });
 
-    it("shows MessageView on invalid syntax and recovers after editing the source", async () => {
+    it.each([
+        ["en", "The diagram could not be rendered"],
+        ["es", "No se ha podido generar el diagrama"],
+    ])("shows a localized MessageView (%s), logs technical details and recovers", async (locale, message) => {
+        localStorage.setItem("plunibio.locale", locale);
         diskContent = "invalid diagram";
         mermaid.render.mockRejectedValueOnce(new Error("Unexpected <script>bad()</script>\nDetails"));
         await mount();
         await vi.waitFor(() => expect(root.querySelector('[data-testid="message-view"]')?.textContent)
-            .toContain("Unexpected <script>bad()</script>"));
+            .toContain(message));
+        expect(root.querySelector('[data-testid="message-view"]')?.textContent).not.toContain("Unexpected");
+        expect(frontendLog).toHaveBeenCalledWith("error", "mermaid.render.failed", {
+            error: expect.stringContaining("Unexpected <script>bad()</script>\nDetails"),
+        });
         expect(root.querySelector("script")).toBeNull();
         await context.editor.saveFile()?.();
         expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: diskContent });
@@ -111,13 +123,33 @@ describe("EditorMermaid", () => {
         expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
     });
 
-    it("leaves an empty document blank without trying to render it", async () => {
-        diskContent = " \n";
+    it.each(["", " \n\t"])("shows an informational empty state for %j and renders after editing", async empty => {
+        diskContent = empty;
         await mount();
+        const message = root.querySelector('[data-testid="message-view"]');
+        expect(message?.getAttribute("data-message-kind")).toBe("status");
+        expect(message?.textContent).toContain("Add Mermaid code in code mode");
+        expect(root.querySelector<HTMLElement>('[data-testid="mermaid-view"]')?.style.display).toBe("none");
         expect(mermaid.render).not.toHaveBeenCalled();
-        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        expect(frontendLog).not.toHaveBeenCalledWith("error", expect.anything(), expect.anything());
+        expect(context.editor.fileModified()).toBe(false);
+        await context.editor.saveFile()?.();
+        expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: empty });
         await toggle();
-        expect(source().state.doc.toString()).toBe(diskContent);
+        expect(source().state.doc.toString()).toBe(empty);
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        const updated = "flowchart LR\n A --> B";
+        source().dispatch({ changes: { from: 0, to: source().state.doc.length, insert: updated } });
+        await toggle();
+        await vi.waitFor(() => expect(root.querySelector('[data-testid="mermaid-preview"] svg')).not.toBeNull());
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
+        diskContent = empty;
+        await context.editor.reloadFile()?.();
+        expect(root.querySelector('[data-testid="message-view"]')?.getAttribute("data-message-kind")).toBe("status");
+        diskContent = updated;
+        context.main.setFilename("another.mmd");
+        await vi.waitFor(() => expect(root.querySelector('[data-testid="mermaid-preview"] svg')).not.toBeNull());
+        expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
     });
 
     it("updates the diagram theme without changing its source or marking it modified", async () => {
