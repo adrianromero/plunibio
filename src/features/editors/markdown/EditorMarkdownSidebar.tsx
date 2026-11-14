@@ -807,70 +807,72 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                             <SidebarButton
                                 getEditor={props.getEditor}
                                 layout="compact"
-                                icon={IndentIncrease}
-                                label={t("markdownToolbar.increaseIndent")}
-                                onRun={(ctx) => ctx.get(commandsCtx).call(sinkListItemCommand.key)}
+                                icon={IndentDecrease}
+                                label={t("markdownToolbar.decreaseIndent")}
+                                onRun={(ctx) => ctx.get(commandsCtx).call(liftListItemCommand.key)}
                             />
                             <SidebarButton
                                 getEditor={props.getEditor}
                                 layout="compact"
-                                icon={IndentDecrease}
-                                label={t("markdownToolbar.decreaseIndent")}
-                                onRun={(ctx) => ctx.get(commandsCtx).call(liftListItemCommand.key)}
+                                icon={IndentIncrease}
+                                label={t("markdownToolbar.increaseIndent")}
+                                onRun={(ctx) => ctx.get(commandsCtx).call(sinkListItemCommand.key)}
                             />
                         </div>
                     </section>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("markdownToolbar.blocks")}</h2>
 
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={ImageIcon}
-                            label={t("markdownToolbar.image")}
-                            onRun={insertImage}
-                        />
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={Table2}
-                            label={t("markdownToolbar.table")}
-                            onRun={(ctx) => {
-                                const commands = ctx.get(commandsCtx);
-                                const { from } = ctx.get(editorViewCtx).state.selection;
-                                commands.call(addBlockTypeCommand.key, {
-                                    nodeType: createTable(ctx, 3, 3),
-                                });
-                                commands.call(selectTextNearPosCommand.key, { pos: from });
-                            }}
-                        />
+                        <div class="sidebarButtonGrid sidebarButtonGrid--2">
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={ImageIcon}
+                                label={t("markdownToolbar.image")}
+                                onRun={insertImage}
+                            />
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={Table2}
+                                label={t("markdownToolbar.table")}
+                                onRun={(ctx) => {
+                                    const commands = ctx.get(commandsCtx);
+                                    const { from } = ctx.get(editorViewCtx).state.selection;
+                                    commands.call(addBlockTypeCommand.key, {
+                                        nodeType: createTable(ctx, 3, 3),
+                                    });
+                                    commands.call(selectTextNearPosCommand.key, { pos: from });
+                                }}
+                            />
 
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={SquareCode}
-                            label={t("markdownToolbar.codeBlock")}
-                            onRun={(ctx) => {
-                                ctx.get(commandsCtx).call(setBlockTypeCommand.key, {
-                                    nodeType: codeBlockSchema.type(ctx),
-                                });
-                            }}
-                        />
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={SquareSigma}
-                            label={t("markdownToolbar.mathBlock")}
-                            onRun={(ctx) => insertTypedCodeBlock(ctx, "LaTeX")}
-                        />
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={Workflow}
-                            label={t("markdownToolbar.mermaidBlock")}
-                            onRun={(ctx) => insertTypedCodeBlock(ctx, "Mermaid")}
-                        />
-                        <SidebarButton
-                            getEditor={props.getEditor}
-                            icon={ChartColumn}
-                            label={t("markdownToolbar.echartsBlock")}
-                            onRun={(ctx) => insertTypedCodeBlock(ctx, "ECharts")}
-                        />
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={SquareCode}
+                                label={t("markdownToolbar.codeBlock")}
+                                onRun={(ctx) => {
+                                    ctx.get(commandsCtx).call(setBlockTypeCommand.key, {
+                                        nodeType: codeBlockSchema.type(ctx),
+                                    });
+                                }}
+                            />
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={SquareSigma}
+                                label={t("markdownToolbar.mathBlock")}
+                                onRun={(ctx) => insertTypedCodeBlock(ctx, "LaTeX")}
+                            />
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={Workflow}
+                                label={t("markdownToolbar.mermaidBlock")}
+                                onRun={(ctx) => insertTypedCodeBlock(ctx, "Mermaid")}
+                            />
+                            <SidebarButton
+                                getEditor={props.getEditor}
+                                icon={ChartColumn}
+                                label={t("markdownToolbar.echartsBlock")}
+                                onRun={(ctx) => insertTypedCodeBlock(ctx, "ECharts")}
+                            />
+                        </div>
                     </section>
                 </SidebarTabSection>
                 <SidebarTabSection key="search" label={t("search.title")}>
