@@ -9,15 +9,15 @@ import { mermaidThemeConfig } from "./MermaidTheme";
 export type MermaidApi = typeof import("mermaid")["default"];
 export type MermaidLoader = () => Promise<MermaidApi>;
 
-let mermaidInstance: Promise<MermaidApi> | null = null;
+let library: Promise<MermaidApi> | null = null;
 let renderQueue: Promise<void> = Promise.resolve();
 
-async function loadMermaid(): Promise<MermaidApi> {
-    if (!mermaidInstance) {
-        mermaidInstance = import("mermaid").then(({ default: mermaid }) => mermaid);
-    }
-
-    return mermaidInstance;
+function loadMermaid(): Promise<MermaidApi> {
+    library ??= import("mermaid").then(({ default: mermaid }) => mermaid).catch((error: unknown) => {
+        library = null;
+        throw error;
+    });
+    return library;
 }
 
 function enqueueRender<T>(render: () => Promise<T>): Promise<T> {
