@@ -9,6 +9,7 @@ import { useAppContext } from "@/app/AppContext";
 import { StoryAppProvider } from "@/app/__stories__/support/StoryAppProvider";
 import { useI18N } from "@/i18n/Localization";
 import { configureCodeLanguages } from "../../text/CodeLanguages";
+import { configureCodeBlockLayout } from "../../markdown/MarkdownCodeBlockLayout";
 import EditorECharts from "../EditorECharts";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
@@ -68,6 +69,7 @@ function MarkdownFixture() {
         crepe = new Crepe({ root, defaultValue: markdown,
             featureConfigs: { [Crepe.Feature.CodeMirror]: { previewOnlyByDefault: true } },
         });
+        crepe.editor.config(configureCodeBlockLayout);
         crepe.editor.config(configureCodeLanguages(t("markdownToolbar.codePreviewMermaidError"), {
             errorText: t("markdownToolbar.codePreviewEChartsError"),
             objectError: t("markdownToolbar.codePreviewEChartsObjectError"),

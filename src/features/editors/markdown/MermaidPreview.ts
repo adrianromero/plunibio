@@ -21,6 +21,7 @@ function createPlaceholder(id: string, loading: PreviewContent): HTMLDivElement 
     const placeholder = document.createElement("div");
     placeholder.id = id;
     placeholder.className = "mermaid-preview";
+    placeholder.setAttribute("aria-busy", "true");
     const message = document.createElement("div");
     message.className = "mermaid-preview-loading";
     message.setAttribute("role", "status");
@@ -74,6 +75,7 @@ export function createMermaidPreviewRenderer(
                     const result = document.createElement("div");
                     result.id = placeholderId;
                     result.className = "mermaid-preview";
+                    result.setAttribute("aria-busy", "false");
                     result.innerHTML = svg;
                     applyPreview(result);
                 } catch (error: unknown) {
@@ -82,6 +84,7 @@ export function createMermaidPreviewRenderer(
                     const result = document.createElement("div");
                     result.id = placeholderId;
                     result.className = "mermaid-preview";
+                    result.setAttribute("aria-busy", "false");
                     result.append(createError(options.errorText, error));
                     applyPreview(result);
                 }

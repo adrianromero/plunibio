@@ -6,6 +6,7 @@ import type { EChartsApi } from "../../shared/EChartsRenderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CodeBlockConfig } from "@milkdown/kit/component/code-block";
 import { createEChartsPreviewRenderer } from "../EChartsPreview";
+import { observeCodeBlockLayout } from "../MarkdownCodeBlockLayout";
 
 describe("EChartsPreview", () => {
     const chart = { setOption: vi.fn(), dispose: vi.fn(), resize: vi.fn(), setTheme: vi.fn(), getZr: () => ({ flush: vi.fn() }) };
@@ -66,5 +67,34 @@ describe("EChartsPreview", () => {
         expect(document.querySelector('[role="alert"]')?.textContent).not.toContain("bad <script>");
         expect(document.querySelector("script")).toBeNull();
         expect(chart.dispose).toHaveBeenCalledOnce();
+    });
+
+    it("releases a failed preview's reservation without affecting the preceding valid chart", async () => {
+        const root = document.createElement("div");
+        const valid = document.createElement("div");
+        const invalid = document.createElement("div");
+        valid.className = invalid.className = "milkdown-code-block";
+        root.append(valid, invalid);
+        document.body.append(root);
+        valid.append(renderer()("echarts", "{}", vi.fn()) as HTMLElement);
+        invalid.append(renderer()("echarts", "{}", vi.fn()) as HTMLElement);
+        await vi.waitFor(() => expect(init).toHaveBeenCalledTimes(2));
+        vi.spyOn(valid, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 600, 440));
+        vi.spyOn(invalid, "getBoundingClientRect").mockImplementation(() =>
+            new DOMRect(0, 0, 600, invalid.querySelector('[role="alert"]') ? 60 : 440));
+        const stop = observeCodeBlockLayout(root);
+        try {
+            invalid.replaceChildren(renderer()("echarts", '{"bad":', vi.fn()) as HTMLElement);
+            await vi.waitFor(() => {
+                expect(invalid.querySelector('[role="alert"]')).not.toBeNull();
+                expect(invalid.querySelector(".echarts-preview")?.getAttribute("aria-busy")).toBe("false");
+                expect(invalid.style.getPropertyValue("--code-block-reserved-height")).toBe("");
+            });
+            expect(invalid.querySelector(".echarts-chart")).toBeNull();
+            expect(valid.querySelector(".echarts-chart")).not.toBeNull();
+            expect(valid.style.getPropertyValue("--code-block-reserved-height")).toBe("");
+            invalid.innerHTML = '<pre class="milkdown-code-block-placeholder">invalid</pre>';
+            await vi.waitFor(() => expect(invalid.style.getPropertyValue("--code-block-reserved-height")).toBe("60px"));
+        } finally { stop(); }
     });
 });

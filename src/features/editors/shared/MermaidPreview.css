@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: MIT
  */
 
+.mermaid-preview {
+    position: relative;
+}
+
+.mermaid-preview[aria-busy="true"]:has(svg) > .mermaid-preview-loading {
+    position: absolute;
+    inset: 0 auto auto 0;
+}
+
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) .mermaid-preview-loading {
     padding: 1rem;
     color: var(--color-text-muted);

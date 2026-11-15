@@ -37,6 +37,7 @@ import MarkdownFloatingActionsHost, {
     createMarkdownFloatingActionsController,
 } from "./MarkdownFloatingActionsHost";
 import { configureMarkdownSerialization } from "./MarkdownSerialization";
+import { configureCodeBlockLayout } from "./MarkdownCodeBlockLayout";
 import { markdownCodeBlockView } from "./MarkdownCodeBlock";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 import { configureCodeLanguages } from "../text/CodeLanguages";
@@ -368,6 +369,7 @@ export function ViewMarkdown(): JSX.Element {
             nextCrepe.editor.config(disableNativeInlineMathTooltip);
             nextCrepe.editor.use(markdownCodeBlockView);
             nextCrepe.editor.config(configureMarkdownSerialization);
+            nextCrepe.editor.config(configureCodeBlockLayout);
 
             // Milkdown's markdownUpdated listener is debounced. Track edits synchronously
             // so switching mode or navigating immediately after typing cannot lose changes.
