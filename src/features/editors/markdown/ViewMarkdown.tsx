@@ -37,6 +37,7 @@ import MarkdownFloatingActionsHost, {
     createMarkdownFloatingActionsController,
 } from "./MarkdownFloatingActionsHost";
 import { configureMarkdownSerialization } from "./MarkdownSerialization";
+import { markdownCodeBlockView } from "./MarkdownCodeBlock";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 import { configureCodeLanguages } from "../text/CodeLanguages";
 import { joinMarkdownFrontmatter, splitMarkdownFrontmatter } from "./MarkdownFrontmatter";
@@ -365,6 +366,7 @@ export function ViewMarkdown(): JSX.Element {
                 })
             );
             nextCrepe.editor.config(disableNativeInlineMathTooltip);
+            nextCrepe.editor.use(markdownCodeBlockView);
             nextCrepe.editor.config(configureMarkdownSerialization);
 
             // Milkdown's markdownUpdated listener is debounced. Track edits synchronously
