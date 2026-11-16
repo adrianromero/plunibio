@@ -1,0 +1,202 @@
+/* Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT */
+
+.print-document {
+    display: none;
+}
+
+@page {
+    margin: 15mm;
+}
+
+@media print {
+    html, body {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        background: white !important;
+    }
+
+    body > :not(.print-document) {
+        display: none !important;
+    }
+
+    .print-document {
+        display: block !important;
+        color: var(--color-text);
+        background: white;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .print-document .contentView,
+    .print-document .milkdown,
+    .print-document .ProseMirror,
+    .print-document .milkdown-code-block,
+    .print-document .milkdown-table-block,
+    .print-document .tableWrapper,
+    .print-document .table-wrapper {
+        display: block !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .print-document .milkdown-code-block {
+        margin-block: 1em !important;
+    }
+
+    .print-document .print-code {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font: 9pt/1.4 monospace;
+    }
+
+    .print-document .print-code-numbered {
+        white-space: normal;
+        padding-left: calc(var(--print-line-number-width) + 1.5ch);
+    }
+
+    .print-document .print-code-line {
+        display: block;
+        position: relative;
+        min-height: 1.4em;
+        white-space: pre-wrap;
+    }
+
+    .print-document .print-code-line::before {
+        content: attr(data-line-number);
+        position: absolute;
+        right: calc(100% + 1.5ch);
+        width: var(--print-line-number-width);
+        color: var(--color-text-muted);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .print-document :is(.mermaid-preview, .echarts-preview) {
+        background: var(--print-diagram-background, white);
+        break-inside: avoid;
+    }
+
+    .print-document .echarts-chart {
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .print-document .echarts-chart > div {
+        width: auto !important;
+        height: auto !important;
+    }
+
+    .print-document :is(.mermaid-preview, .echarts-preview, .echarts-chart) svg {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .print-document .print-image-caption {
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 0.9em;
+    }
+
+    .print-document img {
+        max-width: 100%;
+        height: auto;
+        break-inside: avoid;
+    }
+
+    .print-document :is(h1, h2, h3, h4, h5, h6) {
+        break-after: avoid;
+    }
+
+    .print-document :is(p, li) {
+        orphans: 3;
+        widows: 3;
+    }
+
+    .print-document :is(button, .tools, .milkdown-block-handle, .ProseMirror-gapcursor, .prosemirror-virtual-cursor) {
+        display: none !important;
+    }
+}
+
+.print-document.print-preparing {
+    display: block;
+    position: absolute;
+    left: -100000px;
+    top: 0;
+    width: 180mm;
+    visibility: hidden;
+}
+
+@media print {
+    .print-document {
+        --print-font-size: 12pt;
+        --print-diagram-background: white;
+        font-size: var(--print-font-size);
+        line-height: 1.5;
+    }
+
+    .print-document .ProseMirror p {
+        display: block !important;
+        font-size: var(--print-font-size) !important;
+        line-height: 1.5 !important;
+        overflow: visible !important;
+        padding-block: 0 !important;
+        margin-block: 0.4em !important;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .print-document .milkdown-image-block {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        break-inside: avoid;
+    }
+
+    .print-document .milkdown-image-block .image-wrapper {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    .print-document :is(table, tr, blockquote) {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .print-document .milkdown .ProseMirror h1 { font-size: 2em; line-height: 1.2; }
+    .print-document .milkdown .ProseMirror h2 { font-size: 1.65em; line-height: 1.25; }
+    .print-document .milkdown .ProseMirror h3 { font-size: 1.35em; line-height: 1.3; }
+    .print-document .milkdown .ProseMirror h4 { font-size: 1.2em; line-height: 1.3; }
+    .print-document .milkdown .ProseMirror h5,
+    .print-document .milkdown .ProseMirror h6 { font-size: 1em; line-height: 1.4; }
+
+    .print-document .milkdown .ProseMirror :is(h1, h2, h3, h4, h5, h6) {
+        page-break-after: avoid;
+        margin-top: 1em;
+    }
+
+    .print-document .print-heading-group {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .print-document .milkdown .ProseMirror > :first-child > :first-child,
+    .print-document .milkdown .ProseMirror > h1:first-child {
+        margin-top: 0;
+    }
+
+    .print-document .ProseMirror > p:has(img) {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}

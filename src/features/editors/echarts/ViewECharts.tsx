@@ -17,6 +17,10 @@ export function ViewECharts(): JSX.Element {
     let stop: (() => void) | undefined;
     const [loading, setLoading] = createSignal(false);
     const refresh = (): void => {
+        if (previewRef) {
+            previewRef.dataset.printLanguage = "echarts";
+            previewRef.dataset.printSource = content ?? "";
+        }
         stop?.();
         host.reportError(null);
         host.reportEmpty(content !== null && !content.trim() ? t("editor.emptyECharts") : null);
@@ -51,7 +55,7 @@ export function ViewECharts(): JSX.Element {
                     <Show when={loading()}>
                         <div class="echarts-preview-loading" role="status">{t("markdownToolbar.codePreviewLoading")}</div>
                     </Show>
-                    <div ref={previewRef} class={`echarts-preview ${styles.preview}`}
+                    <div ref={previewRef} data-print-content class={`echarts-preview ${styles.preview}`}
                         data-testid="echarts-preview" role="region"
                         aria-label={t("markdownToolbar.echartsBlock")} aria-busy={loading()} />
                 </div>

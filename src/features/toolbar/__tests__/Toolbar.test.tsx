@@ -33,6 +33,7 @@ vi.mock("@/features/navigation/FileBreadcrumb", () => ({ default: () => null }))
 
 describe("Toolbar", () => {
     let dispose: (() => void) | undefined;
+    let setPrintFile: AppContextValues["editor"]["setPrintFile"];
     let setSaveFile: (handler: SaveFileHandler | null) => void;
     let setReloadFile: (handler: ReloadFileHandler | null) => void;
     let setToggleSidebar: AppContextValues["editor"]["setToggleSidebar"];
@@ -44,6 +45,8 @@ describe("Toolbar", () => {
     beforeEach(() => {
         openWorkspace.mockClear();
         showAbout.mockClear();
+        const [printFile, setPrintFileSignal] = createSignal<(() => Promise<void>) | null>(null);
+        setPrintFile = (handler) => setPrintFileSignal(() => handler);
         const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
         const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);
         const [toggleSidebar, setToggleSidebarSignal] =
@@ -65,6 +68,8 @@ describe("Toolbar", () => {
 
         const [folderSort, setFolderSort] = createSignal<FolderSort>({ ...DEFAULT_FOLDER_SORT });
         editorContext = {
+                printFile,
+                setPrintFile,
                 sourceMode: () => false,
                 setSourceMode: vi.fn(),
                 sourceModeAvailable: () => false,
@@ -136,6 +141,22 @@ describe("Toolbar", () => {
 
         saveEntry?.click();
         expect(save).toHaveBeenCalledOnce();
+    });
+
+    it("always shows Print and follows the active editor availability", () => {
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <Toolbar />, root);
+        const entry = root.querySelector<HTMLButtonElement>('[data-toolbar-menu-entry="print"]');
+        expect(entry?.disabled).toBe(true);
+        expect(entry?.textContent).toContain("CTRL+P");
+        const print = vi.fn(async () => undefined);
+        setPrintFile(print);
+        expect(entry?.disabled).toBe(false);
+        entry?.click();
+        expect(print).toHaveBeenCalledOnce();
+        setPrintFile(null);
+        expect(entry?.disabled).toBe(true);
     });
 
     it("shows the registered sidebar toggle without an action separator", () => {
@@ -352,7 +373,7 @@ describe("Toolbar", () => {
                 sections?.[2]?.querySelectorAll<HTMLElement>("[data-toolbar-menu-entry]") ?? []
             ).map((entry) => entry.dataset.toolbarMenuEntry)
         ).toEqual(["about"]);
-        expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(8);
+        expect(menu?.querySelectorAll('[role="menuitem"]')).toHaveLength(9);
         expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(13);
     });
 });

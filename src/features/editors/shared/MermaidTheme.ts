@@ -7,8 +7,7 @@ import type { MermaidConfig } from "mermaid";
 
 // Mermaid derives further colors from these values, so resolve CSS colors to hex
 // before handing them to its theme engine.
-export function mermaidThemeConfig(): MermaidConfig {
-    const root = document.documentElement;
+export function mermaidThemeConfig(root: HTMLElement = document.documentElement): MermaidConfig {
     const dark = root.dataset.theme === "dark";
     const properties = getComputedStyle(root);
     const probe = document.createElement("span");

@@ -13,6 +13,7 @@ import { useAppContext } from "./AppContext";
 import { frontendLog } from "@/shared/logging/frontendLog";
 
 export type FileEditorAdapter<Content = string> = {
+    preparePrint?: () => (() => void);
     getContent: () => Promise<Content | null>;
     replaceContent: (content: Content, filename: string, onModified: () => void) => Promise<void>;
     focus?: () => void | Promise<void>;

@@ -5,6 +5,7 @@ mod app_error;
 mod commands;
 mod paths;
 mod properties;
+mod printing;
 
 use commands::AppState;
 use properties::Properties;
@@ -60,6 +61,7 @@ fn run_with_configuration(
     builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(printing::init())
         .setup(move |app| {
             let (properties_path, application_properties) = match app.path().home_dir() {
                 Ok(home) => {

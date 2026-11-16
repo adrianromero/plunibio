@@ -12,6 +12,7 @@ export function EditorText(): JSX.Element {
     const { main: { filename } } = useAppContext();
     return (
         <EditorTextView
+            printable
             view={null}
             extensions={editorTextExtensionsForFilename(filename().toLowerCase()) ?? []}
         />

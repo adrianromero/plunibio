@@ -377,3 +377,42 @@ It prints the temporary path to serve; open its `/qa/` page in a browser to run 
 Never publish that instrumented copy. See the website README for build paths and exact procedure.
 CLI read-only checks now live in `scripts/verify-documentation-cli.mjs`; run
 `npm run docs:cli:check -- <binary>` when relevant.
+
+## PDF printing regression checks
+
+```bash
+npm run automation:build
+npm run automation:print
+```
+
+This suite starts the real application in dark mode and prints Atlas Markdown,
+standalone Mermaid and ECharts, Markdown with two ECharts previews, and a long
+pagination fixture, plus JavaScript in EditorText with line numbers. The EditorText
+case checks printed line numbers against their source text, including after blank
+lines and a wrapped line; inspect its syntax colours and wrapping visually.
+Each flow uses a temporary workspace copy. PDFs and source
+view metrics are written to `automation/output/printing/`; no examples are changed.
+The suite checks expected text in each resulting PDF with Poppler's `pdftotext`,
+including every numbered paragraph and the beginning/end of the long code block.
+Render the PDFs with `pdftoppm` to inspect margins, graph placement, and page breaks.
+
+The `printPdf` action uses Ctrl+P through AppShortcuts and the normal print
+preparation. In automation builds only, the output destination is passed to the
+native print operation so it can print silently to a PDF file. Interactive Linux
+printing uses the same operation and 15 mm default margins, with the normal system
+dialog. Production builds reject any silent output path. The automation script
+currently targets Linux/WebKitGTK.
+
+A single case can be repeated with:
+
+```bash
+npm run automation:run -- automation/flows/print-markdown.json
+```
+
+`printPdf` supports `name` and an optional `containsText` array. Set `textMode` to
+`layout` to check spatially aligned text such as line numbers beside code; the
+default is `raw`. These checks inspect
+the PDF itself rather than treating a successful print request as sufficient.
+Print body text is currently 12 pt (16 CSS px), with 1.5 line spacing; the print-only
+`--print-font-size` property in `src/features/printing/PrintDocument.css` is the
+single setting for subsequent font-size trials.

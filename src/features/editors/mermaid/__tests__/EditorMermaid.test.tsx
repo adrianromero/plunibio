@@ -66,6 +66,21 @@ describe("EditorMermaid", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
+    it("prints its SVG and unregisters the action when the editor closes", async () => {
+        const print = vi.spyOn(window, "print").mockImplementation(() => {
+            expect(document.querySelector('.print-document svg[aria-label="diagram"]')).not.toBeNull();
+        });
+        try {
+            await mount();
+            await context.editor.printFile()?.();
+            expect(print).toHaveBeenCalledOnce();
+            window.dispatchEvent(new Event("afterprint"));
+            dispose?.();
+            dispose = undefined;
+            expect(context.editor.printFile()).toBeNull();
+        } finally { print.mockRestore(); }
+    });
+
     it("starts with a read-only diagram and preserves the exact source when saving", async () => {
         await mount();
         await vi.waitFor(() => expect(root.querySelector('[data-testid="mermaid-preview"] svg')).not.toBeNull());

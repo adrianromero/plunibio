@@ -9,7 +9,7 @@ import ViewECharts from "./ViewECharts";
 const extensions = [json()];
 
 export function EditorECharts(): JSX.Element {
-    return <EditorTextView view={ViewECharts} extensions={extensions} />;
+    return <EditorTextView printable view={ViewECharts} extensions={extensions} />;
 }
 
 export default EditorECharts;

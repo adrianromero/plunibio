@@ -1,11 +1,13 @@
 {
     "editor": {
+        "printFailed": "Unable to prepare the document for printing. Check that charts and images have loaded correctly.",
         "emptyMermaid": "The document is empty. Add Mermaid code in code mode to generate a diagram.",
         "emptyECharts": "The document is empty. Add an ECharts configuration in code mode to generate a chart.",
         "loading": "Loading {{ filename }}...",
         "saving": "Saving {{ filename }}..."
     },
     "toolbar": {
+        "print": "Print…",
         "showSource": "Show source code",
         "showView": "Show document view",
         "back": "Back",

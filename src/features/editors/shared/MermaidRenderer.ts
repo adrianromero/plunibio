@@ -32,13 +32,14 @@ function enqueueRender<T>(render: () => Promise<T>): Promise<T> {
 export function renderMermaid(
     id: string,
     content: string,
-    load: MermaidLoader = loadMermaid
+    load: MermaidLoader = loadMermaid,
+    themeRoot: HTMLElement = document.documentElement
 ): Promise<string> {
     return enqueueRender(async () => {
         const mermaid = await load();
         // initialize changes Mermaid's global configuration. Keep it in the same
         // queue as render so simultaneous previews cannot use each other's theme.
-        mermaid.initialize(mermaidThemeConfig());
+        mermaid.initialize(mermaidThemeConfig(themeRoot));
         const { svg } = await mermaid.render(id, content);
         return svg;
     });

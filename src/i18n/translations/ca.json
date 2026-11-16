@@ -1,11 +1,13 @@
 {
     "editor": {
+        "printFailed": "No s’ha pogut preparar el document per imprimir. Comprova que els gràfics i les imatges s’hagin carregat correctament.",
         "emptyMermaid": "El document és buit. Afegeix codi Mermaid en el mode de codi per generar un diagrama.",
         "emptyECharts": "El document és buit. Afegeix una configuració ECharts en el mode de codi per generar un gràfic.",
         "loading": "S'està carregant {{ filename }}...",
         "saving": "S'està desant {{ filename }}..."
     },
     "toolbar": {
+        "print": "Imprimeix…",
         "showSource": "Mostra el codi font",
         "showView": "Mostra la vista del document",
         "back": "Enrere",

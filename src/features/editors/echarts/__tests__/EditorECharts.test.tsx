@@ -13,7 +13,10 @@ import EditorECharts from "../EditorECharts";
 
 const chart = vi.hoisted(() => ({ setOption: vi.fn(), setTheme: vi.fn(), dispose: vi.fn(), resize: vi.fn(), flush: vi.fn() }));
 vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
-vi.mock("echarts", () => ({ init: vi.fn(() => ({ ...chart, getZr: () => ({ flush: chart.flush }) })) }));
+vi.mock("echarts", () => ({ init: vi.fn((target: HTMLElement) => {
+    target.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="680" height="400"></svg>';
+    return { ...chart, isDisposed: () => false, getZr: () => ({ flush: chart.flush }) };
+}) }));
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 
 describe("EditorECharts", () => {
@@ -55,6 +58,19 @@ describe("EditorECharts", () => {
         root?.remove();
         vi.restoreAllMocks();
         await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    it("prints the chart only after rendering finishes", async () => {
+        const print = vi.spyOn(window, "print").mockImplementation(() => {
+            expect(chart.flush).toHaveBeenCalled();
+            expect(document.querySelector('.print-document .echarts-preview svg')).not.toBeNull();
+        });
+        try {
+            await mount();
+            await context.editor.printFile()?.();
+            expect(print).toHaveBeenCalledOnce();
+            window.dispatchEvent(new Event("afterprint"));
+        } finally { print.mockRestore(); }
     });
 
     it("starts read-only and saves the exact JSON source including whitespace", async () => {

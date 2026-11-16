@@ -10,7 +10,7 @@ import { codeBlockConfig } from "@milkdown/kit/component/code-block";
 import { editorViewCtx } from "@milkdown/kit/core";
 import { TextSelection } from "@milkdown/kit/prose/state";
 import { insertTypedCodeBlock } from "../EditorMarkdownSidebar";
-import { markdownCodeBlockView } from "../MarkdownCodeBlock";
+import { markdownCodeBlockView, prepareMarkdownCodeBlocksForPrint } from "../MarkdownCodeBlock";
 
 describe("Markdown code block preview mode", () => {
     let crepe: Crepe;
@@ -45,6 +45,18 @@ describe("Markdown code block preview mode", () => {
         crepe.editor.use(markdownCodeBlockView);
         await crepe.create();
     }
+
+    it("materializes offscreen blocks for printing without changing the document", async () => {
+        await createEditor("```mermaid\nflowchart LR\n A --> B\n```\n\n```js\nconst x = 1\n```");
+        expect(root.querySelectorAll(".milkdown-code-block-placeholder")).toHaveLength(2);
+        const original = crepe.getMarkdown();
+        const release = prepareMarkdownCodeBlocksForPrint(root);
+        await vi.waitFor(() => expect(root.querySelectorAll(".preview")).toHaveLength(2));
+        expect(root.querySelector(".milkdown-code-block-placeholder")).toBeNull();
+        expect(crepe.getMarkdown()).toBe(original);
+        release();
+        await vi.waitFor(() => expect(root.querySelector(".milkdown-code-block.selected")).toBeNull());
+    });
 
     afterEach(async () => {
         await crepe?.destroy();

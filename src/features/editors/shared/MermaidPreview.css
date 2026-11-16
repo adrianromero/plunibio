@@ -3,9 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-.mermaid-preview {
-    position: relative;
-}
+@import "./Preview.css";
 
 .mermaid-preview[aria-busy="true"]:has(svg) > .mermaid-preview-loading {
     position: absolute;
@@ -14,16 +12,6 @@
 
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) .mermaid-preview-loading {
     padding: 1rem;
-    color: var(--color-text-muted);
-}
-:is(.milkdown .milkdown-code-block .preview, .mermaid-preview) .mermaid-preview-error {
-    padding: 1rem;
-    color: var(--color-error-text);
-    background: var(--color-error-background);
-    border: 1px solid var(--color-error-border);
-    border-radius: var(--radius-small);
-    text-align: left;
-    white-space: pre-wrap;
 }
 :is(.milkdown .milkdown-code-block .preview, .mermaid-preview) svg {
     display: block;

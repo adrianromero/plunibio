@@ -1,10 +1,11 @@
 /* Copyright (c) 2026 Adrián Romero
  * SPDX-License-Identifier: MIT */
 
+@import "./Preview.css";
+
 .echarts-preview {
     min-width: 0;
     width: 100%;
-    position: relative;
 }
 
 .echarts-chart {
@@ -18,19 +19,7 @@
     position: absolute;
     inset: 0 auto auto 0;
     z-index: 1;
-    color: var(--color-text-muted);
     padding-block: 0.5rem;
-}
-
-.echarts-preview-error {
-    padding: 0.75rem;
-    color: var(--color-error-text);
-    background: var(--color-error-background);
-    border: 1px solid var(--color-error-border);
-    border-radius: var(--radius-small);
-    text-align: left;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
 }
 
 /* Markdown's generic code preview styles must not constrain ECharts' measured

@@ -229,69 +229,69 @@ body {
     background: var(--color-primary-soft);
 }
 
-.cm-editor .tok-link,
-.cm-editor .tok-heading {
+:is(.cm-editor, .print-code) .tok-link,
+:is(.cm-editor, .print-code) .tok-heading {
     color: var(--color-primary);
 }
 
-.cm-editor .tok-keyword {
+:is(.cm-editor, .print-code) .tok-keyword {
     color: var(--syntax-keyword);
 }
 
-.cm-editor .tok-atom,
-.cm-editor .tok-bool {
+:is(.cm-editor, .print-code) .tok-atom,
+:is(.cm-editor, .print-code) .tok-bool {
     color: var(--syntax-atom);
 }
 
-.cm-editor .tok-literal,
-.cm-editor .tok-inserted {
+:is(.cm-editor, .print-code) .tok-literal,
+:is(.cm-editor, .print-code) .tok-inserted {
     color: var(--syntax-literal);
 }
 
-.cm-editor .tok-string,
-.cm-editor .tok-url {
+:is(.cm-editor, .print-code) .tok-string,
+:is(.cm-editor, .print-code) .tok-url {
     color: var(--syntax-string);
 }
 
-.cm-editor .tok-number {
+:is(.cm-editor, .print-code) .tok-number {
     color: var(--syntax-number);
 }
 
-.cm-editor .tok-string2 {
+:is(.cm-editor, .print-code) .tok-string2 {
     color: var(--syntax-meta);
 }
 
-.cm-editor .tok-variableName,
-.cm-editor .tok-labelName {
+:is(.cm-editor, .print-code) .tok-variableName,
+:is(.cm-editor, .print-code) .tok-labelName {
     color: var(--syntax-variable);
 }
 
-.cm-editor .tok-typeName,
-.cm-editor .tok-namespace,
-.cm-editor .tok-className,
-.cm-editor .tok-macroName {
+:is(.cm-editor, .print-code) .tok-typeName,
+:is(.cm-editor, .print-code) .tok-namespace,
+:is(.cm-editor, .print-code) .tok-className,
+:is(.cm-editor, .print-code) .tok-macroName {
     color: var(--syntax-type);
 }
 
-.cm-editor .tok-propertyName {
+:is(.cm-editor, .print-code) .tok-propertyName {
     color: var(--syntax-property);
 }
 
-.cm-editor .tok-operator,
-.cm-editor .tok-punctuation {
+:is(.cm-editor, .print-code) .tok-operator,
+:is(.cm-editor, .print-code) .tok-punctuation {
     color: var(--syntax-operator);
 }
 
-.cm-editor .tok-comment {
+:is(.cm-editor, .print-code) .tok-comment {
     color: var(--syntax-comment);
 }
 
-.cm-editor .tok-meta {
+:is(.cm-editor, .print-code) .tok-meta {
     color: var(--syntax-meta);
 }
 
-.cm-editor .tok-deleted,
-.cm-editor .tok-invalid {
+:is(.cm-editor, .print-code) .tok-deleted,
+:is(.cm-editor, .print-code) .tok-invalid {
     color: var(--syntax-invalid);
 }
 /*

@@ -100,6 +100,7 @@ function parseSteps(value: unknown): FlowStep[] {
         "observeClipboardWrite",
         "refresh",
         "capture",
+        "printPdf",
     ]);
     return value.map((step, index) => {
         if (!isRecord(step)) {
@@ -110,6 +111,16 @@ function parseSteps(value: unknown): FlowStep[] {
             throw new Error(`steps[${index}].action '${action}' is not supported`);
         }
         validateTargetFields(step, index);
+        if (action === "printPdf") {
+            requireString(step, "name", `steps[${index}]`);
+            if (step.textMode !== undefined && step.textMode !== "raw" && step.textMode !== "layout") {
+                throw new Error(`steps[${index}].textMode must be raw or layout`);
+            }
+            if (step.containsText !== undefined && (!Array.isArray(step.containsText) ||
+                !step.containsText.every((text: unknown) => typeof text === "string" && text.length > 0))) {
+                throw new Error(`steps[${index}].containsText must be an array of non-empty strings`);
+            }
+        }
         if (
             action === "caret" &&
             step.position !== "start" &&

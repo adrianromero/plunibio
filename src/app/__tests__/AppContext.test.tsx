@@ -123,6 +123,38 @@ describe("AppProvider workspace changes", () => {
         expect(pressShortcut("e", "KeyE").defaultPrevented).toBe(false);
     });
 
+    it("routes Ctrl/Cmd+P through AppShortcuts and blocks unavailable or modal printing", async () => {
+        const context = renderProvider();
+        const press = (meta = false): KeyboardEvent => {
+            const event = new KeyboardEvent("keydown", {
+                key: "p", code: "KeyP", ctrlKey: !meta, metaKey: meta,
+                bubbles: true, cancelable: true,
+            });
+            document.dispatchEvent(event);
+            return event;
+        };
+        expect(press().defaultPrevented).toBe(true);
+        const print = vi.fn(async () => undefined);
+        context.editor.setPrintFile(print);
+        press();
+        await Promise.resolve();
+        press(true);
+        expect(print).toHaveBeenCalledTimes(2);
+        context.spinner.showSpinner();
+        press();
+        expect(print).toHaveBeenCalledTimes(2);
+        context.spinner.hideSpinner();
+        const dialog = document.createElement("dialog");
+        dialog.open = true;
+        document.body.append(dialog);
+        press();
+        expect(print).toHaveBeenCalledTimes(2);
+        dialog.remove();
+        context.editor.setPrintFile(null);
+        press();
+        expect(print).toHaveBeenCalledTimes(2);
+    });
+
     it("routes navigation and sidebar shortcuts only to registered handlers", () => {
         const context = renderProvider();
         const navigateBack = vi.fn(() => Promise.resolve());

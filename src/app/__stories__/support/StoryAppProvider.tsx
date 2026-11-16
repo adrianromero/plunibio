@@ -7,6 +7,7 @@ import {
     type RenameEntryHandler,
     type ReloadFileHandler,
     type SaveFileHandler,
+    type PrintFileHandler,
     type SearchFileHandler,
     type ToggleSidebarHandler,
     type ToggleSourceModeHandler,
@@ -49,6 +50,10 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
     const [toggleSourceMode, setToggleSourceModeSignal] = createSignal<ToggleSourceModeHandler | null>(null);
     const setToggleSourceMode = (handler: ToggleSourceModeHandler | null): void => {
         setToggleSourceModeSignal(() => handler);
+    };
+    const [printFile, setPrintFileSignal] = createSignal<PrintFileHandler | null>(null);
+    const setPrintFile = (handler: PrintFileHandler | null): void => {
+        setPrintFileSignal(() => handler);
     };
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
     const [sidebarVisible, setSidebarVisible] = createSignal(true);
@@ -129,6 +134,8 @@ export function StoryAppProvider(props: StoryAppProviderProps): JSX.Element {
             setSaveFile,
             reloadFile,
             setReloadFile,
+            printFile,
+            setPrintFile,
             searchFile,
             setSearchFile,
             sidebarVisible,

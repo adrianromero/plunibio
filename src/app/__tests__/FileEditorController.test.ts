@@ -102,6 +102,8 @@ describe("createFileEditorController", () => {
                 setSpinnerParams: vi.fn(),
             },
             editor: {
+                printFile: () => null,
+                setPrintFile: vi.fn(),
                 sourceMode: () => false,
                 setSourceMode: vi.fn(),
                 sourceModeAvailable: () => false,

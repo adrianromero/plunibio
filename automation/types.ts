@@ -145,6 +145,13 @@ export type CaptureStep = {
     settleMs?: number;
 };
 
+export type PrintPdfStep = {
+    action: "printPdf";
+    name: string;
+    containsText?: string[];
+    textMode?: "raw" | "layout";
+};
+
 export type FlowStep =
     | ClickStep
     | TypeStep
@@ -162,7 +169,8 @@ export type FlowStep =
     | WaitClipboardStep
     | ObserveClipboardWriteStep
     | RefreshStep
-    | CaptureStep;
+    | CaptureStep
+    | PrintPdfStep;
 
 export type AutomationFlow = {
     name: string;

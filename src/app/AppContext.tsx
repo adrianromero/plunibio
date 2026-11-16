@@ -41,6 +41,7 @@ import AppShortcuts, { type ShortcutDefinition } from "./AppShortcuts";
 
 export type SaveFileHandler = () => Promise<void>;
 export type ReloadFileHandler = () => Promise<void>;
+export type PrintFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
 export type NavigateFileHandler = () => Promise<void>;
 export type RenameEntryHandler = () => void | Promise<void>;
@@ -94,6 +95,8 @@ export type AppContextValues = {
         setSaveFile: (handler: SaveFileHandler | null) => void;
         reloadFile: Accessor<ReloadFileHandler | null>;
         setReloadFile: (handler: ReloadFileHandler | null) => void;
+        printFile: Accessor<PrintFileHandler | null>;
+        setPrintFile: (handler: PrintFileHandler | null) => void;
         searchFile: Accessor<SearchFileHandler | null>;
         setSearchFile: (handler: SearchFileHandler | null) => void;
         sidebarVisible: Accessor<boolean>;
@@ -149,6 +152,10 @@ export function AppProvider(props: {
     };
     const [saveFile, setSaveFileSignal] = createSignal<SaveFileHandler | null>(null);
     const [reloadFile, setReloadFileSignal] = createSignal<ReloadFileHandler | null>(null);
+    const [printFile, setPrintFileSignal] = createSignal<PrintFileHandler | null>(null);
+    const setPrintFile = (handler: PrintFileHandler | null): void => {
+        setPrintFileSignal(() => handler);
+    };
     const [searchFile, setSearchFileSignal] = createSignal<SearchFileHandler | null>(null);
     const [navigateBack, setNavigateBackSignal] = createSignal<NavigateFileHandler | null>(null);
     const [navigateForward, setNavigateForwardSignal] =
@@ -255,6 +262,12 @@ export function AppProvider(props: {
         }
     };
     const shortcuts = [
+        {
+            id: "print",
+            key: "p",
+            phase: "capture",
+            getHandler: printFile,
+        },
         {
             id: "toggle-source-mode",
             key: "e",
@@ -548,6 +561,8 @@ export function AppProvider(props: {
                     setSaveFile,
                     reloadFile,
                     setReloadFile,
+                    printFile,
+                    setPrintFile,
                     searchFile,
                     setSearchFile,
                     sidebarVisible,

@@ -38,7 +38,7 @@ import MarkdownFloatingActionsHost, {
 } from "./MarkdownFloatingActionsHost";
 import { configureMarkdownSerialization } from "./MarkdownSerialization";
 import { configureCodeBlockLayout } from "./MarkdownCodeBlockLayout";
-import { markdownCodeBlockView } from "./MarkdownCodeBlock";
+import { markdownCodeBlockView, prepareMarkdownCodeBlocksForPrint } from "./MarkdownCodeBlock";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 import { configureCodeLanguages } from "../text/CodeLanguages";
 import { joinMarkdownFrontmatter, splitMarkdownFrontmatter } from "./MarkdownFrontmatter";
@@ -161,6 +161,7 @@ export function ViewMarkdown(): JSX.Element {
     };
 
     const adapter: FileEditorAdapter = {
+        preparePrint: () => prepareMarkdownCodeBlocksForPrint(editorRef),
         getContent: () => {
             if (!crepeInstance) {
                 return Promise.resolve(null);
@@ -551,6 +552,7 @@ export function ViewMarkdown(): JSX.Element {
                     ref={editorRef}
                     class={`contentView milkdowntheme ${styles.editorMarkdown}`}
                     data-testid="markdown-editor"
+                    data-print-content
                 />
                 <MarkdownLinkActions
                     editorRoot={() => editorRef}

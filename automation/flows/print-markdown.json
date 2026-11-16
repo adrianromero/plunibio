@@ -1,0 +1,48 @@
+{
+    "name": "Print QA: markdown from dark theme",
+    "app": {
+        "basePath": "examples/atlas-de-lumina",
+        "workspaceMode": "temporary-copy",
+        "file": "README.md",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "theme": "dark",
+            "locale": "es",
+            "typography": "sans-serif",
+            "sidebarVisible": false
+        }
+    },
+    "outputDir": "automation/output/printing",
+    "timeoutMs": 20000,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "markdown-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry=\"print\"]"
+            },
+            "state": "enabled"
+        },
+        {
+            "action": "printPdf",
+            "name": "markdown",
+            "containsText": [
+                "Atlas de Lúmina",
+                "La mejor vista aparece desde la terraza occidental",
+                "fragmento representa los datos que utiliza la guía",
+                "const route =",
+                "Mapa del recorrido",
+                "Notas del viajero"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+:is(.mermaid-preview, .echarts-preview) {
+    position: relative;
+}
+
+:is(.mermaid-preview-loading, .echarts-preview-loading) {
+    color: var(--color-text-muted);
+}
+
+:is(.milkdown .milkdown-code-block .preview, .mermaid-preview, .echarts-preview) :is(.mermaid-preview-error, .echarts-preview-error) {
+    padding: 1rem;
+    color: var(--color-error-text);
+    font-family: var(--font-interface);
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

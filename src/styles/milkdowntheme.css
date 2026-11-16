@@ -165,7 +165,8 @@
 .milkdown .milkdown-code-block .tools .language-button,
 .milkdown .milkdown-code-block .tools .tools-button-group button,
 .milkdown .milkdown-code-block .language-picker,
-.milkdown .milkdown-code-block .language-picker .search-input {
+.milkdown .milkdown-code-block .language-picker .search-input,
+.milkdown .milkdown-code-block .preview-panel .preview-label {
     font-family: var(--font-interface);
 }
 

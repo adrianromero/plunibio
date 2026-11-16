@@ -1,0 +1,44 @@
+{
+    "name": "Print QA: EditorText with line numbers from dark theme",
+    "app": {
+        "basePath": "automation/fixtures/printing",
+        "workspaceMode": "temporary-copy",
+        "file": "numbered-code.js",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "theme": "dark",
+            "locale": "es",
+            "typography": "sans-serif",
+            "sidebarVisible": false
+        }
+    },
+    "outputDir": "automation/output/printing",
+    "timeoutMs": 20000,
+    "steps": [
+        {
+            "action": "wait",
+            "target": { "using": "testId", "value": "text-editor" },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": { "using": "css", "value": "[data-toolbar-menu-entry=\"print\"]" },
+            "state": "enabled"
+        },
+        {
+            "action": "printPdf",
+            "name": "text-numbered",
+            "textMode": "layout",
+            "containsText": [
+                "1 // EditorText print QA: numbered JavaScript",
+                "2 const title =",
+                "4 /* This comment spans",
+                "5 multiple source lines. */",
+                "6 const values =",
+                "11 const description =",
+                "12 console.log(title, total(values), description);"
+            ]
+        }
+    ]
+}

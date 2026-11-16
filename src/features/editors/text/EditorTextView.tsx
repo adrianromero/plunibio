@@ -29,14 +29,18 @@ import { frontendLog } from "@/shared/logging/frontendLog";
 import MessageView from "@/shared/errors/MessageView";
 import { codeMirrorSyntaxTheme } from "../shared/CodeMirrorTheme";
 import { EditorTextViewContext } from "./EditorTextViewContext";
+import { printDocument, waitForPrintContent } from "@/features/printing/PrintDocument";
 import styles from "./EditorTextView.module.css";
 
 export type EditorTextViewProps = {
     extensions?: readonly LanguageSupport[];
     view?: Component | null;
+    printable?: boolean;
 };
 
 export function EditorTextView(props: EditorTextViewProps): JSX.Element {
+    let studioRef!: HTMLElement;
+    let printing = false;
     let editorRef!: HTMLDivElement;
     let sourceScrollRef!: HTMLDivElement;
     let editorView: EditorView | null = null;
@@ -62,6 +66,8 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     const {
         main: { basepath, showAppMessage },
         editor: {
+            setPrintFile,
+            printFile,
             setSearchFile,
             searchFile,
             setSidebarVisible,
@@ -219,6 +225,52 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
         })();
         return pendingSwitch;
     };
+    const print = async (): Promise<void> => {
+        if (printing || !ready()) return;
+        printing = true;
+        const wasSource = sourceMode();
+        const version = generation;
+        let releasePrint: (() => void) | undefined;
+        const releasePreparedContent = (): void => {
+            const release = releasePrint;
+            releasePrint = undefined;
+            release?.();
+        };
+        const valid = (): boolean => !disposed && generation === version && ready() && !viewError() && !emptyMessage();
+        try {
+            if (props.view && sourceMode()) await toggleSourceMode();
+            if (!valid()) throw new Error("Unable to render document for printing");
+            const content = props.view
+                ? studioRef.querySelector<HTMLElement>("[data-print-content]")
+                : editorRef;
+            if (!content) throw new Error("Missing print content");
+            releasePrint = view?.preparePrint?.();
+            // Vue mounts Milkdown previews on the next microtask.
+            await Promise.resolve();
+            await waitForPrintContent(content, valid);
+            await printDocument(content, currentFilename, valid, releasePreparedContent, { lineNumbers: !props.view });
+        } catch (error: unknown) {
+            releasePreparedContent();
+            // Let Milkdown apply the restored selection before showing the dialog.
+            await Promise.resolve();
+            if (!disposed && generation === version) {
+                console.error("Unable to print document:", error);
+                await showAppMessage(t("editor.printFailed"), "error");
+            }
+        } finally {
+            releasePreparedContent();
+            if (wasSource && !disposed && generation === version && !sourceMode() && ready()) {
+                await toggleSourceMode();
+            }
+            printing = false;
+        }
+    };
+    createEffect(() => {
+        setPrintFile(props.printable && ready() && (sourceMode() || (!viewError() && !emptyMessage())) ? print : null);
+        onCleanup(() => {
+            if (printFile() === print) setPrintFile(null);
+        });
+    });
     const openSearch = (): void => {
         setSidebarVisible(true);
         setSelectedTab("search");
@@ -249,7 +301,7 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     });
 
     return (
-        <section class={styles.studio} data-testid="text-view">
+        <section ref={studioRef} class={styles.studio} data-testid="text-view">
             <Show when={error() || (!sourceMode() && (viewError() || emptyMessage()))}>
                 <MessageView info={error() || viewError() ? "error" : "status"}>
                     {error() ?? viewError() ?? emptyMessage() ?? t("errors.unknown")}

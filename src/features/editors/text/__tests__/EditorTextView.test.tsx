@@ -47,16 +47,16 @@ describe("EditorTextView mode and document lifecycle", () => {
     let dispose: (() => void) | undefined;
     let context: AppContextValues;
     function Probe() { context = useAppContext(); return null; }
-    const mount = async (markdown = true, view: Component = ViewMarkdown): Promise<void> => {
+    const mount = async (markdown = true, view: Component = ViewMarkdown, filename = markdown ? "notes.md" : "notes.txt"): Promise<void> => {
         root = document.createElement("div");
         document.body.append(root);
         dispose = render(() => (
             <I18NProvider>
-                <StoryAppProvider filename={markdown ? "notes.md" : "notes.txt"}>
+                <StoryAppProvider filename={filename}>
                     <Probe />
                     <Toolbar />
-                    <EditorTextView view={markdown ? view : null}
-                        extensions={editorTextExtensionsForFilename(markdown ? "notes.md" : "notes.txt") ?? []} />
+                    <EditorTextView printable view={markdown ? view : null}
+                        extensions={editorTextExtensionsForFilename(filename) ?? []} />
                 </StoryAppProvider>
             </I18NProvider>
         ), root);
@@ -88,10 +88,54 @@ describe("EditorTextView mode and document lifecycle", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
+    it("prints unsaved source as Markdown and restores source mode", async () => {
+        diskContent = "# Original";
+        await mount();
+        const print = vi.spyOn(window, "print").mockImplementation(() => {
+            expect(document.querySelector(".print-document h1")?.textContent).toBe("Unsaved heading");
+            expect(document.querySelector(".print-document [contenteditable]")).toBeNull();
+        });
+        try {
+            await toggle();
+            source().dispatch({ changes: { from: 0, to: source().state.doc.length, insert: "# Unsaved heading" } });
+            expect(context.editor.printFile()).not.toBeNull();
+            await context.editor.printFile()?.();
+            expect(print).toHaveBeenCalledOnce();
+            expect(context.editor.sourceMode()).toBe(true);
+            expect(source().state.doc.toString()).toBe("# Unsaved heading");
+            expect(context.editor.fileModified()).toBe(true);
+            expect(writes()).toHaveLength(0);
+            window.dispatchEvent(new Event("afterprint"));
+        } finally { print.mockRestore(); }
+    });
+
+    it.each(["notes.txt", "script.js"])("prints complete unsaved text with the language highlighting for %s", async (filename) => {
+        diskContent = "original";
+        await mount(false, ViewMarkdown, filename);
+        const code = Array.from({ length: 500 }, (_, i) => `const value${i} = "<tag>";`).join("\n");
+        source().dispatch({ changes: { from: 0, to: source().state.doc.length, insert: code } });
+        const print = vi.spyOn(window, "print").mockImplementation(() => {
+            const block = document.querySelector(".print-document .print-code");
+            expect(block?.textContent).toBe(code);
+            expect(block?.querySelectorAll(".print-code-line")).toHaveLength(500);
+            expect(block?.lastElementChild?.getAttribute("data-line-number")).toBe("500");
+            expect(block?.querySelector(".tok-keyword")?.textContent ?? null).toBe(filename.endsWith(".js") ? "const" : null);
+            expect(block?.querySelector("tag")).toBeNull();
+        });
+        await context.editor.printFile()?.();
+        expect(print).toHaveBeenCalledOnce();
+        expect(context.editor.sourceMode()).toBe(true);
+        expect(source().state.doc.toString()).toBe(code);
+        expect(context.editor.fileModified()).toBe(true);
+        expect(writes()).toHaveLength(0);
+        window.dispatchEvent(new Event("afterprint"));
+    });
+
     it("keeps plain text fully editable with search, save and reload, without a view toggle", async () => {
         diskContent = "plain text";
         await mount(false);
         expect(context.editor.sourceMode()).toBe(true);
+        expect(context.editor.printFile()).not.toBeNull();
         expect(sourceButton()).toBeNull();
         expect(context.editor.toggleSourceMode()).toBeNull();
         source().dispatch({ changes: { from: 10, insert: " edited" } });

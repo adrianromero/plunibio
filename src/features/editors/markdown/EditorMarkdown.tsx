@@ -11,7 +11,7 @@ import ViewMarkdown from "./ViewMarkdown";
 const extensions = [markdown()];
 
 export function EditorMarkdown(): JSX.Element {
-    return <EditorTextView view={ViewMarkdown} extensions={extensions} />;
+    return <EditorTextView printable view={ViewMarkdown} extensions={extensions} />;
 }
 
 export default EditorMarkdown;

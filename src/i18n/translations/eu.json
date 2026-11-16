@@ -1,11 +1,13 @@
 {
     "editor": {
+        "printFailed": "Ezin izan da dokumentua inprimatzeko prestatu. Egiaztatu grafikoak eta irudiak behar bezala kargatu direla.",
         "emptyMermaid": "Dokumentua hutsik dago. Gehitu Mermaid kodea kode moduan diagrama bat sortzeko.",
         "emptyECharts": "Dokumentua hutsik dago. Gehitu ECharts konfigurazio bat kode moduan grafiko bat sortzeko.",
         "loading": "{{ filename }} kargatzen...",
         "saving": "{{ filename }} gordetzen..."
     },
     "toolbar": {
+        "print": "Inprimatu…",
         "showSource": "Erakutsi iturburu-kodea",
         "showView": "Erakutsi dokumentuaren ikuspegia",
         "back": "Atzera",

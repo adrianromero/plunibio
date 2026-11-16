@@ -11,7 +11,7 @@ import ViewMermaid from "./ViewMermaid";
 const extensions = [mermaidLanguageSupport];
 
 export function EditorMermaid(): JSX.Element {
-    return <EditorTextView view={ViewMermaid} extensions={extensions} />;
+    return <EditorTextView printable view={ViewMermaid} extensions={extensions} />;
 }
 
 export default EditorMermaid;

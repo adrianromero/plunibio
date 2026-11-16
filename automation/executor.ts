@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdir, unlink } from "node:fs/promises";
+import { mkdir, unlink, readFile, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { promisify } from "node:util";
 import { captureGnomeWindow } from "./native-capture";
@@ -399,6 +399,43 @@ async function executeStep(step: FlowStep, context: ExecutionContext): Promise<v
         }
         case "refresh": {
             await browser.refresh();
+            break;
+        }
+        case "printPdf": {
+            if (context.verifyOnly) break;
+            const filename = resolve(context.outputDir, step.name.endsWith(".pdf") ? step.name : `${step.name}.pdf`);
+            await mkdir(dirname(filename), { recursive: true });
+            await unlink(filename).catch((error: NodeJS.ErrnoException) => { if (error.code !== "ENOENT") throw error; });
+            // Exercise the real shortcut, snapshot preparation and native print
+            // operation. Only the destination is supplied by this debug session.
+            await browser.execute((outputPath: string) => {
+                document.documentElement.dataset.automationPrintOutput = outputPath;
+            }, filename);
+            await browser.keys(["Control", "p"]);
+            await browser.waitUntil(async () => {
+                const error = await browser.execute(() => document.querySelector("[data-testid='message-dialog'][open]")?.textContent);
+                if (error) throw new Error(`Print preparation failed: ${error}`);
+                try {
+                    const bytes = await readFile(filename);
+                    return bytes.subarray(0, 5).toString() === "%PDF-" && bytes.subarray(-1024).includes(Buffer.from("%%EOF"));
+                }
+                catch { return false; }
+            }, { timeout: 60000, timeoutMsg: "The native PDF print did not finish" });
+            const bytes = await readFile(filename);
+            if (bytes.subarray(0, 5).toString() !== "%PDF-") throw new Error("Printing did not produce a PDF");
+            if (step.containsText?.length) {
+                const { stdout } = await execFileAsync("pdftotext", [step.textMode === "layout" ? "-layout" : "-raw", filename, "-"]);
+                const normalized = stdout.replace(/\s+/g, " ");
+                for (const text of step.containsText) {
+                    if (!normalized.includes(text)) throw new Error(`PDF is missing expected text: ${text}`);
+                }
+            }
+            const metrics = await browser.execute(() => {
+                const text = document.querySelector(".ProseMirror p");
+                return { theme: document.documentElement.dataset.theme, fontSize: text ? getComputedStyle(text).fontSize : null };
+            });
+            await writeFile(`${filename}.json`, JSON.stringify(metrics, null, 2));
+            console.log(`Printed PDF: ${filename}`);
             break;
         }
         case "capture": {

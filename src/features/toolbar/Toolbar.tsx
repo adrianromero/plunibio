@@ -30,6 +30,7 @@ export function Toolbar() {
             sourceMode,
             sourceModeAvailable,
             toggleSourceMode,
+            printFile,
             saveFile,
             reloadFile,
             toggleSidebar,
@@ -124,6 +125,14 @@ export function Toolbar() {
                             onSelect: () => {
                                 void saveFile()?.();
                             },
+                        },
+                        {
+                            kind: "action",
+                            id: "print",
+                            label: t("toolbar.print"),
+                            shortcut: "CTRL+P",
+                            disabled: () => printFile() === null,
+                            onSelect: () => { void printFile()?.(); },
                         },
                         {
                             kind: "section",

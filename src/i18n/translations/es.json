@@ -1,11 +1,13 @@
 {
     "editor": {
+        "printFailed": "No se ha podido preparar el documento para imprimir. Comprueba que los gráficos y las imágenes se hayan cargado correctamente.",
         "emptyMermaid": "El documento está vacío. Añade código Mermaid en el modo código para generar un diagrama.",
         "emptyECharts": "El documento está vacío. Añade una configuración ECharts en el modo código para generar un gráfico.",
         "loading": "Cargando {{ filename }}...",
         "saving": "Guardando {{ filename }}..."
     },
     "toolbar": {
+        "print": "Imprimir…",
         "showSource": "Mostrar código fuente",
         "showView": "Mostrar vista del documento",
         "back": "Atrás",

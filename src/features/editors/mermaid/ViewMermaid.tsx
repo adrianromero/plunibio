@@ -22,6 +22,10 @@ export function ViewMermaid(): JSX.Element {
     const [loading, setLoading] = createSignal(false);
     let stopObserving: (() => void) | undefined;
     const refresh = (): void => {
+        if (previewRef) {
+            previewRef.dataset.printLanguage = "mermaid";
+            previewRef.dataset.printSource = content ?? "";
+        }
         const version = ++generation;
         const source = content;
         const theme = document.documentElement.dataset.theme;
@@ -85,7 +89,7 @@ export function ViewMermaid(): JSX.Element {
                         </div>
                     </Show>
                     <div
-                        ref={previewRef}
+                        ref={previewRef} data-print-content
                         class={`mermaid-preview ${styles.preview}`}
                         data-testid="mermaid-preview"
                         role="region"

@@ -1,0 +1,45 @@
+{
+    "name": "Print QA: echarts from dark theme",
+    "app": {
+        "basePath": "examples/plunibio-docs-lab",
+        "workspaceMode": "temporary-copy",
+        "file": "ventas.echarts.json",
+        "width": 1024,
+        "height": 768,
+        "preferences": {
+            "theme": "dark",
+            "locale": "es",
+            "typography": "sans-serif",
+            "sidebarVisible": false
+        }
+    },
+    "outputDir": "automation/output/printing",
+    "timeoutMs": 20000,
+    "steps": [
+        {
+            "action": "wait",
+            "target": {
+                "using": "testId",
+                "value": "echarts-view"
+            },
+            "state": "visible"
+        },
+        {
+            "action": "wait",
+            "target": {
+                "using": "css",
+                "value": "[data-toolbar-menu-entry=\"print\"]"
+            },
+            "state": "enabled"
+        },
+        {
+            "action": "printPdf",
+            "name": "echarts",
+            "containsText": [
+                "Ventas por trimestre",
+                "T1",
+                "T4"
+            ]
+        }
+    ]
+}
