@@ -112,7 +112,10 @@ describe("EditorECharts", () => {
         expect(chart.setOption).not.toHaveBeenCalled();
         await context.editor.saveFile()?.();
         expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: invalid });
-        await toggle();
+        const action = root.querySelector<HTMLButtonElement>('[data-testid="message-view"] button');
+        expect(action?.textContent).toBe("Show source code");
+        action?.click();
+        await vi.waitFor(() => expect(context.editor.sourceMode()).toBe(true));
         expect(source().state.doc.toString()).toBe(invalid);
         source().dispatch({ changes: { from: 0, to: source().state.doc.length, insert: "{}" } });
         await toggle();
@@ -148,7 +151,8 @@ describe("EditorECharts", () => {
         await mount();
         const message = root.querySelector('[data-testid="message-view"]');
         expect(message?.getAttribute("data-message-kind")).toBe("status");
-        expect(message?.textContent).toContain("Add an ECharts configuration in code mode");
+        expect(message?.textContent).toContain("Add an ECharts configuration to get started.");
+        expect(message?.querySelector("button")?.textContent).toBe("Show source code");
         expect(root.querySelector<HTMLElement>('[data-testid="echarts-view"]')?.style.display).toBe("none");
         expect(chart.setOption).not.toHaveBeenCalled();
         expect(frontendLog).not.toHaveBeenCalledWith("error", expect.anything(), expect.anything());

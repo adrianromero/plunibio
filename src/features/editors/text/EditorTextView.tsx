@@ -6,7 +6,7 @@
 import { basicSetup } from "codemirror";
 import { EditorView } from "@codemirror/view";
 import type { LanguageSupport } from "@codemirror/language";
-import { batch, createEffect, createSignal, onCleanup, Show, type Component, type JSX } from "solid-js";
+import { batch, createEffect, createSignal, Match, onCleanup, Show, Switch, type Component, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { useAppContext } from "@/app/AppContext";
 import {
@@ -66,6 +66,7 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     const {
         main: { basepath, showAppMessage },
         editor: {
+            reloadFile,
             setPrintFile,
             printFile,
             setSearchFile,
@@ -225,6 +226,10 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
         })();
         return pendingSwitch;
     };
+    const reloadAction = () => {
+        const reload = reloadFile();
+        return reload ? { label: t("toolbar.reload"), run: reload } : undefined;
+    };
     const print = async (): Promise<void> => {
         if (printing || !ready()) return;
         printing = true;
@@ -302,11 +307,23 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
 
     return (
         <section ref={studioRef} class={styles.studio} data-testid="text-view">
-            <Show when={error() || (!sourceMode() && (viewError() || emptyMessage()))}>
-                <MessageView info={error() || viewError() ? "error" : "status"}>
-                    {error() ?? viewError() ?? emptyMessage() ?? t("errors.unknown")}
-                </MessageView>
-            </Show>
+            <Switch>
+                <Match when={error()}>
+                    {(message) => <MessageView action={reloadAction()}>{message()}</MessageView>}
+                </Match>
+                <Match when={!sourceMode() && (viewError() || emptyMessage())}>
+                    {(message) => (
+                        <MessageView
+                            info={viewError() ? "error" : "status"}
+                            action={props.view && view && ready()
+                                ? { label: t("toolbar.showSource"), run: toggleSourceMode }
+                                : undefined}
+                        >
+                            {message()}
+                        </MessageView>
+                    )}
+                </Match>
+            </Switch>
             <section
                 class={styles.studio}
                 style={{ display: sourceMode() && !error() ? undefined : "none" }}

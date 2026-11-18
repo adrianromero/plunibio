@@ -75,6 +75,7 @@ describe("EditorTextView mode and document lifecycle", () => {
         return editor;
     };
     const sourceButton = (): HTMLButtonElement | null => root.querySelector('[data-testid="source-mode-toggle"]');
+    const messageButton = (): HTMLButtonElement | null => root.querySelector('[data-testid="message-view"] button');
     const writes = () => vi.mocked(invoke).mock.calls.filter(([command]) => command === "write_file");
     beforeEach(() => {
         diskContent = "---\ntitle: Example\n---\n# Original\n\nText\n";
@@ -236,8 +237,12 @@ describe("EditorTextView mode and document lifecycle", () => {
         await context.editor.reloadFile()?.();
         expect(root.querySelector('[data-testid="message-view"]')).not.toBeNull();
         expect(context.editor.toggleSourceMode()).toBeNull();
+        expect(sourceButton()?.disabled).toBe(true);
+        expect(messageButton()?.textContent).toBe("Reload");
         failRead = false;
-        await context.editor.reloadFile()?.();
+        messageButton()?.click();
+        await vi.waitFor(() => expect(source().state.doc.toString()).toBe(diskContent));
+        expect(messageButton()).toBeNull();
         expect(context.editor.sourceMode()).toBe(true);
         diskContent = "# Another\n";
         context.main.setFilename("another.md");
@@ -426,7 +431,9 @@ describe("EditorTextView mode and document lifecycle", () => {
                 error: expect.stringContaining("Markdown creation failed"),
             });
             expect(context.editor.fileModified()).toBe(true);
-            await toggle();
+            expect(messageButton()?.textContent).toBe("Show source code");
+            messageButton()?.click();
+            await vi.waitFor(() => expect(source().hasFocus).toBe(true));
             expect(source().state.doc.toString()).toBe(text);
             await toggle();
             expect(root.querySelector('[data-testid="message-view"]')).toBeNull();

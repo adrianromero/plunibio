@@ -115,15 +115,16 @@ describe("EditorMermaid", () => {
     });
 
     it.each([
-        ["en", "The diagram could not be rendered"],
-        ["es", "No se ha podido generar el diagrama"],
-    ])("shows a localized MessageView (%s), logs technical details and recovers", async (locale, message) => {
+        ["en", "The diagram could not be rendered", "Show source code"],
+        ["es", "No se ha podido generar el diagrama", "Mostrar código fuente"],
+    ])("shows a localized MessageView (%s), logs technical details and recovers", async (locale, message, action) => {
         localStorage.setItem("plunibio.locale", locale);
         diskContent = "invalid diagram";
         mermaid.render.mockRejectedValueOnce(new Error("Unexpected <script>bad()</script>\nDetails"));
         await mount();
         await vi.waitFor(() => expect(root.querySelector('[data-testid="message-view"]')?.textContent)
             .toContain(message));
+        expect(root.querySelector('[data-testid="message-view"] button')?.textContent).toBe(action);
         expect(root.querySelector('[data-testid="message-view"]')?.textContent).not.toContain("Unexpected");
         expect(frontendLog).toHaveBeenCalledWith("error", "mermaid.render.failed", {
             error: expect.stringContaining("Unexpected <script>bad()</script>\nDetails"),
@@ -143,14 +144,17 @@ describe("EditorMermaid", () => {
         await mount();
         const message = root.querySelector('[data-testid="message-view"]');
         expect(message?.getAttribute("data-message-kind")).toBe("status");
-        expect(message?.textContent).toContain("Add Mermaid code in code mode");
+        expect(message?.textContent).toContain("Add Mermaid code to get started.");
         expect(root.querySelector<HTMLElement>('[data-testid="mermaid-view"]')?.style.display).toBe("none");
         expect(mermaid.render).not.toHaveBeenCalled();
         expect(frontendLog).not.toHaveBeenCalledWith("error", expect.anything(), expect.anything());
         expect(context.editor.fileModified()).toBe(false);
         await context.editor.saveFile()?.();
         expect(writes()[writes().length - 1]?.[1]).toMatchObject({ content: empty });
-        await toggle();
+        const action = message?.querySelector("button");
+        expect(action?.textContent).toBe("Show source code");
+        action?.click();
+        await vi.waitFor(() => expect(source().hasFocus).toBe(true));
         expect(source().state.doc.toString()).toBe(empty);
         expect(root.querySelector('[data-testid="message-view"]')).toBeNull();
         const updated = "flowchart LR\n A --> B";
