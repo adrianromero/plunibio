@@ -83,11 +83,6 @@
     list-style: none;
 }
 
-.variant .externalStage {
-    min-height: auto;
-    justify-content: flex-start;
-}
-
 .note {
     margin: 0;
     color: var(--color-text-muted);

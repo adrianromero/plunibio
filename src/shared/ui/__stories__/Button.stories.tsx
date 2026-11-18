@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import ExternalLink from "lucide-solid/icons/external-link";
 import File from "lucide-solid/icons/file";
 import Folder from "lucide-solid/icons/folder";
 import RefreshCw from "lucide-solid/icons/refresh-cw";
 import Save from "lucide-solid/icons/save";
 import type { JSX } from "solid-js";
 import breadcrumbStyles from "@/features/navigation/FileBreadcrumb.module.css";
+import MessageView from "@/shared/errors/MessageView";
 import styles from "./Button.stories.module.css";
-import externalFileStyles from "@/features/editors/external/EditorExternalFile.module.css";
 import folderStyles from "@/features/editors/folder/EditorFolder.module.css";
 
 const meta = {
@@ -283,40 +282,19 @@ export const ComponentScoped: Story = {
                     />
                 </Variant>
 
-                <Variant
-                    name="Abrir archivo externo · estilo mixto"
-                    source="theme.css · .stdButton + EditorExternalFile.module.css · .externalFile button"
-                    note="La base y los estados son globales; el módulo del componente añade el espaciado entre icono y texto."
-                >
-                    <ButtonStates
-                        normal={
-                            <div
-                                class={`${externalFileStyles.externalFile} ${styles.externalStage}`}
-                            >
-                                <button class="stdButton">
-                                    <ExternalLink class="actionIcon" /> Abrir archivo
-                                </button>
-                            </div>
-                        }
-                        selected={
-                            <div
-                                class={`${externalFileStyles.externalFile} ${styles.externalStage}`}
-                            >
-                                <button class="stdButton selected">
-                                    <ExternalLink class="actionIcon" /> Abrir archivo
-                                </button>
-                            </div>
-                        }
-                        disabled={
-                            <div
-                                class={`${externalFileStyles.externalFile} ${styles.externalStage}`}
-                            >
-                                <button class="stdButton" disabled={true}>
-                                    <ExternalLink class="actionIcon" /> Abrir archivo
-                                </button>
-                            </div>
-                        }
-                    />
+                <Variant name="Abrir archivo externo" source="MessageView · action">
+                    <MessageView
+                        info="status"
+                        action={{ label: "Abrir con la aplicación predeterminada", run: () => undefined }}
+                    >
+                        Este formato se abre en una aplicación externa.
+                    </MessageView>
+                    <MessageView
+                        info="status"
+                        action={{ label: "Abriendo...", run: () => undefined, disabled: true }}
+                    >
+                        Este formato se abre en una aplicación externa.
+                    </MessageView>
                 </Variant>
             </section>
         </div>

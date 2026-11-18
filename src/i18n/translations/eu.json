@@ -165,6 +165,7 @@
         "divider": "Bereizlea"
     },
     "externalFile": {
+        "description": "Formatu hau kanpoko aplikazio batean irekitzen da.",
         "open": "Ireki aplikazio lehenetsiarekin",
         "opening": "Irekitzen..."
     },

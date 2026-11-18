@@ -165,6 +165,7 @@
         "divider": "Separador"
     },
     "externalFile": {
+        "description": "Aquest format s'obre en una aplicació externa.",
         "open": "Obre amb l'aplicació predeterminada",
         "opening": "S'està obrint..."
     },

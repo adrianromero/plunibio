@@ -12,7 +12,13 @@ import { useI18N } from "@/i18n/Localization";
 type MessageViewProps = {
     children: JSX.Element;
     info?: MessageInfoKind;
-    action?: { label: string; run: () => void | Promise<void> };
+    testId?: string;
+    action?: {
+        label: string;
+        run: () => void | Promise<void>;
+        disabled?: boolean;
+        testId?: string;
+    };
 };
 
 export function MessageView(props: MessageViewProps): JSX.Element {
@@ -24,7 +30,7 @@ export function MessageView(props: MessageViewProps): JSX.Element {
     return (
         <section
             class={`${styles.messageView} ${styles[info().class]}`}
-            data-testid="message-view"
+            data-testid={props.testId ?? "message-view"}
             data-message-kind={kind()}
         >
             <div class={styles.messageContent}>
@@ -34,7 +40,13 @@ export function MessageView(props: MessageViewProps): JSX.Element {
                     <div>{props.children}</div>
                 </div>
                 <Show when={props.action}>{(action) => (
-                    <button type="button" class="stdButton" onClick={() => void action().run()}>
+                    <button
+                        type="button"
+                        class="stdButton"
+                        data-testid={action().testId}
+                        disabled={action().disabled}
+                        onClick={() => void action().run()}
+                    >
                         {action().label}
                     </button>
                 )}</Show>

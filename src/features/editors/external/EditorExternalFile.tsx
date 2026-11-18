@@ -5,11 +5,10 @@
 
 import { createSignal, type JSX } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import ExternalLink from "lucide-solid/icons/external-link";
 import { useAppContext } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
+import MessageView from "@/shared/errors/MessageView";
 import { useI18N } from "@/i18n/Localization";
-import styles from "./EditorExternalFile.module.css";
 
 export function EditorExternalFile(): JSX.Element {
     const { t } = useI18N();
@@ -38,20 +37,18 @@ export function EditorExternalFile(): JSX.Element {
     };
 
     return (
-        <section class="scrollingView" data-testid="external-file-view">
-            <div class={`contentView ${styles.externalFile}`}>
-                <button
-                    class="stdButton"
-                    data-testid="open-external-file"
-                    type="button"
-                    disabled={opening()}
-                    onClick={() => void openFile()}
-                >
-                    <ExternalLink class="actionIcon" aria-hidden="true" />
-                    <span>{t(opening() ? "externalFile.opening" : "externalFile.open")}</span>
-                </button>
-            </div>
-        </section>
+        <MessageView
+            info="status"
+            testId="external-file-view"
+            action={{
+                label: t(opening() ? "externalFile.opening" : "externalFile.open"),
+                run: openFile,
+                disabled: opening(),
+                testId: "open-external-file",
+            }}
+        >
+            {t("externalFile.description")}
+        </MessageView>
     );
 }
 
