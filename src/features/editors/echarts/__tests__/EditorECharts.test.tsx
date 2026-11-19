@@ -151,7 +151,7 @@ describe("EditorECharts", () => {
         await mount();
         const message = root.querySelector('[data-testid="message-view"]');
         expect(message?.getAttribute("data-message-kind")).toBe("status");
-        expect(message?.textContent).toContain("Add an ECharts configuration to get started.");
+        expect(message?.textContent).toContain("Add the chart configuration in JSON to get started.");
         expect(message?.querySelector("button")?.textContent).toBe("Show source code");
         expect(root.querySelector<HTMLElement>('[data-testid="echarts-view"]')?.style.display).toBe("none");
         expect(chart.setOption).not.toHaveBeenCalled();

@@ -5,6 +5,8 @@
 
 import File from "lucide-solid/icons/file";
 import FileText from "lucide-solid/icons/file-text";
+import FileChartColumn from "lucide-solid/icons/file-chart-column";
+import FileChartLine from "lucide-solid/icons/file-chart-line";
 import Folder from "lucide-solid/icons/folder";
 import { createEffect, createSignal, createUniqueId, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -13,8 +15,8 @@ import dialogStyles from "@/shared/ui/dialog/Dialog.module.css";
 import ModalDialog from "@/shared/ui/dialog/ModalDialog";
 import styles from "./CreateEntryDialog.module.css";
 import { frontendLog } from "@/shared/logging/frontendLog";
-
-export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
+import type { CreateEntryKind } from "@/app/AppContext";
+import { templateExtensions } from "./NewFileTemplates";
 
 type CreateEntryDialogProps = {
     open: boolean;
@@ -29,6 +31,15 @@ function initialName(kind: CreateEntryKind): string {
     return "";
 }
 
+const icons = {
+    directory: Folder,
+    markdown: FileText,
+    text: FileText,
+    diagram: FileChartLine,
+    chart: FileChartColumn,
+    other: File,
+};
+
 export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
     const { t } = useI18N();
     const titleId = createUniqueId();
@@ -38,11 +49,16 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
     let wasOpen = false;
 
     const isDirectory = (): boolean => props.kind === "directory";
-    const icon = () => (isDirectory() ? Folder : props.kind === "other" ? File : FileText);
+    const templateExtension = () =>
+        props.kind === "diagram" || props.kind === "chart" ? templateExtensions[props.kind] : "";
+    const canSubmit = (): boolean => {
+        const value = name().trim().toLowerCase();
+        return value.length > 0 && value !== templateExtension();
+    };
 
     createEffect(() => {
         if (props.open && !wasOpen) {
-            const value = initialName(props.kind);
+            const value = templateExtension() || initialName(props.kind);
             setName(value);
             queueMicrotask(() => {
                 inputRef.focus();
@@ -53,8 +69,10 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
     });
 
     const submit = (): void => {
-        if (name().trim().length === 0) return;
-        props.onConfirm(name());
+        if (!canSubmit()) return;
+        const extension = templateExtension();
+        const value = extension ? name().trim() : name();
+        props.onConfirm(value.toLowerCase().endsWith(extension) ? value : value + extension);
     };
 
     return (
@@ -74,7 +92,7 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
                 }}
             >
                 <div class={`${dialogStyles.iconRow} ${styles.iconRow}`}>
-                    <Dynamic component={icon()} class={dialogStyles.icon} aria-hidden="true" />
+                    <Dynamic component={icons[props.kind]} class={dialogStyles.icon} aria-hidden="true" />
                 </div>
                 <h2 id={titleId} class={dialogStyles.title}>
                     {isDirectory() ? t("folder.createFolder") : t("folder.createFile")}
@@ -94,7 +112,7 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
                     />
                 </div>
                 <div class={dialogStyles.actions}>
-                    <button class="stdButton" type="submit" disabled={name().trim().length === 0}>
+                    <button class="stdButton" type="submit" disabled={!canSubmit()}>
                         {t("dialog.confirm")}
                     </button>
                     <button class="stdButton" type="button" onClick={props.onCancel}>

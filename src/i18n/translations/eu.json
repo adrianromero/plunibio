@@ -1,8 +1,8 @@
 {
     "editor": {
         "printFailed": "Ezin izan da dokumentua inprimatzeko prestatu. Egiaztatu grafikoak eta irudiak behar bezala kargatu direla.",
-        "emptyMermaid": "Dokumentua hutsik dago. Hasteko, gehitu Mermaid kodea.",
-        "emptyECharts": "Dokumentua hutsik dago. Hasteko, gehitu ECharts konfigurazio bat.",
+        "emptyMermaid": "Dokumentua hutsik dago. Hasteko, idatzi diagramaren definizioa.",
+        "emptyECharts": "Dokumentua hutsik dago. Hasteko, gehitu grafikoaren konfigurazioa JSON formatuan.",
         "loading": "{{ filename }} kargatzen...",
         "saving": "{{ filename }} gordetzen..."
     },
@@ -38,6 +38,11 @@
         "unsavedChanges": "Gorde gabeko aldaketak",
         "pathNavigation": "Uneko fitxategiaren bide-izena"
     },
+    "fileTemplates": {
+        "diagramStart": "Hasiera",
+        "diagramEnd": "Amaiera",
+        "chartGroup": "{{ letter }} taldea"
+    },
     "folder": {
         "actions": "Ekintzak",
         "sortBy": "Ordenatu honen arabera",
@@ -53,6 +58,8 @@
         "newFolder": "Karpeta berria",
         "newMarkdown": "Markdown fitxategi berria",
         "newText": "Testu-fitxategi berria",
+        "newDiagram": "Diagrama berria",
+        "newChart": "Grafiko berria",
         "newOther": "Bestelako fitxategi berria",
         "root": "Hasiera",
         "loading": "{{ path }} kargatzen...",
@@ -128,7 +135,7 @@
         "linkActions": "Estekaren ekintzak",
         "imageActions": "Irudiaren ekintzak",
         "mathActions": "Lerroko formularen ekintzak",
-        "mathExpression": "LaTeX adierazpena",
+        "mathExpression": "Adierazpen matematikoa",
         "editMath": "Editatu adierazpena",
         "copyMath": "Kopiatu adierazpena",
         "linkAddress": "Estekaren helbidea",
@@ -157,10 +164,10 @@
         "codePreviewLoading": "Kargatzen...",
         "codePreviewMermaidError": "Ezin izan da diagrama irudikatu",
         "codePreviewEChartsError": "Ezin izan da grafikoa irudikatu",
-        "codePreviewEChartsObjectError": "ECharts aukera JSON objektu bat izan behar da",
-        "echartsBlock": "ECharts",
+        "codePreviewEChartsObjectError": "Grafikoaren konfigurazioak JSON objektu bat izan behar du",
+        "echartsBlock": "Grafikoa",
         "mathBlock": "Formula",
-        "mermaidBlock": "Mermaid",
+        "mermaidBlock": "Diagrama",
         "quote": "Aipua",
         "divider": "Bereizlea"
     },

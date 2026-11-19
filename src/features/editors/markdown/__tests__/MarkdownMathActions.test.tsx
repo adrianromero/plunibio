@@ -95,11 +95,11 @@ describe("MarkdownMathActions", () => {
                 .querySelector('button[aria-label="Edit expression"]')
                 ?.getAttribute("title")
         ).toBe("Edit expression");
-        expect(actions.querySelector('input[aria-label="LaTeX expression"]')).toBeNull();
+        expect(actions.querySelector('input[aria-label="Mathematical expression"]')).toBeNull();
         actions.querySelector<HTMLButtonElement>('button[aria-label="Edit expression"]')!.click();
         const input = await vi.waitFor(() => {
             const element = actions.querySelector<HTMLInputElement>(
-                'input[aria-label="LaTeX expression"]'
+                'input[aria-label="Mathematical expression"]'
             );
             expect(element).not.toBeNull();
             return element!;
@@ -130,7 +130,7 @@ describe("MarkdownMathActions", () => {
             .click();
         const reopenedInput = await vi.waitFor(() => {
             const element = reopenedActions.querySelector<HTMLInputElement>(
-                'input[aria-label="LaTeX expression"]'
+                'input[aria-label="Mathematical expression"]'
             );
             expect(element).not.toBeNull();
             return element!;
@@ -143,7 +143,7 @@ describe("MarkdownMathActions", () => {
             expect(crepe?.getMarkdown().trim()).toBe("Before $b^2 + c^2$ after");
             expect(
                 root?.querySelector(
-                    'form[aria-label="Inline math actions"] input[aria-label="LaTeX expression"]'
+                    'form[aria-label="Inline math actions"] input[aria-label="Mathematical expression"]'
                 )
             ).toBeNull();
         });
@@ -171,7 +171,7 @@ describe("MarkdownMathActions", () => {
 
         await vi.waitFor(() => {
             const explicitInput = root?.querySelector<HTMLInputElement>(
-                'form[aria-label="Inline math actions"] input[aria-label="LaTeX expression"]'
+                'form[aria-label="Inline math actions"] input[aria-label="Mathematical expression"]'
             );
             expect(explicitInput?.value).toBe("b^2 + c^2");
         });

@@ -14,7 +14,7 @@ import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
-import { useAppContext } from "@/app/AppContext";
+import { useAppContext, type CreateEntryKind } from "@/app/AppContext";
 import { translateAppError } from "@/shared/errors/AppError";
 import { useI18N } from "@/i18n/Localization";
 import type { DirectoryEntry } from "@/backend/rusttypes";
@@ -23,7 +23,8 @@ import { Dynamic } from "solid-js/web";
 import { sortFolderEntries } from "./FolderSorting";
 import { nextFolderSort } from "@/preferences/FolderSortPreferences";
 import EditorFolderSidebar from "./EditorFolderSidebar";
-import CreateEntryDialog, { type CreateEntryKind } from "./CreateEntryDialog";
+import CreateEntryDialog from "./CreateEntryDialog";
+import { newFileContent } from "./NewFileTemplates";
 import MessageView from "@/shared/errors/MessageView";
 import EditorImage from "@/features/editors/image/EditorImage";
 import EditorMarkdown from "@/features/editors/markdown/EditorMarkdown";
@@ -133,9 +134,10 @@ export function EditorFolder(): JSX.Element {
         let errorMessage: string | null = null;
         let createdFilename: string | null = null;
         try {
+            const content = newFileContent(kind, t);
             const entry = await invoke<DirectoryEntry>(
                 kind === "directory" ? "create_directory" : "create_file",
-                { basepath: currentBasepath, filename: currentFilename, name }
+                { basepath: currentBasepath, filename: currentFilename, name, ...(content === undefined ? {} : { content }) }
             );
             frontendLog("debug", "entry.created", { kind });
             if (basepath() !== currentBasepath || filename() !== currentFilename) return;

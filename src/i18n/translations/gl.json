@@ -1,8 +1,8 @@
 {
     "editor": {
         "printFailed": "Non se puido preparar o documento para imprimir. Comproba que os gráficos e as imaxes se cargaron correctamente.",
-        "emptyMermaid": "O documento está baleiro. Engade código Mermaid para comezar.",
-        "emptyECharts": "O documento está baleiro. Engade unha configuración ECharts para comezar.",
+        "emptyMermaid": "O documento está baleiro. Escribe a definición do diagrama para comezar.",
+        "emptyECharts": "O documento está baleiro. Engade a configuración do gráfico en JSON para comezar.",
         "loading": "Cargando {{ filename }}...",
         "saving": "Gardando {{ filename }}..."
     },
@@ -38,6 +38,11 @@
         "unsavedChanges": "Cambios sen gardar",
         "pathNavigation": "Ruta do ficheiro actual"
     },
+    "fileTemplates": {
+        "diagramStart": "Inicio",
+        "diagramEnd": "Fin",
+        "chartGroup": "Grupo {{ letter }}"
+    },
     "folder": {
         "actions": "Accións",
         "sortBy": "Ordenar por",
@@ -53,6 +58,8 @@
         "newFolder": "Novo cartafol",
         "newMarkdown": "Novo ficheiro Markdown",
         "newText": "Novo ficheiro de texto",
+        "newDiagram": "Novo diagrama",
+        "newChart": "Novo gráfico",
         "newOther": "Outro ficheiro novo",
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
@@ -128,7 +135,7 @@
         "linkActions": "Accións da ligazón",
         "imageActions": "Accións da imaxe",
         "mathActions": "Accións da fórmula en liña",
-        "mathExpression": "Expresión LaTeX",
+        "mathExpression": "Expresión matemática",
         "editMath": "Editar expresión",
         "copyMath": "Copiar expresión",
         "linkAddress": "Enderezo da ligazón",
@@ -157,10 +164,10 @@
         "codePreviewLoading": "Cargando...",
         "codePreviewMermaidError": "Non se puido representar o diagrama",
         "codePreviewEChartsError": "Non se puido representar o gráfico",
-        "codePreviewEChartsObjectError": "A opción de ECharts debe ser un obxecto JSON",
-        "echartsBlock": "ECharts",
+        "codePreviewEChartsObjectError": "A configuración do gráfico debe ser un obxecto JSON",
+        "echartsBlock": "Gráfico",
         "mathBlock": "Fórmula",
-        "mermaidBlock": "Mermaid",
+        "mermaidBlock": "Diagrama",
         "quote": "Cita",
         "divider": "Separador"
     },

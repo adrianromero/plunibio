@@ -144,7 +144,7 @@ describe("EditorMermaid", () => {
         await mount();
         const message = root.querySelector('[data-testid="message-view"]');
         expect(message?.getAttribute("data-message-kind")).toBe("status");
-        expect(message?.textContent).toContain("Add Mermaid code to get started.");
+        expect(message?.textContent).toContain("Write the diagram definition to get started.");
         expect(root.querySelector<HTMLElement>('[data-testid="mermaid-view"]')?.style.display).toBe("none");
         expect(mermaid.render).not.toHaveBeenCalled();
         expect(frontendLog).not.toHaveBeenCalledWith("error", expect.anything(), expect.anything());

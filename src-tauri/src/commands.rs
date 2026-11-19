@@ -755,11 +755,12 @@ pub(crate) async fn create_file(
     basepath: String,
     filename: String,
     name: String,
+    content: Option<String>,
 ) -> Result<DirectoryEntry, AppError> {
     validate_entry_name(&name)?;
     let (base, parent) = resolve_existing_path(&basepath, &filename).await?;
     let path = parent.join(&name);
-    let file = tokio::fs::OpenOptions::new()
+    let mut file = tokio::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(&path)
@@ -767,6 +768,23 @@ pub(crate) async fn create_file(
         .map_err(|error| {
             create_error("create_file", &name, error, AppErrorCode::CreateFileFailed)
         })?;
+    if let Some(content) = content {
+        let write_result = async {
+            file.write_all(content.as_bytes()).await?;
+            file.flush().await
+        }
+        .await;
+        if let Err(error) = write_result {
+            drop(file);
+            let _ = tokio::fs::remove_file(&path).await;
+            return Err(create_error(
+                "create_file",
+                &name,
+                error,
+                AppErrorCode::CreateFileFailed,
+            ));
+        }
+    }
     let metadata = file.metadata().await.ok();
     created_entry(&base, &path, name, PathKind::File, metadata.as_ref())
 }

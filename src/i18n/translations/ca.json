@@ -1,8 +1,8 @@
 {
     "editor": {
         "printFailed": "No s’ha pogut preparar el document per imprimir. Comprova que els gràfics i les imatges s’hagin carregat correctament.",
-        "emptyMermaid": "El document és buit. Afegeix codi Mermaid per començar.",
-        "emptyECharts": "El document és buit. Afegeix una configuració ECharts per començar.",
+        "emptyMermaid": "El document és buit. Escriu la definició del diagrama per començar.",
+        "emptyECharts": "El document és buit. Afegeix la configuració del gràfic en JSON per començar.",
         "loading": "S'està carregant {{ filename }}...",
         "saving": "S'està desant {{ filename }}..."
     },
@@ -38,6 +38,11 @@
         "unsavedChanges": "Canvis sense desar",
         "pathNavigation": "Ruta del fitxer actual"
     },
+    "fileTemplates": {
+        "diagramStart": "Inici",
+        "diagramEnd": "Fi",
+        "chartGroup": "Grup {{ letter }}"
+    },
     "folder": {
         "actions": "Accions",
         "sortBy": "Ordenar per",
@@ -53,6 +58,8 @@
         "newFolder": "Carpeta nova",
         "newMarkdown": "Fitxer Markdown nou",
         "newText": "Fitxer de text nou",
+        "newDiagram": "Diagrama nou",
+        "newChart": "Gràfic nou",
         "newOther": "Un altre fitxer nou",
         "root": "Inici",
         "loading": "S'està carregant {{ path }}...",
@@ -128,7 +135,7 @@
         "linkActions": "Accions de l'enllaç",
         "imageActions": "Accions de la imatge",
         "mathActions": "Accions de la fórmula en línia",
-        "mathExpression": "Expressió LaTeX",
+        "mathExpression": "Expressió matemàtica",
         "editMath": "Edita l'expressió",
         "copyMath": "Copia l'expressió",
         "linkAddress": "Adreça de l'enllaç",
@@ -157,10 +164,10 @@
         "codePreviewLoading": "S'està carregant...",
         "codePreviewMermaidError": "No s'ha pogut representar el diagrama",
         "codePreviewEChartsError": "No s’ha pogut generar el gràfic",
-        "codePreviewEChartsObjectError": "L’opció d’ECharts ha de ser un objecte JSON",
-        "echartsBlock": "ECharts",
+        "codePreviewEChartsObjectError": "La configuració del gràfic ha de ser un objecte JSON",
+        "echartsBlock": "Gràfic",
         "mathBlock": "Fórmula",
-        "mermaidBlock": "Mermaid",
+        "mermaidBlock": "Diagrama",
         "quote": "Citació",
         "divider": "Separador"
     },

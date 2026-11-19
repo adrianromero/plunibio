@@ -4,6 +4,8 @@
  */
 
 import File from "lucide-solid/icons/file";
+import FileChartColumn from "lucide-solid/icons/file-chart-column";
+import FileChartLine from "lucide-solid/icons/file-chart-line";
 import FilePen from "lucide-solid/icons/file-pen";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
@@ -19,7 +21,15 @@ import { useI18N } from "@/i18n/Localization";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
 import type { FolderSort, FolderSortAttribute } from "@/preferences/FolderSortPreferences";
-import type { CreateEntryKind } from "./CreateEntryDialog";
+import type { CreateEntryKind } from "@/app/AppContext";
+
+const fileActions = [
+    { kind: "markdown", label: "folder.newMarkdown", icon: FilePen, shortcut: "Ctrl+Shift+M" },
+    { kind: "text", label: "folder.newText", icon: FileText, shortcut: "Ctrl+Shift+T" },
+    { kind: "diagram", label: "folder.newDiagram", icon: FileChartLine, shortcut: null },
+    { kind: "chart", label: "folder.newChart", icon: FileChartColumn, shortcut: null },
+    { kind: "other", label: "folder.newOther", icon: File, shortcut: null },
+] as const;
 
 type EditorFolderSidebarProps = {
     disabled: boolean;
@@ -73,40 +83,24 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                     </section>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.createFile")}</h2>
-                        <button
-                            class="stdButton toolbar sidebarAction"
-                            type="button"
-                            data-create-kind="markdown"
-                            title={`${t("folder.newMarkdown")} (CTRL+SHIFT+M)`}
-                            disabled={props.disabled}
-                            onClick={() => props.onCreate("markdown")}
-                        >
-                            <FilePen aria-hidden="true" />
-                            <span class="sidebarActionLabel">{t("folder.newMarkdown")}</span>
-                            <span class="sidebarActionShortcut">Ctrl+Shift+M</span>
-                        </button>
-                        <button
-                            class="stdButton toolbar sidebarAction"
-                            type="button"
-                            data-create-kind="text"
-                            title={`${t("folder.newText")} (CTRL+SHIFT+T)`}
-                            disabled={props.disabled}
-                            onClick={() => props.onCreate("text")}
-                        >
-                            <FileText aria-hidden="true" />
-                            <span class="sidebarActionLabel">{t("folder.newText")}</span>
-                            <span class="sidebarActionShortcut">Ctrl+Shift+T</span>
-                        </button>
-                        <button
-                            class="stdButton toolbar sidebarAction"
-                            type="button"
-                            data-create-kind="other"
-                            disabled={props.disabled}
-                            onClick={() => props.onCreate("other")}
-                        >
-                            <File aria-hidden="true" />
-                            <span class="sidebarActionLabel">{t("folder.newOther")}</span>
-                        </button>
+                        <For each={fileActions}>
+                            {(action) => (
+                                <button
+                                    class="stdButton toolbar sidebarAction"
+                                    type="button"
+                                    data-create-kind={action.kind}
+                                    title={action.shortcut ? `${t(action.label)} (${action.shortcut.toUpperCase()})` : undefined}
+                                    disabled={props.disabled}
+                                    onClick={() => props.onCreate(action.kind)}
+                                >
+                                    <Dynamic component={action.icon} aria-hidden="true" />
+                                    <span class="sidebarActionLabel">{t(action.label)}</span>
+                                    <Show when={action.shortcut}>
+                                        <span class="sidebarActionShortcut">{action.shortcut}</span>
+                                    </Show>
+                                </button>
+                            )}
+                        </For>
                     </section>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.sortBy")}</h2>

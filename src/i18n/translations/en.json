@@ -1,8 +1,8 @@
 {
     "editor": {
         "printFailed": "Unable to prepare the document for printing. Check that charts and images have loaded correctly.",
-        "emptyMermaid": "The document is empty. Add Mermaid code to get started.",
-        "emptyECharts": "The document is empty. Add an ECharts configuration to get started.",
+        "emptyMermaid": "The document is empty. Write the diagram definition to get started.",
+        "emptyECharts": "The document is empty. Add the chart configuration in JSON to get started.",
         "loading": "Loading {{ filename }}...",
         "saving": "Saving {{ filename }}..."
     },
@@ -38,6 +38,11 @@
         "unsavedChanges": "Unsaved changes",
         "pathNavigation": "Current file path"
     },
+    "fileTemplates": {
+        "diagramStart": "Start",
+        "diagramEnd": "End",
+        "chartGroup": "Group {{ letter }}"
+    },
     "folder": {
         "actions": "Actions",
         "sortBy": "Sort by",
@@ -53,6 +58,8 @@
         "newFolder": "New folder",
         "newMarkdown": "New Markdown file",
         "newText": "New text file",
+        "newDiagram": "New diagram",
+        "newChart": "New chart",
         "newOther": "Other new file",
         "root": "Home",
         "loading": "Loading {{ path }}...",
@@ -128,7 +135,7 @@
         "linkActions": "Link actions",
         "imageActions": "Image actions",
         "mathActions": "Inline math actions",
-        "mathExpression": "LaTeX expression",
+        "mathExpression": "Mathematical expression",
         "editMath": "Edit expression",
         "copyMath": "Copy expression",
         "linkAddress": "Link address",
@@ -157,10 +164,10 @@
         "codePreviewLoading": "Loading...",
         "codePreviewMermaidError": "The diagram could not be rendered",
         "codePreviewEChartsError": "The chart could not be rendered",
-        "codePreviewEChartsObjectError": "The ECharts option must be a JSON object",
-        "echartsBlock": "ECharts",
+        "codePreviewEChartsObjectError": "The chart configuration must be a JSON object",
+        "echartsBlock": "Chart",
         "mathBlock": "Formula",
-        "mermaidBlock": "Mermaid",
+        "mermaidBlock": "Diagram",
         "quote": "Quote",
         "divider": "Divider"
     },

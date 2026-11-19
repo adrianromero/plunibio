@@ -215,9 +215,14 @@ fn creates_empty_files_and_directories_without_overwriting() {
         );
         assert!(base.join("docs/notes").is_dir());
 
-        let file = super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
-            .await
-            .unwrap();
+        let file = super::create_file(
+            basepath.clone(),
+            "docs".to_owned(),
+            "new.md".to_owned(),
+            None,
+        )
+        .await
+        .unwrap();
         assert_eq!(file.name, "new.md");
         assert_eq!(file.size_bytes, Some(0));
         assert_eq!(file.item_count, None);
@@ -227,13 +232,32 @@ fn creates_empty_files_and_directories_without_overwriting() {
             Vec::<u8>::new()
         );
 
-        let duplicate =
-            super::create_file(basepath.clone(), "docs".to_owned(), "new.md".to_owned())
-                .await
-                .unwrap_err();
+        let source = "flowchart TD\n    A[Inicio] --> B[Fin]\n";
+        let diagram = super::create_file(
+            basepath.clone(),
+            "docs".to_owned(),
+            "new.mmd".to_owned(),
+            Some(source.to_owned()),
+        )
+        .await
+        .unwrap();
+        assert_eq!(diagram.size_bytes, Some(source.len() as u64));
+
+        let duplicate = super::create_file(
+            basepath.clone(),
+            "docs".to_owned(),
+            "new.mmd".to_owned(),
+            None,
+        )
+        .await
+        .unwrap_err();
         let value = serde_json::to_value(duplicate).unwrap();
         assert_eq!(value["code"], "path_already_exists");
-        assert_eq!(value["path"], "new.md");
+        assert_eq!(value["path"], "new.mmd");
+        assert_eq!(
+            std::fs::read_to_string(base.join("docs/new.mmd")).unwrap(),
+            source
+        );
 
         std::fs::remove_dir_all(base).unwrap();
     });
@@ -296,7 +320,7 @@ fn create_entry_rejects_paths_instead_of_names() {
         let basepath = base.to_string_lossy().into_owned();
 
         for name in ["", "   ", ".", "..", "nested/file.md", "nested\\file.md"] {
-            let error = super::create_file(basepath.clone(), String::new(), name.to_owned())
+            let error = super::create_file(basepath.clone(), String::new(), name.to_owned(), None)
                 .await
                 .unwrap_err();
             let value = serde_json::to_value(error).unwrap();

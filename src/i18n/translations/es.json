@@ -1,8 +1,8 @@
 {
     "editor": {
         "printFailed": "No se ha podido preparar el documento para imprimir. Comprueba que los gráficos y las imágenes se hayan cargado correctamente.",
-        "emptyMermaid": "El documento está vacío. Añade código Mermaid para empezar.",
-        "emptyECharts": "El documento está vacío. Añade una configuración ECharts para empezar.",
+        "emptyMermaid": "El documento está vacío. Escribe la definición del diagrama para empezar.",
+        "emptyECharts": "El documento está vacío. Añade la configuración del gráfico en JSON para empezar.",
         "loading": "Cargando {{ filename }}...",
         "saving": "Guardando {{ filename }}..."
     },
@@ -38,6 +38,11 @@
         "unsavedChanges": "Cambios sin guardar",
         "pathNavigation": "Ruta del archivo actual"
     },
+    "fileTemplates": {
+        "diagramStart": "Inicio",
+        "diagramEnd": "Fin",
+        "chartGroup": "Grupo {{ letter }}"
+    },
     "folder": {
         "actions": "Acciones",
         "sortBy": "Ordenar por",
@@ -53,6 +58,8 @@
         "newFolder": "Nueva carpeta",
         "newMarkdown": "Nuevo archivo Markdown",
         "newText": "Nuevo archivo de texto",
+        "newDiagram": "Nuevo diagrama",
+        "newChart": "Nuevo gráfico",
         "newOther": "Otro archivo nuevo",
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
@@ -128,7 +135,7 @@
         "linkActions": "Acciones del enlace",
         "imageActions": "Acciones de la imagen",
         "mathActions": "Acciones de la fórmula en línea",
-        "mathExpression": "Expresión LaTeX",
+        "mathExpression": "Expresión matemática",
         "editMath": "Editar expresión",
         "copyMath": "Copiar expresión",
         "linkAddress": "Dirección del enlace",
@@ -157,10 +164,10 @@
         "codePreviewLoading": "Cargando...",
         "codePreviewMermaidError": "No se ha podido generar el diagrama",
         "codePreviewEChartsError": "No se ha podido generar el gráfico",
-        "codePreviewEChartsObjectError": "La opción de ECharts debe ser un objeto JSON",
-        "echartsBlock": "ECharts",
+        "codePreviewEChartsObjectError": "La configuración del gráfico debe ser un objeto JSON",
+        "echartsBlock": "Gráfico",
         "mathBlock": "Fórmula",
-        "mermaidBlock": "Mermaid",
+        "mermaidBlock": "Diagrama",
         "quote": "Cita",
         "divider": "Separador"
     },

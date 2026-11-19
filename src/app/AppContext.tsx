@@ -45,7 +45,7 @@ export type PrintFileHandler = () => Promise<void>;
 export type SearchFileHandler = () => void;
 export type NavigateFileHandler = () => Promise<void>;
 export type RenameEntryHandler = () => void | Promise<void>;
-export type CreateEntryKind = "directory" | "markdown" | "text" | "other";
+export type CreateEntryKind = "directory" | "markdown" | "text" | "diagram" | "chart" | "other";
 export type CreateEntryHandler = (kind: CreateEntryKind) => void;
 export type ToggleSourceModeHandler = () => Promise<void>;
 export type ToggleSidebarHandler = () => void;

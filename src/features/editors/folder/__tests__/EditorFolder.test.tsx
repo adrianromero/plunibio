@@ -70,8 +70,10 @@ vi.mock("@/app/AppContext", () => ({
 
 vi.mock("@/i18n/Localization", () => ({
     useI18N: () => ({
-        t: (key: string, params?: { count?: number }) =>
-            params?.count === undefined ? key : `${key}:${params.count}`,
+        t: (key: string, params?: { count?: number; letter?: string }) => {
+            if (params?.letter) return `Group ${params.letter}`;
+            return params?.count === undefined ? key : `${key}:${params.count}`;
+        },
         locale: () => "en",
     }),
 }));
@@ -266,6 +268,8 @@ describe("EditorFolder", () => {
         ["directory", ""],
         ["markdown", ".md"],
         ["text", ".txt"],
+        ["diagram", ".mmd"],
+        ["chart", ".echarts.json"],
         ["other", ""],
     ])("opens the creation dialog for the %s sidebar action", async (kind, initialName) => {
         const root = document.createElement("div");
@@ -289,7 +293,7 @@ describe("EditorFolder", () => {
         dispose = render(() => <EditorFolder />, root);
 
         const buttons = root.querySelectorAll<HTMLButtonElement>("[data-create-kind]");
-        expect(buttons).toHaveLength(4);
+        expect(buttons).toHaveLength(6);
         expect(Array.from(buttons).every((button) => button.disabled)).toBe(true);
         createEntryShortcut?.("markdown");
         expect(root.querySelector<HTMLDialogElement>('[data-testid="create-entry-dialog"]')?.open)
@@ -345,6 +349,49 @@ describe("EditorFolder", () => {
         expect(lastHideCall).toBeLessThan(
             loadFilenameMock.mock.invocationCallOrder[0]!
         );
+    });
+
+    it.each([
+        { kind: "diagram", extension: ".mmd", name: "sample" },
+        { kind: "chart", extension: ".echarts.json", name: "sample.echarts.json" },
+    ])("creates a $kind with initial content before opening it", async ({ kind, extension, name }) => {
+        const savedName = `sample${extension}`;
+        invokeMock.mockImplementation(async (command: string) => {
+            if (command === "list_directory") return [fileEntry("visible.md")];
+            if (command === "create_file") return fileEntry(savedName);
+            throw new Error(`Unexpected command: ${command}`);
+        });
+        const root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(() => <EditorFolder />, root);
+        await vi.waitFor(() => expect(root.textContent).toContain("visible.md"));
+
+        const action = root.querySelector<HTMLButtonElement>(`[data-create-kind="${kind}"]`)!;
+        expect(action.querySelector(".sidebarActionShortcut")).toBeNull();
+        action.click();
+        const input = root.querySelector<HTMLInputElement>('[data-testid="create-entry-name"]')!;
+        const submit = root.querySelector<HTMLButtonElement>('[data-testid="create-entry-dialog"] button[type="submit"]')!;
+        await vi.waitFor(() => expect(input.value).toBe(extension));
+        expect(submit.disabled).toBe(true);
+        input.value = name;
+        input.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        submit.click();
+
+        await vi.waitFor(() => expect(loadFilenameMock).toHaveBeenCalledWith(`docs/${savedName}`));
+        const [, args] = invokeMock.mock.calls.find(([command]) => command === "create_file")!;
+        expect(args).toMatchObject({ basepath: "/notes", filename: "docs", name: savedName });
+        if (kind === "diagram") {
+            expect(args.content.trim().split("\n")).toEqual([
+                "flowchart TD",
+                '    start["fileTemplates.diagramStart"] --> finish["fileTemplates.diagramEnd"]',
+            ]);
+        } else {
+            expect(JSON.parse(args.content)).toMatchObject({
+                xAxis: { type: "category", data: ["Group A", "Group B"] },
+                yAxis: { type: "value" },
+                series: [{ type: "bar", data: [3, 5] }],
+            });
+        }
     });
 
     it("uses distinct icons for Markdown, plain text and other files", () => {
