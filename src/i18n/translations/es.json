@@ -6,6 +6,14 @@
         "loading": "Cargando {{ filename }}...",
         "saving": "Guardando {{ filename }}..."
     },
+    "table": {
+        "newRow": "Fila nueva",
+        "editing": "Edición",
+        "deleteRow": "Eliminar fila",
+        "deleteRowNumber": "Eliminar fila {{ row }}",
+        "deleteColumn": "Eliminar columna",
+        "deleteColumnNamed": "Eliminar columna «{{ name }}»"
+    },
     "toolbar": {
         "print": "Imprimir…",
         "showSource": "Mostrar código fuente",
@@ -60,7 +68,9 @@
         "newText": "Nuevo archivo de texto",
         "newDiagram": "Nuevo diagrama",
         "newChart": "Nuevo gráfico",
+        "newTable": "Nuevo archivo de tabla",
         "newOther": "Otro archivo nuevo",
+        "table": "Tabla",
         "root": "Inicio",
         "loading": "Cargando {{ path }}...",
         "empty": "Esta carpeta está vacía",
@@ -252,6 +262,7 @@
         "unknown": "Error desconocido",
         "loadFileFailed": "No se ha podido cargar el archivo.",
         "renderViewFailed": "No se ha podido generar la vista del documento.",
+        "invalidCsv": "No se ha podido leer este CSV como tabla. Revisa su sintaxis en la vista de código fuente.",
         "unsupportedPathType": "Tipo de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

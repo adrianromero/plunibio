@@ -32,6 +32,8 @@ import EditorMermaid from "@/features/editors/mermaid/EditorMermaid";
 import EditorECharts from "@/features/editors/echarts/EditorECharts";
 import { editorForFilename } from "@/features/editors/EditorForFilename";
 import EditorText from "@/features/editors/text/EditorText";
+import EditorTable from "@/features/editors/table/EditorTable";
+import FileSpreadsheet from "lucide-solid/icons/file-spreadsheet";
 import { frontendLog } from "@/shared/logging/frontendLog";
 
 type DirectoryResult =
@@ -50,6 +52,7 @@ export function fileIconForFilename(filename: string): typeof File {
     if (editor === EditorMermaid) return FileChartLine;
     if (editor === EditorECharts) return FileChartColumn;
     if (editor === EditorText) return FileText;
+    if (editor === EditorTable) return FileSpreadsheet;
     if (editor === EditorImage) return FileImage;
     return File;
 }

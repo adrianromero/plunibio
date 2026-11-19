@@ -205,10 +205,12 @@ SOFTWARE.
 | `@tauri-apps/api` | 2.12.4 | `Apache-2.0 OR MIT` |
 | `@tauri-apps/plugin-clipboard-manager` | 2.5.0 | `MIT OR Apache-2.0` |
 | `@tauri-apps/plugin-opener` | 2.5.4 | `MIT OR Apache-2.0` |
+| `ag-grid-community` | 36.3.0 | `MIT` |
 | `codemirror` | 6.0.2 | `MIT` |
 | `echarts` | 6.1.0 | `Apache-2.0` |
 | `lucide-solid` | 1.47.0 | `ISC` |
 | `mermaid` | 12.2.0 | `MIT` |
+| `papaparse` | 5.7.1 | `MIT` |
 | `prosemirror-search` | 1.1.1 | `MIT` |
 | `solid-js` | 1.9.17 | `MIT` |
 
@@ -243,6 +245,7 @@ normally shipped as JavaScript runtime code in the desktop application.
 | `@storybook/addon-docs` | 10.6.5 | `MIT` |
 | `@tauri-apps/cli` | 2.12.4 | `Apache-2.0 OR MIT` |
 | `@types/node` | 26.6.5 | `MIT` |
+| `@types/papaparse` | 5.5.2 | `MIT` |
 | `@wdio/cli` | 9.32.0 | `MIT` |
 | `@wdio/globals` | 9.31.3 | `MIT` |
 | `@wdio/local-runner` | 9.32.0 | `MIT` |

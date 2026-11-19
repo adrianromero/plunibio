@@ -6,6 +6,14 @@
         "loading": "S'està carregant {{ filename }}...",
         "saving": "S'està desant {{ filename }}..."
     },
+    "table": {
+        "newRow": "Fila nova",
+        "editing": "Edició",
+        "deleteRow": "Suprimeix la fila",
+        "deleteRowNumber": "Suprimeix la fila {{ row }}",
+        "deleteColumn": "Suprimeix la columna",
+        "deleteColumnNamed": "Suprimeix la columna «{{ name }}»"
+    },
     "toolbar": {
         "print": "Imprimeix…",
         "showSource": "Mostra el codi font",
@@ -60,7 +68,9 @@
         "newText": "Fitxer de text nou",
         "newDiagram": "Diagrama nou",
         "newChart": "Gràfic nou",
+        "newTable": "Fitxer de taula nou",
         "newOther": "Un altre fitxer nou",
+        "table": "Taula",
         "root": "Inici",
         "loading": "S'està carregant {{ path }}...",
         "empty": "Aquesta carpeta és buida",
@@ -252,6 +262,7 @@
         "unknown": "Error desconegut",
         "loadFileFailed": "No s'ha pogut carregar el fitxer.",
         "renderViewFailed": "No s’ha pogut generar la vista del document.",
+        "invalidCsv": "No s’ha pogut llegir aquest CSV com a taula. Revisa’n la sintaxi a la vista de codi font.",
         "unsupportedPathType": "Tipus de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

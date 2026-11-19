@@ -11,6 +11,7 @@ import FileChartColumn from "lucide-solid/icons/file-chart-column";
 import FileChartLine from "lucide-solid/icons/file-chart-line";
 import FileImage from "lucide-solid/icons/file-image";
 import FilePen from "lucide-solid/icons/file-pen";
+import FileSpreadsheet from "lucide-solid/icons/file-spreadsheet";
 import FileText from "lucide-solid/icons/file-text";
 import type { CreateEntryHandler, ReloadFileHandler } from "@/app/AppContext";
 import { loadFolderSort, saveFolderSort, type FolderSort } from "@/preferences/FolderSortPreferences";
@@ -270,6 +271,7 @@ describe("EditorFolder", () => {
         ["text", ".txt"],
         ["diagram", ".mmd"],
         ["chart", ".echarts.json"],
+        ["table", ".csv"],
         ["other", ""],
     ])("opens the creation dialog for the %s sidebar action", async (kind, initialName) => {
         const root = document.createElement("div");
@@ -293,7 +295,7 @@ describe("EditorFolder", () => {
         dispose = render(() => <EditorFolder />, root);
 
         const buttons = root.querySelectorAll<HTMLButtonElement>("[data-create-kind]");
-        expect(buttons).toHaveLength(6);
+        expect(buttons).toHaveLength(7);
         expect(Array.from(buttons).every((button) => button.disabled)).toBe(true);
         createEntryShortcut?.("markdown");
         expect(root.querySelector<HTMLDialogElement>('[data-testid="create-entry-dialog"]')?.open)
@@ -354,7 +356,8 @@ describe("EditorFolder", () => {
     it.each([
         { kind: "diagram", extension: ".mmd", name: "sample" },
         { kind: "chart", extension: ".echarts.json", name: "sample.echarts.json" },
-    ])("creates a $kind with initial content before opening it", async ({ kind, extension, name }) => {
+        { kind: "table", extension: ".csv", name: "sample" },
+    ])("creates and opens a $kind without a keyboard shortcut", async ({ kind, extension, name }) => {
         const savedName = `sample${extension}`;
         invokeMock.mockImplementation(async (command: string) => {
             if (command === "list_directory") return [fileEntry("visible.md")];
@@ -385,12 +388,14 @@ describe("EditorFolder", () => {
                 "flowchart TD",
                 '    start["fileTemplates.diagramStart"] --> finish["fileTemplates.diagramEnd"]',
             ]);
-        } else {
+        } else if (kind === "chart") {
             expect(JSON.parse(args.content)).toMatchObject({
                 xAxis: { type: "category", data: ["Group A", "Group B"] },
                 yAxis: { type: "value" },
                 series: [{ type: "bar", data: [3, 5] }],
             });
+        } else {
+            expect(args.content).toBeUndefined();
         }
     });
 
@@ -401,6 +406,7 @@ describe("EditorFolder", () => {
         expect(fileIconForFilename("chart.ECHARTS.JSON")).toBe(FileChartColumn);
         expect(fileIconForFilename("diagram.mmd")).toBe(FileChartLine);
         expect(fileIconForFilename("diagram.MERMAID")).toBe(FileChartLine);
+        expect(fileIconForFilename("data.CSV")).toBe(FileSpreadsheet);
         expect(fileIconForFilename("notes.txt")).toBe(FileText);
         expect(fileIconForFilename("server.log")).toBe(FileText);
         expect(fileIconForFilename("photo.png")).toBe(FileImage);

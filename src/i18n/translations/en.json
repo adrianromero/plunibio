@@ -6,6 +6,14 @@
         "loading": "Loading {{ filename }}...",
         "saving": "Saving {{ filename }}..."
     },
+    "table": {
+        "newRow": "New row",
+        "editing": "Editing",
+        "deleteRow": "Delete row",
+        "deleteRowNumber": "Delete row {{ row }}",
+        "deleteColumn": "Delete column",
+        "deleteColumnNamed": "Delete column “{{ name }}”"
+    },
     "toolbar": {
         "print": "Print…",
         "showSource": "Show source code",
@@ -60,7 +68,9 @@
         "newText": "New text file",
         "newDiagram": "New diagram",
         "newChart": "New chart",
+        "newTable": "New table file",
         "newOther": "Other new file",
+        "table": "Table",
         "root": "Home",
         "loading": "Loading {{ path }}...",
         "empty": "This folder is empty",
@@ -252,6 +262,7 @@
         "unknown": "Unknown error",
         "loadFileFailed": "The file could not be loaded.",
         "renderViewFailed": "The document view could not be generated.",
+        "invalidCsv": "This CSV could not be read as a table. Check its syntax in the source view.",
         "unsupportedPathType": "Unsupported path type: {{ filename }}"
     },
     "backendErrors": {

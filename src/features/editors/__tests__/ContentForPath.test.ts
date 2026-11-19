@@ -10,6 +10,7 @@ import EditorMarkdown from "../markdown/EditorMarkdown";
 import EditorMermaid from "../mermaid/EditorMermaid";
 import EditorECharts from "../echarts/EditorECharts";
 import EditorText from "../text/EditorText";
+import EditorTable from "../table/EditorTable";
 
 describe("contentForPath", () => {
     it.each(["README.md", "notes.markdown", "draft.mdown", "document.mkd"])(
@@ -43,6 +44,10 @@ describe("contentForPath", () => {
     it.each(["chart.json", "chart.echarts.json.bak.json"])("keeps ordinary JSON in EditorText: %s", filename => {
         const selection = contentForPath(filename, { kind: "file" });
         if (selection?.kind === "content") expect(selection.component).toBe(EditorText);
+    });
+
+    it.each(["data.csv", "folder/data.CSV"])("opens %s with EditorTable", (filename) => {
+        expect(contentForPath(filename, { kind: "file" })).toEqual({ kind: "content", component: EditorTable, props: {} });
     });
 
     it("opens LaTeX files with EditorText", () => {

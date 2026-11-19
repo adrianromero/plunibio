@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+.studio {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--color-view-background);
+}
+
+.grid {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.grid :global(.ag-cell).rowNumber {
+    background: var(--ag-header-background-color);
+    font-variant-numeric: tabular-nums;
+    padding-inline: 8px;
+    text-align: end;
+}
+
+.newRowMarker {
+    font-weight: 600;
+    font-size: 1.15em;
+}
+
+.grid :global(.ag-cell).match {
+    background: var(--color-search-match);
+}
+
+.grid :global(.ag-cell).current {
+    background: var(--color-search-match-active);
+}
+
+.print {
+    display: none;
+}
+
+@media print {
+    :global(.print-document) .print {
+        display: block;
+        color: black;
+    }
+
+    :global(.print-document) .print table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        break-inside: auto;
+        page-break-inside: auto;
+    }
+
+    .print thead {
+        display: table-header-group;
+    }
+
+    .print :is(th, td) {
+        border: 1px solid #bbb;
+        padding: 0.3em 0.5em;
+        text-align: start;
+        vertical-align: top;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .print th {
+        background: #f1f1f1;
+    }
+}

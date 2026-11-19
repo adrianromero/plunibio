@@ -6,6 +6,14 @@
         "loading": "{{ filename }} kargatzen...",
         "saving": "{{ filename }} gordetzen..."
     },
+    "table": {
+        "newRow": "Errenkada berria",
+        "editing": "Edizioa",
+        "deleteRow": "Ezabatu errenkada",
+        "deleteRowNumber": "Ezabatu {{ row }}. errenkada",
+        "deleteColumn": "Ezabatu zutabea",
+        "deleteColumnNamed": "Ezabatu «{{ name }}» zutabea"
+    },
     "toolbar": {
         "print": "Inprimatu…",
         "showSource": "Erakutsi iturburu-kodea",
@@ -60,7 +68,9 @@
         "newText": "Testu-fitxategi berria",
         "newDiagram": "Diagrama berria",
         "newChart": "Grafiko berria",
+        "newTable": "Taula-fitxategi berria",
         "newOther": "Bestelako fitxategi berria",
+        "table": "Taula",
         "root": "Hasiera",
         "loading": "{{ path }} kargatzen...",
         "empty": "Karpeta hau hutsik dago",
@@ -252,6 +262,7 @@
         "unknown": "Errore ezezaguna",
         "loadFileFailed": "Ezin izan da fitxategia kargatu.",
         "renderViewFailed": "Ezin izan da dokumentuaren ikuspegia sortu.",
+        "invalidCsv": "Ezin izan da CSV hau taula gisa irakurri. Egiaztatu sintaxia iturburu-kodearen ikuspegian.",
         "unsupportedPathType": "Onartzen ez den bide mota: {{ filename }}"
     },
     "backendErrors": {

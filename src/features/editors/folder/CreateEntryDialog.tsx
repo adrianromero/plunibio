@@ -7,6 +7,7 @@ import File from "lucide-solid/icons/file";
 import FileText from "lucide-solid/icons/file-text";
 import FileChartColumn from "lucide-solid/icons/file-chart-column";
 import FileChartLine from "lucide-solid/icons/file-chart-line";
+import FileSpreadsheet from "lucide-solid/icons/file-spreadsheet";
 import Folder from "lucide-solid/icons/folder";
 import { createEffect, createSignal, createUniqueId, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -37,6 +38,7 @@ const icons = {
     text: FileText,
     diagram: FileChartLine,
     chart: FileChartColumn,
+    table: FileSpreadsheet,
     other: File,
 };
 
@@ -50,7 +52,8 @@ export function CreateEntryDialog(props: CreateEntryDialogProps): JSX.Element {
 
     const isDirectory = (): boolean => props.kind === "directory";
     const templateExtension = () =>
-        props.kind === "diagram" || props.kind === "chart" ? templateExtensions[props.kind] : "";
+        props.kind === "diagram" || props.kind === "chart" || props.kind === "table"
+            ? templateExtensions[props.kind] : "";
     const canSubmit = (): boolean => {
         const value = name().trim().toLowerCase();
         return value.length > 0 && value !== templateExtension();

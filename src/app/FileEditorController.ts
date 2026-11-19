@@ -13,6 +13,7 @@ import { useAppContext } from "./AppContext";
 import { frontendLog } from "@/shared/logging/frontendLog";
 
 export type FileEditorAdapter<Content = string> = {
+    flushEdits?: () => void;
     preparePrint?: () => (() => void);
     getContent: () => Promise<Content | null>;
     replaceContent: (content: Content, filename: string, onModified: () => void) => Promise<void>;
@@ -157,12 +158,9 @@ export function createFileEditorController<Content = string>(
     };
 
     const componentOnUnload = async (): Promise<void> => {
-        if (!fileModified()) {
-            return;
-        }
-
         try {
-            await writeCurrentFile(false);
+            adapter.flushEdits?.();
+            if (fileModified()) await writeCurrentFile(false);
         } catch (err: unknown) {
             console.error(`Error automatically saving file in ${editorName}:`, err);
             throw new UserMessageError(
@@ -171,6 +169,8 @@ export function createFileEditorController<Content = string>(
             );
         }
     };
+
+    saveCurrentFile.flushEdits = adapter.flushEdits;
 
     const replaceContentFromDisk = async (
         currentBasepath: string,
@@ -215,6 +215,7 @@ export function createFileEditorController<Content = string>(
 
     const reloadCurrentFile = async (): Promise<void> => {
         if (state().status !== "error") {
+            adapter.flushEdits?.();
             const confirmed = await showAppConfirmation(
                 fileModified() ? t("dialog.reloadDiscardChanges") : t("dialog.reloadFile"),
                 "question",

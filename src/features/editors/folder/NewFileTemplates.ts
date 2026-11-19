@@ -9,6 +9,7 @@ import type { CreateEntryKind } from "@/app/AppContext";
 export const templateExtensions = {
     diagram: ".mmd",
     chart: ".echarts.json",
+    table: ".csv",
 } as const;
 
 export function newFileContent(kind: CreateEntryKind, t: Translator): string | undefined {

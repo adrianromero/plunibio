@@ -7,6 +7,7 @@ import File from "lucide-solid/icons/file";
 import FileChartColumn from "lucide-solid/icons/file-chart-column";
 import FileChartLine from "lucide-solid/icons/file-chart-line";
 import FilePen from "lucide-solid/icons/file-pen";
+import FileSpreadsheet from "lucide-solid/icons/file-spreadsheet";
 import FileText from "lucide-solid/icons/file-text";
 import Folder from "lucide-solid/icons/folder";
 import ArrowUp from "lucide-solid/icons/arrow-up";
@@ -28,6 +29,7 @@ const fileActions = [
     { kind: "text", label: "folder.newText", icon: FileText, shortcut: "Ctrl+Shift+T" },
     { kind: "diagram", label: "folder.newDiagram", icon: FileChartLine, shortcut: null },
     { kind: "chart", label: "folder.newChart", icon: FileChartColumn, shortcut: null },
+    { kind: "table", label: "folder.newTable", icon: FileSpreadsheet, shortcut: null },
     { kind: "other", label: "folder.newOther", icon: File, shortcut: null },
 ] as const;
 

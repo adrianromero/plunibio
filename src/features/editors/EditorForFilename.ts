@@ -10,12 +10,14 @@ import EditorMermaid from "./mermaid/EditorMermaid";
 import EditorECharts from "./echarts/EditorECharts";
 import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
 import EditorText from "./text/EditorText";
+import EditorTable from "./table/EditorTable";
 
 export type EditorForFilename =
     | typeof EditorMarkdown
     | typeof EditorMermaid
     | typeof EditorECharts
     | typeof EditorText
+    | typeof EditorTable
     | typeof EditorImage
     | typeof EditorExternalFile;
 
@@ -26,6 +28,8 @@ export function editorForFilename(filename: string): EditorForFilename {
     const extension = extensionIndex >= 0 ? normalizedFilename.slice(extensionIndex) : "";
 
     switch (extension) {
+        case ".csv":
+            return EditorTable;
         case ".md":
         case ".markdown":
         case ".mdown":
