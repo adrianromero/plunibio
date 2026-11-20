@@ -46,6 +46,7 @@ import {
     NodeSelection,
     Plugin,
     TextSelection,
+    type EditorState,
     type Selection,
     type Transaction,
 } from "@milkdown/kit/prose/state";
@@ -223,55 +224,35 @@ function setHeading(ctx: Ctx, level: number): void {
     });
 }
 
-function getHeadingLevel(ctx: Ctx, selection?: Selection): number {
-    const currentSelection = selection ?? ctx.get(editorViewCtx).state.selection;
-    const node = currentSelection.$from.parent;
+function getHeadingLevel(ctx: Ctx): number {
+    const node = ctx.get(editorViewCtx).state.selection.$from.parent;
 
     return node.type === headingSchema.type(ctx) ? (node.attrs.level as number) : 0;
 }
 
-function isMarkActive(ctx: Ctx, markType: MarkType, selection?: Selection): boolean {
-    const state = ctx.get(editorViewCtx).state;
-    const currentSelection = selection ?? state.selection;
-
-    if (!currentSelection.empty) {
-        return state.doc.rangeHasMark(currentSelection.from, currentSelection.to, markType);
+function isMarkActive(state: EditorState, markType: MarkType): boolean {
+    const { selection, storedMarks } = state;
+    if (!selection.empty) {
+        return state.doc.rangeHasMark(selection.from, selection.to, markType);
     }
 
-    if (state.storedMarks?.some((mark) => mark.type === markType)) {
-        return true;
-    }
-
-    return (
-        currentSelection instanceof TextSelection &&
-        Boolean(currentSelection.$cursor?.marks().some((mark) => mark.type === markType))
-    );
+    return Boolean(markType.isInSet(storedMarks ?? selection.$from.marks()));
 }
 
-function isTypingMarkActive(ctx: Ctx, markType: MarkType, selection?: Selection): boolean {
-    const state = ctx.get(editorViewCtx).state;
-    const currentSelection = selection ?? state.selection;
-    const marks =
-        state.storedMarks ??
-        (currentSelection.empty
-            ? currentSelection.$from.marks()
-            : currentSelection.$from.marksAcross(currentSelection.$to)) ??
-        [];
-
-    return marks.some((mark) => mark.type === markType);
+function isInlineMathSelected(selection: Selection): boolean {
+    return selection instanceof NodeSelection && selection.node.type.name === "math_inline";
 }
 
-export function getInlineStyleState(ctx: Ctx, selection?: Selection): InlineStyleState {
-    const currentSelection = selection ?? ctx.get(editorViewCtx).state.selection;
+export function getInlineStyleState(ctx: Ctx): InlineStyleState {
+    const { state } = ctx.get(editorViewCtx);
 
     return {
-        bold: isTypingMarkActive(ctx, strongSchema.type(ctx), currentSelection),
-        italic: isTypingMarkActive(ctx, emphasisSchema.type(ctx), currentSelection),
-        strikethrough: isTypingMarkActive(ctx, strikethroughSchema.type(ctx), currentSelection),
-        code: isTypingMarkActive(ctx, inlineCodeSchema.type(ctx), currentSelection),
-        // Inline math is an atomic node, not a mark that can be pending for the next input.
-        math: false,
-        link: isMarkActive(ctx, linkSchema.type(ctx), currentSelection),
+        bold: isMarkActive(state, strongSchema.type(ctx)),
+        italic: isMarkActive(state, emphasisSchema.type(ctx)),
+        strikethrough: isMarkActive(state, strikethroughSchema.type(ctx)),
+        code: isMarkActive(state, inlineCodeSchema.type(ctx)),
+        math: isInlineMathSelected(state.selection),
+        link: isMarkActive(state, linkSchema.type(ctx)),
     };
 }
 
@@ -313,7 +294,7 @@ function toggleInlineCode(ctx: Ctx): void {
 
     const markType = inlineCodeSchema.type(ctx);
     view.dispatch(
-        isMarkActive(ctx, markType)
+        isMarkActive(state, markType)
             ? state.tr.removeStoredMark(markType)
             : state.tr.addStoredMark(markType.create())
     );
@@ -321,27 +302,22 @@ function toggleInlineCode(ctx: Ctx): void {
 
 function toggleLink(ctx: Ctx, onCreateLink?: () => void): void {
     const view = ctx.get(editorViewCtx);
+    const { state } = view;
     const markType = linkSchema.type(ctx);
 
-    if (view.state.selection.empty && isMarkActive(ctx, markType)) {
-        view.dispatch(view.state.tr.removeStoredMark(markType));
-        return;
-    }
-
-    const { from, to } = view.state.selection;
-    if (view.state.doc.rangeHasMark(from, to, markType) || !onCreateLink) {
+    const active = isMarkActive(state, markType);
+    if (active && state.selection.empty) {
+        view.dispatch(state.tr.removeStoredMark(markType));
+    } else if (active || !onCreateLink) {
         ctx.get(commandsCtx).call(toggleLinkCommand.key);
-        return;
+    } else {
+        onCreateLink();
     }
-
-    onCreateLink();
 }
 
 export function toggleInlineMath(ctx: Ctx, onCreateMath?: () => void): void {
     const view = ctx.get(editorViewCtx);
-    const selectedMath =
-        view.state.selection instanceof NodeSelection &&
-        view.state.selection.node.type.name === "math_inline";
+    const selectedMath = isInlineMathSelected(view.state.selection);
 
     ctx.get(commandsCtx).call("ToggleLatex");
     if (!selectedMath) onCreateMath?.();
@@ -581,9 +557,9 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
     const [selectedInlineStyles, setSelectedInlineStyles] =
         createSignal<InlineStyleState>(EMPTY_INLINE_STYLE_STATE);
 
-    const updateSelectedState = (ctx: Ctx, selection?: Selection): void => {
-        setSelectedHeadingLevel(getHeadingLevel(ctx, selection));
-        setSelectedInlineStyles(getInlineStyleState(ctx, selection));
+    const updateSelectedState = (ctx: Ctx): void => {
+        setSelectedHeadingLevel(getHeadingLevel(ctx));
+        setSelectedInlineStyles(getInlineStyleState(ctx));
     };
 
     createEffect(() => {
@@ -725,60 +701,44 @@ export function EditorMarkdownSidebar(props: EditorMarkdownSidebarProps): JSX.El
                                 selected={selectedInlineStyles().bold}
                                 icon={Bold}
                                 label={t("markdownToolbar.bold")}
-                                onRun={(ctx) => {
-                                    ctx.get(commandsCtx).call(toggleStrongCommand.key);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={(ctx) => ctx.get(commandsCtx).call(toggleStrongCommand.key)}
                             />
                             <SidebarIconButton
                                 getEditor={props.getEditor}
                                 selected={selectedInlineStyles().italic}
                                 icon={Italic}
                                 label={t("markdownToolbar.italic")}
-                                onRun={(ctx) => {
-                                    ctx.get(commandsCtx).call(toggleEmphasisCommand.key);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={(ctx) => ctx.get(commandsCtx).call(toggleEmphasisCommand.key)}
                             />
                             <SidebarIconButton
                                 getEditor={props.getEditor}
                                 selected={selectedInlineStyles().strikethrough}
                                 icon={Strikethrough}
                                 label={t("markdownToolbar.strikethrough")}
-                                onRun={(ctx) => {
-                                    ctx.get(commandsCtx).call(toggleStrikethroughCommand.key);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={(ctx) =>
+                                    ctx.get(commandsCtx).call(toggleStrikethroughCommand.key)
+                                }
                             />
                             <SidebarIconButton
                                 getEditor={props.getEditor}
                                 selected={selectedInlineStyles().link}
                                 icon={Link2}
                                 label={t("markdownToolbar.link")}
-                                onRun={(ctx) => {
-                                    toggleLink(ctx, props.onCreateLink);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={(ctx) => toggleLink(ctx, props.onCreateLink)}
                             />
                             <SidebarIconButton
                                 getEditor={props.getEditor}
                                 selected={selectedInlineStyles().code}
                                 icon={Code}
                                 label={t("markdownToolbar.inlineCode")}
-                                onRun={(ctx) => {
-                                    toggleInlineCode(ctx);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={toggleInlineCode}
                             />
                             <SidebarIconButton
                                 getEditor={props.getEditor}
                                 selected={selectedInlineStyles().math}
                                 icon={Sigma}
                                 label={t("markdownToolbar.inlineMath")}
-                                onRun={(ctx) => {
-                                    toggleInlineMath(ctx, props.onCreateMath);
-                                    updateSelectedState(ctx);
-                                }}
+                                onRun={(ctx) => toggleInlineMath(ctx, props.onCreateMath)}
                             />
                         </div>
                     </section>

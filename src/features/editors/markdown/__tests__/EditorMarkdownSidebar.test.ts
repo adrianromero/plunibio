@@ -16,7 +16,7 @@ import {
     strikethroughSchema,
     toggleStrikethroughCommand,
 } from "@milkdown/kit/preset/gfm";
-import { NodeSelection } from "@milkdown/kit/prose/state";
+import { NodeSelection, TextSelection } from "@milkdown/kit/prose/state";
 import { runCrepeMarkdownAction } from "./support/crepeMarkdownTest";
 import {
     getInlineStyleState,
@@ -89,23 +89,38 @@ describe("acciones de EditorMarkdownSidebar", () => {
         });
     });
 
-    it("no trata un nodo de matemática en línea como formato de tecleo", async () => {
+    it.each([
+        ["negrita", "**texto**", toggleStrongCommand, "bold"],
+        ["cursiva", "*texto*", toggleEmphasisCommand, "italic"],
+        ["tachado", "~~texto~~", toggleStrikethroughCommand, "strikethrough"],
+    ] as const)(
+        "indica que se puede quitar %s de una selección mixta",
+        async (_name, markdown, command, style) => {
+            await runCrepeMarkdownAction(`[[Antes ${markdown} después]]`, (ctx) => {
+                expect(getInlineStyleState(ctx)[style]).toBe(true);
+                ctx.get(commandsCtx).call(command.key);
+                expect(getInlineStyleState(ctx)[style]).toBe(false);
+            });
+        }
+    );
+
+    it("activa el botón de fórmula al seleccionar el nodo y lo apaga con el caret al lado", async () => {
         await runCrepeMarkdownAction("Antes [[]]$x$ después", (ctx) => {
             const view = ctx.get(editorViewCtx);
-            const mathInline = view.state.schema.nodes.math_inline;
-            let mathPosition: number | null = null;
-
-            view.state.doc.descendants((node, position) => {
-                if (mathPosition === null && node.type === mathInline) {
-                    mathPosition = position;
-                }
-            });
-
-            expect(mathPosition).not.toBeNull();
-            view.dispatch(
-                view.state.tr.setSelection(NodeSelection.create(view.state.doc, mathPosition!))
-            );
+            const { doc, selection } = view.state;
+            const math = NodeSelection.create(doc, selection.from);
+            expect(math.node.type.name).toBe("math_inline");
             expect(getInlineStyleState(ctx).math).toBe(false);
+
+            view.dispatch(view.state.tr.setSelection(TextSelection.create(doc, math.to)));
+            expect(getInlineStyleState(ctx).math).toBe(false);
+
+            view.dispatch(view.state.tr.setSelection(math));
+            expect(getInlineStyleState(ctx).math).toBe(true);
+
+            toggleInlineMath(ctx);
+            expect(getInlineStyleState(ctx).math).toBe(false);
+            expect(view.state.doc.textContent).toBe("Antes x después");
         });
     });
 

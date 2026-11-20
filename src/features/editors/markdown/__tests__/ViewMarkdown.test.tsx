@@ -1099,6 +1099,49 @@ describe("ViewMarkdown", () => {
         });
     });
 
+    it.each([
+        ["Bold", "**texto**", "strong"],
+        ["Italic", "*texto*", "em"],
+        ["Strikethrough", "~~texto~~", "del"],
+        ["Link", "[texto](./target.md)", "a"],
+        ["Inline code", "`texto`", "code"],
+    ])("turns off %s at the end of a formatted span", async (label, markup, tag) => {
+        markdownContent = `Antes ${markup} después`;
+        root = document.createElement("div");
+        document.body.append(root);
+        dispose = render(
+            () => (
+                <I18NProvider>
+                    <StoryAppProvider filename="README.md">
+                        <EditorMarkdown />
+                    </StoryAppProvider>
+                </I18NProvider>
+            ),
+            root
+        );
+
+        const formatted = await vi.waitFor(() => {
+            const element = root?.querySelector<HTMLElement>(`.ProseMirror p ${tag}`);
+            expect(element?.textContent).toBe("texto");
+            return element!;
+        });
+        const button = root.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+        formatted.closest<HTMLElement>(".ProseMirror")!.focus();
+        const range = document.createRange();
+        range.selectNodeContents(formatted);
+        range.collapse(false);
+        window.getSelection()!.removeAllRanges();
+        window.getSelection()!.addRange(range);
+        document.dispatchEvent(new Event("selectionchange"));
+        await vi.waitFor(() => expect(button.classList.contains("selected")).toBe(true));
+
+        activateButton(button);
+
+        expect(button.classList.contains("selected")).toBe(false);
+        expect(root.querySelector(`.ProseMirror p ${tag}`)?.textContent).toBe("texto");
+        expect(root.querySelector('form[aria-label="Link actions"]')).toBeNull();
+    });
+
     it("creates a link with its URL as text from the shared editor", async () => {
         markdownContent = "";
         root = document.createElement("div");
