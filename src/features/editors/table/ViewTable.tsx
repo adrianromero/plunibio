@@ -21,6 +21,7 @@ type GridRow = { index: number; isNew: boolean };
 type CellPosition = { row: number; column: number };
 const initialColumnCount = 3;
 const rowNumberColumnId = "row-number";
+const tableRowHeight = 30;
 
 function gridColumnCount(csv: CsvDocument): number {
     return csv.header
@@ -260,9 +261,14 @@ export function ViewTable(): JSX.Element {
                     borderColor: "var(--color-border-subtle)",
                     foregroundColor: "var(--color-text)",
                     headerBackgroundColor: "var(--color-surface-subtle)",
+                    headerFontWeight: 700,
                     fontFamily: "var(--font-interface)",
                     columnBorder: true,
+                    wrapperBorder: { width: 1, style: "solid", color: "var(--color-border)" },
+                    wrapperBorderRadius: "var(--radius-medium)",
                 }),
+                headerHeight: tableRowHeight,
+                rowHeight: tableRowHeight,
                 defaultColDef: {
                     editable: true,
                     cellDataType: false,
