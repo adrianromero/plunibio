@@ -80,6 +80,13 @@ function rowIndicator(row: number): HTMLElement | null {
     return root.querySelector(`[row-index="${row}"] [role="gridcell"][col-id="row-number"]`);
 }
 
+function dataHeaders(): (string | undefined)[] {
+    return Array.from(
+        root.querySelectorAll('[role="columnheader"]:not([col-id="row-number"])'),
+        (header) => header.textContent?.trim()
+    );
+}
+
 async function selectCell(row: number, column: number): Promise<void> {
     const target = await vi.waitFor(() => cell(row, column));
     target.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, detail: 1 }));
@@ -98,27 +105,25 @@ afterEach(() => {
 
 it("writes default headers above the first pending edit in an empty CSV", async () => {
     await mount("");
-    const labels = () => Array.from(
-        root.querySelectorAll('[role="columnheader"]:not([col-id="row-number"])'),
-        (header) => header.textContent?.trim()
-    );
-    await vi.waitFor(() => expect(labels()).toEqual(["A", "B", "C"]));
+    await vi.waitFor(() => expect(dataHeaders()).toEqual(["A", "B", "C"]));
     await vi.waitFor(() => expect(rowIndicator(0)?.textContent).toBe("*"));
     await enterText(0, 0, "0012");
     await context.main.onunload()?.();
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "A,B,C\n0012,," }));
     await vi.waitFor(() => expect(cell(0, 1)).toBeTruthy());
 
-    await enterText(0, 1, "false");
+    await enterText(0, 2, "false");
     await context.editor.toggleSourceMode()?.();
     await context.editor.saveFile()?.();
-    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "A,B,C\n0012,false," }));
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "A,B,C\n0012,,false" }));
     await context.editor.toggleSourceMode()?.();
     await vi.waitFor(() => expect(cell(0, 0).textContent).toBe("0012"));
+    expect(dataHeaders()).toEqual(["A", "B", "C"]);
 });
 
 it("shows read-only row numbers and moves the new-row marker when data is entered", async () => {
     await mount("Name\nAna\nLeo");
+    await vi.waitFor(() => expect(dataHeaders()).toEqual(["Name"]));
     await vi.waitFor(() => expect(rowIndicator(2)?.textContent).toBe("*"));
     expect(rowIndicator(0)?.textContent).toBe("1");
     expect(rowIndicator(1)?.textContent).toBe("2");
@@ -132,6 +137,7 @@ it("shows read-only row numbers and moves the new-row marker when data is entere
     await context.editor.saveFile()?.();
     await vi.waitFor(() => expect(rowIndicator(3)?.textContent).toBe("*"));
     expect(rowIndicator(2)?.textContent).toBe("3");
+    expect(dataHeaders()).toEqual(["Name"]);
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "Name\nAna\nLeo\nEva" }));
 });
 
@@ -176,11 +182,12 @@ it("deletes the selected data row and column from the editing sidebar and saves 
         content: "Name,Note\r\nAna,first\r\nEva\r\n",
     }));
 
-    await selectCell(2, 2);
+    await selectCell(2, 1);
     await vi.waitFor(() => {
         expect(deleteAction("row").disabled).toBe(true);
-        expect(deleteAction("column").disabled).toBe(true);
+        expect(deleteAction("column").disabled).toBe(false);
     });
+    expect(dataHeaders()).toEqual(["Name", "Note"]);
     context.editor.searchFile()?.();
     await vi.waitFor(() => expect(document.activeElement).toBe(root.querySelector('[data-testid="search-input"]')));
     expect(editingTab().getAttribute("aria-selected")).toBe("false");

@@ -25,7 +25,7 @@ const tableRowHeight = 30;
 
 function gridColumnCount(csv: CsvDocument): number {
     return csv.header
-        ? csv.rows.reduce((width, row) => Math.max(width, row.length + 1), csv.header.length + 1)
+        ? csv.rows.reduce((width, row) => Math.max(width, row.length), csv.header.length)
         : initialColumnCount;
 }
 
@@ -46,7 +46,6 @@ export function ViewTable(): JSX.Element {
     let refreshQueued = false;
     let columnCount = initialColumnCount;
     let displayedColumns = 0;
-    let displayedHeaderLength = 0;
     let displayedRows = 0;
     let modified = (): void => undefined;
     let focusSearch: (() => void) | null = null;
@@ -71,13 +70,11 @@ export function ViewTable(): JSX.Element {
     };
 
     const setCell = (row: number, column: number, value: string): boolean => {
-        if (!csv || (csv.rows[row]?.[column] ?? "") === value) return false;
+        if (!csv || column >= columnCount || (csv.rows[row]?.[column] ?? "") === value) return false;
         csv.header ??= Array.from({ length: initialColumnCount }, (_, index) => columnName(index));
-        while (csv.header.length <= column) csv.header.push(columnName(csv.header.length));
         const cells = csv.rows[row] ?? (csv.rows[row] = Array<string>(csv.header.length).fill(""));
         while (cells.length <= column) cells.push("");
         cells[column] = value;
-        columnCount = Math.max(columnCount, cells.length + 1);
         dirty = true;
         modified();
         updateDeleteTargets();
@@ -112,7 +109,7 @@ export function ViewTable(): JSX.Element {
         const row = selectedCell?.row;
         const column = selectedCell?.column;
         setRowTarget(csv && row !== undefined && row < csv.rows.length ? row : null);
-        setColumnTarget(csv?.header && column !== undefined && column < columnCount - 1
+        setColumnTarget(csv?.header && column !== undefined && column < columnCount
             ? { index: column, label: columnLabel(column).trim() || columnName(column) }
             : null);
     };
@@ -168,11 +165,9 @@ export function ViewTable(): JSX.Element {
 
     const syncGrid = (): void => {
         if (!grid || !csv) return;
-        const headerLength = csv.header?.length ?? 0;
-        if (displayedColumns !== columnCount || displayedHeaderLength !== headerLength) {
+        if (displayedColumns !== columnCount) {
             grid.setGridOption("columnDefs", columns());
             displayedColumns = columnCount;
-            displayedHeaderLength = headerLength;
         }
         const rowCount = csv.rows.length + 1;
         if (displayedRows !== rowCount) {
@@ -190,8 +185,8 @@ export function ViewTable(): JSX.Element {
             if (index >= csv.rows.length) return;
             csv.rows.splice(index, 1);
         } else {
-            if (!csv.header || index >= columnCount - 1) return;
-            if (columnCount === 2) {
+            if (!csv.header || index >= columnCount) return;
+            if (columnCount === 1) {
                 csv.header = undefined;
                 csv.rows = [];
             } else {
@@ -216,7 +211,6 @@ export function ViewTable(): JSX.Element {
         grid = null;
         refreshQueued = false;
         displayedColumns = 0;
-        displayedHeaderLength = 0;
         displayedRows = 0;
         csv = null;
         selectedCell = null;
@@ -252,7 +246,6 @@ export function ViewTable(): JSX.Element {
             modified = onModified;
             columnCount = gridColumnCount(csv);
             displayedColumns = columnCount;
-            displayedHeaderLength = csv.header?.length ?? 0;
             displayedRows = csv.rows.length + 1;
             grid = createGrid<GridRow>(gridRef, {
                 theme: themeQuartz.withParams({
@@ -307,7 +300,7 @@ export function ViewTable(): JSX.Element {
             const table = document.createElement("table");
             const header = table.createTHead().insertRow();
             const body = table.createTBody();
-            const width = csv?.header ? columnCount - 1 : initialColumnCount;
+            const width = columnCount;
             for (let index = 0; index < width; index += 1) {
                 const cell = document.createElement("th");
                 cell.scope = "col";
