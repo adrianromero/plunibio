@@ -7,6 +7,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { render } from "solid-js/web";
 import App from "./app/App";
+import { installWebKitKeyboardWorkaround } from "./app/WebKitKeyboardWorkaround";
 import type { InitialConfig } from "./backend/rusttypes";
 import { applyTheme, loadTheme } from "./preferences/ThemePreferences";
 import { applyTypography, loadTypography } from "./preferences/TypographyPreferences";
@@ -23,6 +24,9 @@ if (import.meta.env.VITE_PLUNIBIO_AUTOMATION === "1") {
 
 applyTheme(loadTheme());
 applyTypography(loadTypography());
+
+const removeKeyboardWorkaround = installWebKitKeyboardWorkaround();
+import.meta.hot?.dispose(removeKeyboardWorkaround);
 
 function isEditableTarget(target: EventTarget | null): boolean {
     if (!(target instanceof Element)) {

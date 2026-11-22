@@ -7,6 +7,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { render } from "solid-js/web";
 import { afterEach, expect, it, vi } from "vitest";
 import { useAppContext, type AppContextValues } from "@/app/AppContext";
+import { installWebKitKeyboardWorkaround } from "@/app/WebKitKeyboardWorkaround";
 import { StoryAppProvider } from "@/app/__stories__/support/StoryAppProvider";
 import Toolbar from "@/features/toolbar/Toolbar";
 import I18NProvider from "@/i18n/Localization";
@@ -26,6 +27,7 @@ vi.mock("@/shared/logging/frontendLog", () => ({ frontendLog: vi.fn() }));
 let context: AppContextValues;
 let root: HTMLDivElement;
 let dispose: (() => void) | undefined;
+let removeKeyboardWorkaround: (() => void) | undefined;
 
 function Probe() {
     context = useAppContext();
@@ -92,12 +94,34 @@ async function selectCell(row: number, column: number): Promise<void> {
 }
 
 afterEach(() => {
+    removeKeyboardWorkaround?.();
+    removeKeyboardWorkaround = undefined;
     dispose?.();
     dispose = undefined;
     root?.remove();
     vi.restoreAllMocks();
     vi.mocked(invoke).mockClear();
     window.dispatchEvent(new Event("afterprint"));
+});
+
+it("navigates back to the previous cell when WebKitGTK reports Shift+Tab as unidentified", async () => {
+    removeKeyboardWorkaround = installWebKitKeyboardWorkaround();
+    await mount("A,B\nAna,Leo");
+    const first = await vi.waitFor(() => cell(0, 0));
+    const second = cell(0, 1);
+    first.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, detail: 1 }));
+    first.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, detail: 1 }));
+    first.focus();
+
+    first.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", code: "Tab", bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(second);
+
+    const backwardTab = new KeyboardEvent("keydown", {
+        key: "Unidentified", code: "Tab", shiftKey: true, bubbles: true, cancelable: true,
+    });
+    second.dispatchEvent(backwardTab);
+    expect(document.activeElement).toBe(first);
+    expect(backwardTab.defaultPrevented).toBe(true);
 });
 
 it("writes default headers above the first pending edit in an empty CSV", async () => {
