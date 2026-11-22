@@ -7,7 +7,14 @@
         "saving": "Saving {{ filename }}..."
     },
     "table": {
-        "newRow": "New row"
+        "newRow": "New row",
+        "missingValue": "Value missing.",
+        "expected": {
+            "string": "Expected text.",
+            "number": "Expected a number.",
+            "boolean": "Expected a boolean."
+        },
+        "replacementRejected": "Cells skipped because the replacement did not match the column type: {{ count }}."
     },
     "toolbar": {
         "print": "Print…",
@@ -258,6 +265,10 @@
         "loadFileFailed": "The file could not be loaded.",
         "renderViewFailed": "The document view could not be generated.",
         "invalidCsv": "This CSV could not be read as a table. Check its syntax in the source view.",
+        "invalidJsonTable": "This file must contain a JSON array of objects. Check the source view.",
+        "invalidJsonlTable": "Line {{ line }} must contain a JSON object. Check the source view.",
+        "noTableColumns": "This table has no columns.",
+        "invalidTableMetadata": "Could not read valid table metadata from {{ filename }}.",
         "unsupportedPathType": "Unsupported path type: {{ filename }}"
     },
     "backendErrors": {

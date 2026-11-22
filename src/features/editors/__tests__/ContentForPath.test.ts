@@ -41,12 +41,11 @@ describe("contentForPath", () => {
         if (selection?.kind === "content") expect(selection.component).toBe(EditorECharts);
     });
 
-    it.each(["chart.json", "chart.echarts.json.bak.json"])("keeps ordinary JSON in EditorText: %s", filename => {
-        const selection = contentForPath(filename, { kind: "file" });
-        if (selection?.kind === "content") expect(selection.component).toBe(EditorText);
+    it.each(["chart.json", "chart.echarts.json.bak.json", "events.jsonl", "folder/events.JSONL"])("opens %s with EditorText", filename => {
+        expect(contentForPath(filename, { kind: "file" })).toEqual({ kind: "content", component: EditorText, props: {} });
     });
 
-    it.each(["data.csv", "folder/data.CSV"])("opens %s with EditorTable", (filename) => {
+    it.each(["data.csv", "folder/data.CSV", "data.table.json", "folder/data.TABLE.JSONL"])("opens %s with EditorTable", (filename) => {
         expect(contentForPath(filename, { kind: "file" })).toEqual({ kind: "content", component: EditorTable, props: {} });
     });
 

@@ -11,6 +11,7 @@ import EditorECharts from "./echarts/EditorECharts";
 import { editorTextExtensionsForFilename } from "./text/CodeLanguages";
 import EditorText from "./text/EditorText";
 import EditorTable from "./table/EditorTable";
+import { tableFormatForFilename } from "./table/TableFormats";
 
 export type EditorForFilename =
     | typeof EditorMarkdown
@@ -24,12 +25,11 @@ export type EditorForFilename =
 export function editorForFilename(filename: string): EditorForFilename {
     const normalizedFilename = filename.toLowerCase();
     if (normalizedFilename.endsWith(".echarts.json")) return EditorECharts;
+    if (tableFormatForFilename(normalizedFilename)) return EditorTable;
     const extensionIndex = normalizedFilename.lastIndexOf(".");
     const extension = extensionIndex >= 0 ? normalizedFilename.slice(extensionIndex) : "";
 
     switch (extension) {
-        case ".csv":
-            return EditorTable;
         case ".md":
         case ".markdown":
         case ".mdown":

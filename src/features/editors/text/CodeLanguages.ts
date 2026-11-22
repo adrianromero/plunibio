@@ -23,6 +23,7 @@ import type { Ctx } from "@milkdown/kit/ctx";
 import { createMermaidPreviewRenderer } from "../markdown/MermaidPreview";
 import { createEChartsPreviewRenderer } from "../markdown/EChartsPreview";
 import { mermaidLanguageSupport } from "./MermaidLanguage";
+import { jsonLinesLanguage } from "./JsonLinesLanguage";
 
 const PLAIN_TEXT_LANGUAGE_NAME = "Text";
 const plainTextSupport = new LanguageSupport(
@@ -91,6 +92,7 @@ export const CODE_LANGUAGES: readonly LanguageDescription[] = [
     }),
     LanguageDescription.of({ name: "CSS", extensions: ["css"], support: css() }),
     LanguageDescription.of({ name: "JSON", extensions: ["json"], support: json() }),
+    LanguageDescription.of({ name: "JSONL", extensions: ["jsonl"], support: jsonLinesLanguage }),
     LanguageDescription.of({ name: "ECharts", alias: ["echarts"], support: json() }),
     LanguageDescription.of({
         name: "Mermaid",

@@ -29,6 +29,7 @@ describe("CodeLanguages", () => {
             "HTML",
             "CSS",
             "JSON",
+            "JSONL",
             "ECharts",
             "Mermaid",
             "Markdown",
@@ -49,6 +50,7 @@ describe("CodeLanguages", () => {
         ["Cargo.toml", "TOML"],
         ["config.yml", "YAML"],
         ["vector.svg", "XML"],
+        ["events.jsonl", "JSONL"],
         ["diagram.mmd", "Mermaid"],
         ["README.md", "Markdown"],
         ["formula.tex", "LaTeX"],
@@ -67,6 +69,22 @@ describe("CodeLanguages", () => {
 
     it("no considera texto un tipo de archivo desconocido", () => {
         expect(editorTextExtensionsForFilename("archive.bin")).toBeNull();
+    });
+
+    it("resalta los valores JSONL en líneas consecutivas", () => {
+        const [support] = editorTextExtensionsForFilename("data.jsonl") ?? [];
+        const source = '{"value":true}\n{"number":4e-5,"missing":null}';
+        const tokens: Record<string, string> = {};
+        highlightTree(support.language.parser.parse(source), classHighlighter, (from, to, classes) => {
+            tokens[source.slice(from, to)] = classes;
+        });
+        expect(tokens).toMatchObject({
+            '"value"': "tok-propertyName",
+            '"number"': "tok-propertyName",
+            "true": "tok-bool",
+            "4e-5": "tok-number",
+            "null": "tok-keyword",
+        });
     });
 
     it("resalta la sintaxis Mermaid con las clases del tema de CodeMirror", () => {

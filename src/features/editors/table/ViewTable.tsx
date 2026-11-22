@@ -4,48 +4,48 @@
  */
 
 import type { ColDef, GridApi } from "ag-grid-community";
-import { createEffect, onCleanup, type JSX } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onCleanup, Show, type JSX } from "solid-js";
 import { useAppContext } from "@/app/AppContext";
+import { textFileStorage } from "@/app/FileEditorController";
 import AppSidebar from "@/app/sidebar/AppSidebar";
 import SearchPanel from "@/features/search/SearchPanel";
 import { useI18N } from "@/i18n/Localization";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
 import { useEditorTextView } from "../text/EditorTextViewContext";
-import { columnName, parseCsv, serializeCsv, type CsvDocument } from "./CsvDocument";
+import { tableCellTypes, type CellValue } from "./TableCellTypes";
+import { createTableGridColumn, tableCellPresentation, type GridRow } from "./TableCellPresentation";
+import type { TableColumn, TableDocument, TableRow } from "./TableDocument";
+import { metadataFilename, parseTableColumns, tableFormatForFilename } from "./TableFormats";
 import { TableSearchController } from "./TableSearchController";
 import styles from "./ViewTable.module.css";
 
-type GridRow = { id: string; values?: string[] };
-
-const initialColumnCount = 3;
 const rowNumberColumnId = "row-number";
-
-function gridColumnCount(csv: CsvDocument): number {
-    return csv.header
-        ? csv.rows.reduce((width, row) => Math.max(width, row.length), csv.header.length)
-        : initialColumnCount;
-}
 
 export function ViewTable(): JSX.Element {
     const host = useEditorTextView();
-    const { t } = useI18N();
-    const { editor: { theme, searchFile, setSearchFile, setSidebarVisible } } = useAppContext();
+    const { t, locale } = useI18N();
+    const { main: { basepath }, editor: { theme, searchFile, setSearchFile, setSidebarVisible } } = useAppContext();
+    const [rejectedReplacements, setRejectedReplacements] = createSignal(0);
+    const decimalSeparator = createMemo(() => new Intl.NumberFormat(locale()).formatToParts(1.1)
+        .find(({ type }) => type === "decimal")?.value ?? ".");
     let gridRef!: HTMLDivElement;
     let printRef!: HTMLDivElement;
     let grid: GridApi<GridRow> | null = null;
-    let csv: CsvDocument | null = null;
+    let model: TableDocument | null = null;
     let source: string | null = null;
     let dirty = false;
-    let columnCount = initialColumnCount;
     let nextRowId = 0;
     let modified = (): void => undefined;
     let focusSearch: (() => void) | null = null;
     let refreshQueued = false;
     let generation = 0;
 
-    const createRow = (values?: string[]): GridRow => ({ id: String(nextRowId++), values });
-    const columnLabel = (column: number): string => csv?.header ? csv.header[column] ?? "" : columnName(column);
+    const createRow = (values?: TableRow): GridRow => ({ id: String(nextRowId++), values });
+    const displayCell = (row: TableRow, column: TableColumn): string => {
+        const cell = row.read(column);
+        return cell.value === undefined ? cell.rawText : tableCellTypes[column.type].format(cell.value, decimalSeparator());
+    };
     const flushEdits = (): void => { grid?.stopEditing(); };
     const focusGrid = (): void => {
         const cell = grid?.getFocusedCell();
@@ -53,12 +53,11 @@ export function ViewTable(): JSX.Element {
         grid?.setFocusedCell(cell?.rowIndex ?? 0, column && column !== rowNumberColumnId ? column : "0");
     };
 
-    const setCell = (row: GridRow, column: number, value: string): boolean => {
-        if (!csv || (row.values?.[column] ?? "") === value) return false;
+    const setCell = (row: GridRow, column: TableColumn, value: CellValue): boolean => {
+        if (!model) return false;
+        if (Object.is(row.values?.read(column).value, value)) return false;
         if (!row.values) {
-            csv.header ??= Array.from({ length: initialColumnCount }, (_, index) => columnName(index));
-            row.values = Array<string>(csv.header.length).fill("");
-            csv.rows.push(row.values);
+            row.values = model.appendRow(column, value);
             const activeGrid = grid;
             // A cell editor is still being closed while the value setter runs.
             queueMicrotask(() => {
@@ -66,21 +65,27 @@ export function ViewTable(): JSX.Element {
                     activeGrid.applyTransaction({ update: [{ ...row }], add: [createRow()] });
                 }
             });
+        } else {
+            row.values.write(column, value);
         }
-        while (row.values.length <= column) row.values.push("");
-        row.values[column] = value;
         dirty = true;
         modified();
         return true;
     };
 
     const search = new TableSearchController(
-        () => csv?.rows ?? [],
+        () => model ? displayRows(model) : [],
         (edits) => {
+            let rejected = 0;
             for (const { row, column, value } of edits) {
+                const definition = model?.columns[column];
                 const data = grid?.getDisplayedRowAtIndex(row)?.data;
-                if (data?.values) setCell(data, column, value);
+                if (!definition || !data?.values) continue;
+                const parsed = tableCellTypes[definition.type].parse(value, decimalSeparator());
+                if (parsed === undefined) rejected += 1;
+                else setCell(data, definition, parsed);
             }
+            setRejectedReplacements(rejected);
         },
         ({ row, column }) => {
             grid?.ensureIndexVisible(row);
@@ -98,30 +103,20 @@ export function ViewTable(): JSX.Element {
             });
         }
     );
+    createEffect(on(decimalSeparator, () => search.contentChanged(), { defer: true }));
 
-    const createColumn = (column: number): ColDef<GridRow, string> => ({
-        colId: String(column),
-        headerName: columnLabel(column),
-        // The default text input strips line breaks. Multiline values can be edited in source mode.
-        editable: ({ data }) => !!data && !/[\r\n]/.test(data.values?.[column] ?? ""),
-        valueGetter: ({ data }) => data?.values?.[column] ?? "",
-        valueSetter: ({ data, newValue }) => {
-            if (!data || !setCell(data, column, newValue ?? "")) return false;
-            search.contentChanged();
-            return true;
-        },
-        cellClassRules: {
-            [styles.match]: ({ node }) => node.rowIndex !== null && search.isMatch(node.rowIndex, column),
-            [styles.current]: ({ node }) => node.rowIndex !== null && search.isCurrent(node.rowIndex, column),
-        },
-    });
+    const displayRows = (table: TableDocument): string[][] => table.rows.map((row) =>
+        table.columns.map((column) => displayCell(row, column))
+    );
 
     const rowNumberColumn: ColDef<GridRow, string> = {
         colId: rowNumberColumnId,
         headerName: "",
+        cellDataType: false,
         pinned: "left",
         lockPinned: true,
         width: 88,
+        resizable: false,
         suppressNavigable: true,
         rowDrag: ({ data }) => !!data?.values,
         valueGetter: ({ data, node }) => {
@@ -140,14 +135,16 @@ export function ViewTable(): JSX.Element {
     };
 
     const saveRowOrder = (activeGrid: GridApi<GridRow>): void => {
-        if (!csv || grid !== activeGrid) return;
-        const previous = csv.rows;
-        const rows: string[][] = [];
+        if (!model || grid !== activeGrid) return;
+        const previous = model.rows;
+        const indices = new Map(previous.map((row, index) => [row, index]));
+        const order: number[] = [];
         activeGrid.forEachNodeAfterFilterAndSort(({ data }) => {
-            if (data?.values) rows.push(data.values);
+            const index = data?.values && indices.get(data.values);
+            if (index !== undefined) order.push(index);
         });
-        if (rows.length !== previous.length || rows.every((row, index) => row === previous[index])) return;
-        csv.rows = rows;
+        if (order.length !== previous.length || order.every((row, index) => row === index)) return;
+        model.reorderRows(order);
         dirty = true;
         modified();
         search.contentChanged();
@@ -158,10 +155,11 @@ export function ViewTable(): JSX.Element {
         grid?.destroy();
         grid = null;
         refreshQueued = false;
-        csv = null;
+        model = null;
         source = null;
         dirty = false;
         nextRowId = 0;
+        setRejectedReplacements(0);
         search.clear();
         printRef?.replaceChildren();
     };
@@ -170,35 +168,61 @@ export function ViewTable(): JSX.Element {
         flushEdits,
         getContent: async () => {
             flushEdits();
-            return dirty && csv ? serializeCsv(csv) : source;
+            return dirty && model ? model.serialize() : source;
         },
-        replaceContent: async (content, _filename, onModified) => {
+        replaceContent: async (content, filename, onModified) => {
             destroy();
             source = content;
-            csv = parseCsv(content);
-            if (!csv) {
-                host.reportError(t("errors.invalidCsv"));
+            const version = generation;
+            const format = tableFormatForFilename(filename);
+            if (!format) {
+                host.reportError(t("errors.renderViewFailed"));
                 return;
             }
-            const version = generation;
+            const metadataPath = metadataFilename(filename, format);
+            let columns: TableColumn[] | null = null;
+            try {
+                const metadata = await textFileStorage.read(basepath(), metadataPath);
+                if (version !== generation) return;
+                if (!metadata.isNew) {
+                    columns = parseTableColumns(metadata.content);
+                    if (!columns) {
+                        host.reportError(t("errors.invalidTableMetadata", { filename: metadataPath }));
+                        return;
+                    }
+                }
+            } catch {
+                if (version === generation) host.reportError(t("errors.invalidTableMetadata", { filename: metadataPath }));
+                return;
+            }
+            const loaded = format.load(content, columns);
+            if ("error" in loaded) {
+                host.reportError(t(loaded.error, loaded.params));
+                return;
+            }
             const {
-                CellStyleModule, ClientSideRowModelApiModule, ClientSideRowModelModule, RenderApiModule,
-                RowApiModule, RowDragModule, ScrollApiModule, TextEditorModule, createGrid, themeQuartz,
+                CellStyleModule, CheckboxEditorModule, ClientSideRowModelApiModule, ClientSideRowModelModule,
+                LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                ScrollApiModule, TextEditorModule, TooltipModule, createGrid, themeQuartz,
             } = await import("ag-grid-community");
             if (version !== generation) return;
 
             modified = onModified;
-            columnCount = gridColumnCount(csv);
+            model = loaded.document;
+            const table = model;
             grid = createGrid<GridRow>(gridRef, {
                 theme: themeQuartz,
                 defaultColDef: {
-                    cellDataType: false,
                     sortable: false,
-                    resizable: false,
                     suppressMovable: true,
                 },
-                columnDefs: [rowNumberColumn, ...Array.from({ length: columnCount }, (_, index) => createColumn(index))],
-                rowData: [...csv.rows.map(createRow), createRow()],
+                columnDefs: [
+                    rowNumberColumn,
+                    ...table.columns.map((column, index) => createTableGridColumn(column, index, {
+                        t, decimalSeparator, supportsMultilineText: table.supportsMultilineText, setCell, search,
+                    })),
+                ],
+                rowData: [...table.rows.map(createRow), createRow()],
                 getRowId: ({ data }) => data.id,
                 stopEditingWhenCellsLoseFocus: true,
                 rowDragManaged: true,
@@ -208,8 +232,9 @@ export function ViewTable(): JSX.Element {
                 onRowDragEnd: ({ api }) => queueMicrotask(() => saveRowOrder(api)),
             }, {
                 modules: [
-                    CellStyleModule, ClientSideRowModelModule, ClientSideRowModelApiModule, RenderApiModule,
-                    RowApiModule, RowDragModule, ScrollApiModule, TextEditorModule,
+                    CellStyleModule, CheckboxEditorModule, ClientSideRowModelModule, ClientSideRowModelApiModule,
+                    LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                    ScrollApiModule, TextEditorModule, TooltipModule,
                 ],
             });
             gridRef.querySelector('[role="grid"]')?.setAttribute("aria-label", t("folder.table"));
@@ -220,16 +245,19 @@ export function ViewTable(): JSX.Element {
             const table = document.createElement("table");
             const header = table.createTHead().insertRow();
             const body = table.createTBody();
-            for (let index = 0; index < columnCount; index += 1) {
+            const columns = model?.columns ?? [];
+            for (const { label } of columns) {
                 const cell = document.createElement("th");
                 cell.scope = "col";
-                cell.textContent = columnLabel(index);
+                cell.textContent = label;
                 header.append(cell);
             }
-            for (const row of csv?.rows ?? []) {
+            for (const row of model?.rows ?? []) {
                 const line = body.insertRow();
-                for (let index = 0; index < columnCount; index += 1) {
-                    line.insertCell().textContent = row[index] ?? "";
+                for (const column of columns) {
+                    const cell = line.insertCell();
+                    cell.textContent = displayCell(row, column);
+                    cell.className = tableCellPresentation[column.type].printClass ?? "";
                 }
             }
             printRef.replaceChildren(table);
@@ -270,6 +298,11 @@ export function ViewTable(): JSX.Element {
                 <SidebarTab defaultKey="search">
                     <SidebarTabSection key="search" label={t("search.title")}>
                         <SearchPanel controller={search} registerFocus={(handler) => { focusSearch = handler; }} />
+                        <Show when={rejectedReplacements() > 0}>
+                            <p class={styles.replacementError} role="status">
+                                {t("table.replacementRejected", { count: rejectedReplacements() })}
+                            </p>
+                        </Show>
                     </SidebarTabSection>
                 </SidebarTab>
             </AppSidebar>

@@ -7,7 +7,14 @@
         "saving": "{{ filename }} gordetzen..."
     },
     "table": {
-        "newRow": "Errenkada berria"
+        "newRow": "Errenkada berria",
+        "missingValue": "Balioa falta da.",
+        "expected": {
+            "string": "Testua espero zen.",
+            "number": "Zenbaki bat espero zen.",
+            "boolean": "Balio boolear bat espero zen."
+        },
+        "replacementRejected": "Ordezko balioa zutabearen motarekin bat ez datorrelako saltatutako gelaxkak: {{ count }}."
     },
     "toolbar": {
         "print": "Inprimatu…",
@@ -258,6 +265,10 @@
         "loadFileFailed": "Ezin izan da fitxategia kargatu.",
         "renderViewFailed": "Ezin izan da dokumentuaren ikuspegia sortu.",
         "invalidCsv": "Ezin izan da CSV hau taula gisa irakurri. Egiaztatu sintaxia iturburu-kodearen ikuspegian.",
+        "invalidJsonTable": "Fitxategi honek objektuen JSON array bat izan behar du. Begiratu iturburu-kodearen ikuspegia.",
+        "invalidJsonlTable": "{{ line }} lerroak JSON objektu bat izan behar du. Begiratu iturburu-kodearen ikuspegia.",
+        "noTableColumns": "Taula honek ez du zutaberik.",
+        "invalidTableMetadata": "Ezin izan dira baliozko taula-metadatuak irakurri {{ filename }} fitxategian.",
         "unsupportedPathType": "Onartzen ez den bide mota: {{ filename }}"
     },
     "backendErrors": {

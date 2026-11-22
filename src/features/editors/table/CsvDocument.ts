@@ -49,11 +49,3 @@ export function serializeCsv({ header, rows, delimiter, newline, finalNewline, b
     else if (lastRow?.length === 1 && lastRow[0] === "") content += '""';
     return bom + content;
 }
-
-export function columnName(index: number): string {
-    let name = "";
-    for (let value = index + 1; value > 0; value = Math.floor((value - 1) / 26)) {
-        name = String.fromCharCode(65 + (value - 1) % 26) + name;
-    }
-    return name;
-}

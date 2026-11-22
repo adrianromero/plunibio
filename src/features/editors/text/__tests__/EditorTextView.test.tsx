@@ -16,6 +16,7 @@ import I18NProvider from "@/i18n/Localization";
 import Toolbar from "@/features/toolbar/Toolbar";
 import ViewMarkdown from "../../markdown/ViewMarkdown";
 import { editorTextExtensionsForFilename } from "../CodeLanguages";
+import EditorText from "../EditorText";
 import EditorTextView from "../EditorTextView";
 import { useEditorTextView } from "../EditorTextViewContext";
 
@@ -55,8 +56,9 @@ describe("EditorTextView mode and document lifecycle", () => {
                 <StoryAppProvider filename={filename}>
                     <Probe />
                     <Toolbar />
-                    <EditorTextView printable view={markdown ? view : null}
-                        extensions={editorTextExtensionsForFilename(filename) ?? []} />
+                    {markdown
+                        ? <EditorTextView printable view={view} extensions={editorTextExtensionsForFilename(filename) ?? []} />
+                        : <EditorText />}
                 </StoryAppProvider>
             </I18NProvider>
         ), root);
@@ -130,6 +132,16 @@ describe("EditorTextView mode and document lifecycle", () => {
         expect(context.editor.fileModified()).toBe(true);
         expect(writes()).toHaveLength(0);
         window.dispatchEvent(new Event("afterprint"));
+    });
+
+    it("opens and saves ordinary JSONL in the highlighted text editor", async () => {
+        diskContent = '{"id":1}\n{"id":2}';
+        await mount(false, ViewMarkdown, "events.jsonl");
+        expect(sourceButton()).toBeNull();
+        expect(Array.from(root.querySelectorAll(".tok-propertyName"), (token) => token.textContent)).toEqual(['"id"', '"id"']);
+        source().dispatch({ changes: { from: source().state.doc.length, insert: '\n{"id":3}' } });
+        await context.editor.saveFile()?.();
+        expect(writes()[0]?.[1]).toMatchObject({ filename: "events.jsonl", content: '{"id":1}\n{"id":2}\n{"id":3}' });
     });
 
     it("keeps plain text fully editable with search, save and reload, without a view toggle", async () => {

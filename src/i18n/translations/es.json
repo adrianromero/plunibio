@@ -7,7 +7,14 @@
         "saving": "Guardando {{ filename }}..."
     },
     "table": {
-        "newRow": "Fila nueva"
+        "newRow": "Fila nueva",
+        "missingValue": "Falta el valor.",
+        "expected": {
+            "string": "Se esperaba texto.",
+            "number": "Se esperaba un número.",
+            "boolean": "Se esperaba un valor booleano."
+        },
+        "replacementRejected": "Celdas omitidas porque el reemplazo no coincide con el tipo de la columna: {{ count }}."
     },
     "toolbar": {
         "print": "Imprimir…",
@@ -258,6 +265,10 @@
         "loadFileFailed": "No se ha podido cargar el archivo.",
         "renderViewFailed": "No se ha podido generar la vista del documento.",
         "invalidCsv": "No se ha podido leer este CSV como tabla. Revisa su sintaxis en la vista de código fuente.",
+        "invalidJsonTable": "Este archivo debe contener un array JSON de objetos. Revisa la vista de código fuente.",
+        "invalidJsonlTable": "La línea {{ line }} debe contener un objeto JSON. Revisa la vista de código fuente.",
+        "noTableColumns": "Esta tabla no tiene columnas.",
+        "invalidTableMetadata": "No se han podido leer metadatos de tabla válidos en {{ filename }}.",
         "unsupportedPathType": "Tipo de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

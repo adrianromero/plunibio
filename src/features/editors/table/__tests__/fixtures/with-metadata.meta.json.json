@@ -1,0 +1,7 @@
+{
+    "columns": [
+        { "id": "a", "label": "Text", "type": "string" },
+        { "id": "b", "label": "Number", "type": "number" },
+        { "id": "c", "label": "Boolean", "type": "boolean" }
+    ]
+}

@@ -7,7 +7,14 @@
         "saving": "S'està desant {{ filename }}..."
     },
     "table": {
-        "newRow": "Fila nova"
+        "newRow": "Fila nova",
+        "missingValue": "Falta el valor.",
+        "expected": {
+            "string": "S’esperava text.",
+            "number": "S’esperava un número.",
+            "boolean": "S’esperava un valor booleà."
+        },
+        "replacementRejected": "Cel·les omeses perquè el reemplaçament no coincideix amb el tipus de la columna: {{ count }}."
     },
     "toolbar": {
         "print": "Imprimeix…",
@@ -258,6 +265,10 @@
         "loadFileFailed": "No s'ha pogut carregar el fitxer.",
         "renderViewFailed": "No s’ha pogut generar la vista del document.",
         "invalidCsv": "No s’ha pogut llegir aquest CSV com a taula. Revisa’n la sintaxi a la vista de codi font.",
+        "invalidJsonTable": "Aquest fitxer ha de contenir una matriu JSON d’objectes. Revisa la vista de codi font.",
+        "invalidJsonlTable": "La línia {{ line }} ha de contenir un objecte JSON. Revisa la vista de codi font.",
+        "noTableColumns": "Aquesta taula no té columnes.",
+        "invalidTableMetadata": "No s’han pogut llegir metadades de taula vàlides a {{ filename }}.",
         "unsupportedPathType": "Tipus de ruta no compatible: {{ filename }}"
     },
     "backendErrors": {

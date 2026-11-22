@@ -1,0 +1,7 @@
+{
+    "columns": [
+        { "id": "count", "label": "Count", "type": "number" },
+        { "id": "name", "label": "Name", "type": "string" },
+        { "id": "ready", "label": "Ready", "type": "boolean" }
+    ]
+}

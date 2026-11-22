@@ -18,12 +18,30 @@
     min-height: 0;
 }
 
+.cellValue {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.grid :global(.ag-cell).cellIssue {
+    background: var(--color-error-background);
+    box-shadow: inset 3px 0 var(--color-error-border);
+}
+
 .grid :global(.ag-cell).match {
     background: var(--color-search-match);
 }
 
 .grid :global(.ag-cell).current {
     background: var(--color-search-match-active);
+}
+
+.replacementError {
+    margin: 0.5rem;
+    color: var(--color-error-text);
 }
 
 .print {
@@ -65,5 +83,9 @@
 
     .print th {
         background: #f1f1f1;
+    }
+
+    .print .numeric {
+        text-align: end;
     }
 }
