@@ -16,21 +16,6 @@
     flex: 1 1 0;
     min-width: 0;
     min-height: 0;
-    margin: var(--view-padding);
-    border-radius: var(--radius-medium);
-    box-shadow: var(--shadow-surface);
-}
-
-.grid :global(.ag-cell).rowNumber {
-    background: var(--ag-header-background-color);
-    font-variant-numeric: tabular-nums;
-    padding-inline: 8px;
-    text-align: end;
-}
-
-.newRowMarker {
-    font-weight: 600;
-    font-size: 1.15em;
 }
 
 .grid :global(.ag-cell).match {

@@ -12,6 +12,7 @@ import Toolbar from "@/features/toolbar/Toolbar";
 import I18NProvider from "@/i18n/Localization";
 import EditorTable from "../EditorTable";
 import { parseCsv, serializeCsv } from "../CsvDocument";
+import styles from "../ViewTable.module.css";
 
 let diskContent = "";
 vi.mock("@tauri-apps/api/core", () => ({
@@ -68,16 +69,12 @@ async function enterText(row: number, column: number, value: string): Promise<vo
     input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-function deleteAction(kind: "row" | "column"): HTMLButtonElement {
-    return root.querySelector<HTMLButtonElement>(`[data-testid="delete-table-${kind}"]`)!;
-}
-
-function editingTab(): HTMLButtonElement {
-    return root.querySelector<HTMLButtonElement>('[role="tab"][data-tab-key="edit"]')!;
-}
-
 function rowIndicator(row: number): HTMLElement | null {
     return root.querySelector(`[row-index="${row}"] [role="gridcell"][col-id="row-number"]`);
+}
+
+function rowGrip(row: number): Element | null | undefined {
+    return rowIndicator(row)?.querySelector(".ag-row-drag:not(.ag-invisible):not(.ag-hidden) .ag-icon-grip");
 }
 
 function dataHeaders(): (string | undefined)[] {
@@ -91,7 +88,7 @@ async function selectCell(row: number, column: number): Promise<void> {
     const target = await vi.waitFor(() => cell(row, column));
     target.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, detail: 1 }));
     target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, detail: 1 }));
-    target.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }));
+    target.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, detail: 2 }));
 }
 
 afterEach(() => {
@@ -127,16 +124,19 @@ it("shows read-only row numbers and moves the new-row marker when data is entere
     await vi.waitFor(() => expect(rowIndicator(2)?.textContent).toBe("*"));
     expect(rowIndicator(0)?.textContent).toBe("1");
     expect(rowIndicator(1)?.textContent).toBe("2");
-    expect(rowIndicator(1)?.getAttribute("aria-readonly")).toBe("true");
+    expect(rowGrip(1)).toBeTruthy();
+    expect(rowGrip(2)).toBeNull();
     expect(rowIndicator(1)?.getAttribute("aria-colindex")).toBe("1");
     expect(rowIndicator(2)?.querySelector('[role="img"]')?.getAttribute("aria-label")).toBe("New row");
-    rowIndicator(1)?.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }));
+    rowIndicator(1)?.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, detail: 2 }));
     expect(root.querySelector('[col-id="row-number"] input')).toBeNull();
 
     await enterText(2, 0, "Eva");
     await context.editor.saveFile()?.();
     await vi.waitFor(() => expect(rowIndicator(3)?.textContent).toBe("*"));
     expect(rowIndicator(2)?.textContent).toBe("3");
+    await vi.waitFor(() => expect(rowGrip(2)).toBeTruthy());
+    expect(rowGrip(3)).toBeNull();
     expect(dataHeaders()).toEqual(["Name"]);
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "Name\nAna\nLeo\nEva" }));
 });
@@ -155,62 +155,33 @@ it("uses the first record as read-only column labels and keeps the second record
     }));
 });
 
-it("deletes the selected data row and column from the editing sidebar and saves the resulting CSV", async () => {
-    await mount("Name,ID,Note\r\nAna,0012,first\r\nLeo,0003,second\r\nEva,0007\r\n");
-    expect(editingTab().getAttribute("aria-selected")).toBe("true");
-    await vi.waitFor(() => expect(deleteAction("row").disabled).toBe(false));
-    await selectCell(1, 1);
-    await vi.waitFor(() => expect(deleteAction("row").textContent).toContain("2"));
-    deleteAction("row").focus();
-    expect(deleteAction("row").textContent).toContain("2");
-    expect(root.querySelector('[data-toolbar-menu-entry^="delete-table-"]')).toBeNull();
-    deleteAction("row").click();
-    await vi.waitFor(() => {
-        expect(cell(1, 0).textContent).toBe("Eva");
-        expect(rowIndicator(1)?.textContent).toBe("2");
-        expect(rowIndicator(2)?.textContent).toBe("*");
-    });
-    expect(context.editor.fileModified()).toBe(true);
-    expect(invoke).not.toHaveBeenCalledWith("write_file", expect.anything());
+it("keeps only the search tab in the table sidebar and uses the selected theme", async () => {
+    await mount("Name\nAna");
+    const sidebar = root.querySelector('[data-testid="table-view"] [data-testid="app-sidebar"]');
+    expect(Array.from(sidebar?.querySelectorAll('[role="tab"]') ?? [], (tab) => tab.getAttribute("data-tab-key")))
+        .toEqual(["search"]);
+    expect(context.editor.toggleSidebar()).not.toBeNull();
+    expect(context.editor.searchFile()).not.toBeNull();
+    expect(root.querySelector(".ag-theme-mode")?.getAttribute("data-ag-theme-mode")).toBe("light");
+    context.editor.setTheme("dark");
+    expect(root.querySelector(".ag-theme-mode")?.getAttribute("data-ag-theme-mode")).toBe("dark");
 
-    await selectCell(0, 1);
-    await vi.waitFor(() => expect(deleteAction("column").textContent).toContain("ID"));
-    deleteAction("column").click();
-    await vi.waitFor(() => expect(cell(0, 1).textContent).toBe("first"));
-    await context.editor.saveFile()?.();
-    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
-        content: "Name,Note\r\nAna,first\r\nEva\r\n",
-    }));
-
-    await selectCell(2, 1);
-    await vi.waitFor(() => {
-        expect(deleteAction("row").disabled).toBe(true);
-        expect(deleteAction("column").disabled).toBe(false);
-    });
-    expect(dataHeaders()).toEqual(["Name", "Note"]);
+    await context.editor.toggleSourceMode()?.();
     context.editor.searchFile()?.();
     await vi.waitFor(() => expect(document.activeElement).toBe(root.querySelector('[data-testid="search-input"]')));
-    expect(editingTab().getAttribute("aria-selected")).toBe("false");
-    editingTab().click();
-    await context.editor.toggleSourceMode()?.();
-    expect(editingTab()).toBeNull();
 });
 
-it("keeps the header after deleting the last row and clears the CSV after deleting the last column", async () => {
-    await mount("Name\r\nAna\r\n");
-    editingTab().click();
-    await selectCell(0, 0);
-    await vi.waitFor(() => expect(deleteAction("row").disabled).toBe(false));
-    deleteAction("row").click();
-    await context.editor.saveFile()?.();
-    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "Name\r\n" }));
+it("preserves multiline fields while editing other cells with the default text editor", async () => {
+    await mount('Name,Note\nAna,"line one\nline two"');
+    const multiline = await vi.waitFor(() => cell(0, 1));
+    multiline.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, detail: 2 }));
+    expect(multiline.querySelector("input, textarea")).toBeNull();
 
-    await vi.waitFor(() => expect(cell(0, 0).textContent).toBe(""));
-    await selectCell(0, 0);
-    await vi.waitFor(() => expect(deleteAction("column").disabled).toBe(false));
-    deleteAction("column").click();
-    await context.main.onunload()?.();
-    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "", createIfEmpty: false }));
+    await enterText(0, 0, "Leo");
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: 'Name,Note\nLeo,"line one\nline two"',
+    }));
 });
 
 it("prints all rows with column headings and restores source mode", async () => {
@@ -246,6 +217,10 @@ it("searches and replaces text in the grid through the shared sidebar", async ()
     expect(counter()).toBe("0 / 3");
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     expect(counter()).toBe("1 / 3");
+    await vi.waitFor(() => {
+        expect(cell(0, 1).classList.contains(styles.current)).toBe(true);
+        expect(cell(1, 1).classList.contains(styles.match)).toBe(true);
+    });
 
     const replacement = root.querySelector<HTMLInputElement>('[data-testid="replace-input"]')!;
     replacement.value = "$1";

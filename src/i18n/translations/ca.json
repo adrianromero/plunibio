@@ -7,12 +7,7 @@
         "saving": "S'està desant {{ filename }}..."
     },
     "table": {
-        "newRow": "Fila nova",
-        "editing": "Edició",
-        "deleteRow": "Suprimeix la fila",
-        "deleteRowNumber": "Suprimeix la fila {{ row }}",
-        "deleteColumn": "Suprimeix la columna",
-        "deleteColumnNamed": "Suprimeix la columna «{{ name }}»"
+        "newRow": "Fila nova"
     },
     "toolbar": {
         "print": "Imprimeix…",

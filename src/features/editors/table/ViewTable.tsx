@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { ColDef, GridApi, ICellRendererParams } from "ag-grid-community";
-import Trash2 from "lucide-solid/icons/trash-2";
-import { createEffect, createSignal, onCleanup, type JSX } from "solid-js";
+import type { ColDef, GridApi } from "ag-grid-community";
+import { createEffect, onCleanup, type JSX } from "solid-js";
 import { useAppContext } from "@/app/AppContext";
 import AppSidebar from "@/app/sidebar/AppSidebar";
 import SearchPanel from "@/features/search/SearchPanel";
@@ -17,11 +16,10 @@ import { columnName, parseCsv, serializeCsv, type CsvDocument } from "./CsvDocum
 import { TableSearchController } from "./TableSearchController";
 import styles from "./ViewTable.module.css";
 
-type GridRow = { index: number; isNew: boolean };
-type CellPosition = { row: number; column: number };
+type GridRow = { id: string; values?: string[] };
+
 const initialColumnCount = 3;
 const rowNumberColumnId = "row-number";
-const tableRowHeight = 30;
 
 function gridColumnCount(csv: CsvDocument): number {
     return csv.header
@@ -32,103 +30,89 @@ function gridColumnCount(csv: CsvDocument): number {
 export function ViewTable(): JSX.Element {
     const host = useEditorTextView();
     const { t } = useI18N();
-    const { editor: { searchFile, setSearchFile, setSidebarVisible } } = useAppContext();
-    const [sidebarTab, setSidebarTab] = createSignal("edit");
-    const [rowTarget, setRowTarget] = createSignal<number | null>(null);
-    const [columnTarget, setColumnTarget] = createSignal<{ index: number; label: string } | null>(null);
-    let selectedCell: CellPosition | null = null;
+    const { editor: { theme, searchFile, setSearchFile, setSidebarVisible } } = useAppContext();
     let gridRef!: HTMLDivElement;
     let printRef!: HTMLDivElement;
     let grid: GridApi<GridRow> | null = null;
     let csv: CsvDocument | null = null;
     let source: string | null = null;
     let dirty = false;
-    let refreshQueued = false;
     let columnCount = initialColumnCount;
-    let displayedColumns = 0;
-    let displayedRows = 0;
+    let nextRowId = 0;
     let modified = (): void => undefined;
     let focusSearch: (() => void) | null = null;
+    let refreshQueued = false;
     let generation = 0;
 
+    const createRow = (values?: string[]): GridRow => ({ id: String(nextRowId++), values });
+    const columnLabel = (column: number): string => csv?.header ? csv.header[column] ?? "" : columnName(column);
+    const flushEdits = (): void => { grid?.stopEditing(); };
     const focusGrid = (): void => {
         const cell = grid?.getFocusedCell();
         const column = cell?.column.getColId();
         grid?.setFocusedCell(cell?.rowIndex ?? 0, column && column !== rowNumberColumnId ? column : "0");
     };
 
-    const queueRefresh = (): void => {
-        if (refreshQueued || !grid) return;
-        refreshQueued = true;
-        const activeGrid = grid;
-        queueMicrotask(() => {
-            if (grid !== activeGrid) return;
-            refreshQueued = false;
-            syncGrid();
-            activeGrid.refreshCells({ force: true });
-        });
-    };
-
-    const setCell = (row: number, column: number, value: string): boolean => {
-        if (!csv || column >= columnCount || (csv.rows[row]?.[column] ?? "") === value) return false;
-        csv.header ??= Array.from({ length: initialColumnCount }, (_, index) => columnName(index));
-        const cells = csv.rows[row] ?? (csv.rows[row] = Array<string>(csv.header.length).fill(""));
-        while (cells.length <= column) cells.push("");
-        cells[column] = value;
+    const setCell = (row: GridRow, column: number, value: string): boolean => {
+        if (!csv || (row.values?.[column] ?? "") === value) return false;
+        if (!row.values) {
+            csv.header ??= Array.from({ length: initialColumnCount }, (_, index) => columnName(index));
+            row.values = Array<string>(csv.header.length).fill("");
+            csv.rows.push(row.values);
+            const activeGrid = grid;
+            // A cell editor is still being closed while the value setter runs.
+            queueMicrotask(() => {
+                if (activeGrid && grid === activeGrid) {
+                    activeGrid.applyTransaction({ update: [{ ...row }], add: [createRow()] });
+                }
+            });
+        }
+        while (row.values.length <= column) row.values.push("");
+        row.values[column] = value;
         dirty = true;
         modified();
-        updateDeleteTargets();
         return true;
     };
 
     const search = new TableSearchController(
         () => csv?.rows ?? [],
         (edits) => {
-            for (const { row, column, value } of edits) setCell(row, column, value);
+            for (const { row, column, value } of edits) {
+                const data = grid?.getDisplayedRowAtIndex(row)?.data;
+                if (data?.values) setCell(data, column, value);
+            }
         },
         ({ row, column }) => {
-            const id = String(column);
             grid?.ensureIndexVisible(row);
-            grid?.ensureColumnVisible(id);
+            grid?.ensureColumnVisible(String(column));
         },
         focusGrid,
-        queueRefresh
+        () => {
+            if (refreshQueued || !grid) return;
+            refreshQueued = true;
+            const activeGrid = grid;
+            queueMicrotask(() => {
+                if (grid !== activeGrid) return;
+                refreshQueued = false;
+                activeGrid.refreshCells({ force: true });
+            });
+        }
     );
-
-    const columnLabel = (column: number): string => csv?.header ? csv.header[column] ?? "" : columnName(column);
-    const deleteRowLabel = (): string => {
-        const row = rowTarget();
-        return row === null ? t("table.deleteRow") : t("table.deleteRowNumber", { row: row + 1 });
-    };
-    const deleteColumnLabel = (): string => {
-        const column = columnTarget();
-        return column === null ? t("table.deleteColumn") : t("table.deleteColumnNamed", { name: column.label });
-    };
-
-    const updateDeleteTargets = (): void => {
-        const row = selectedCell?.row;
-        const column = selectedCell?.column;
-        setRowTarget(csv && row !== undefined && row < csv.rows.length ? row : null);
-        setColumnTarget(csv?.header && column !== undefined && column < columnCount
-            ? { index: column, label: columnLabel(column).trim() || columnName(column) }
-            : null);
-    };
 
     const createColumn = (column: number): ColDef<GridRow, string> => ({
         colId: String(column),
         headerName: columnLabel(column),
-        valueGetter: ({ data }) => data ? csv?.rows[data.index]?.[column] ?? "" : "",
-        valueSetter: ({ data, newValue, oldValue }) => {
-            const value = newValue ?? "";
-            // The browser normalizes newlines in a textarea even if the user leaves it untouched.
-            if (!data || value === oldValue?.replace(/\r\n?/g, "\n")) return false;
-            if (!setCell(data.index, column, value)) return false;
+        // The default text input strips line breaks. Multiline values can be edited in source mode.
+        editable: ({ data }) => !!data && !/[\r\n]/.test(data.values?.[column] ?? ""),
+        valueGetter: ({ data }) => data?.values?.[column] ?? "",
+        valueSetter: ({ data, newValue }) => {
+            if (!data || !setCell(data, column, newValue ?? "")) return false;
             search.contentChanged();
             return true;
         },
         cellClassRules: {
-            [styles.match]: ({ data }) => !!data && search.isMatch(data.index, column),
-            [styles.current]: ({ data }) => !!data && search.isCurrent(data.index, column),
+            [styles.match]: ({ node }) => node.rowIndex !== null && search.isMatch(node.rowIndex, column),
+            [styles.current]: ({ node }) => node.rowIndex !== null && search.isCurrent(node.rowIndex, column),
         },
     });
 
@@ -137,71 +121,35 @@ export function ViewTable(): JSX.Element {
         headerName: "",
         pinned: "left",
         lockPinned: true,
-        width: 60,
-        editable: false,
+        width: 88,
         suppressNavigable: true,
-        cellClass: styles.rowNumber,
-        valueGetter: ({ data }) => {
+        rowDrag: ({ data }) => !!data?.values,
+        valueGetter: ({ data, node }) => {
             if (!data) return "";
-            return data.isNew ? "*" : String(data.index + 1);
+            return data.values ? String((node?.rowIndex ?? 0) + 1) : "*";
         },
-        cellRenderer: ({ data, value, eGridCell }: ICellRendererParams<GridRow, string>) => {
-            eGridCell.setAttribute("aria-readonly", "true");
-            const label = document.createElement("span");
-            label.textContent = value ?? "";
-            if (data?.isNew) {
-                const newRowLabel = t("table.newRow");
-                label.className = styles.newRowMarker;
-                label.setAttribute("role", "img");
-                label.setAttribute("aria-label", newRowLabel);
-                label.title = newRowLabel;
-            }
-            return label;
-        },
-        cellRendererParams: { suppressMouseEventHandling: () => true },
-    };
-    const columns = () => [rowNumberColumn, ...Array.from({ length: columnCount }, (_, column) => createColumn(column))];
-    const rows = (count: number) => Array.from({ length: count }, (_, index) => ({ index, isNew: index === count - 1 }));
-
-    const syncGrid = (): void => {
-        if (!grid || !csv) return;
-        if (displayedColumns !== columnCount) {
-            grid.setGridOption("columnDefs", columns());
-            displayedColumns = columnCount;
-        }
-        const rowCount = csv.rows.length + 1;
-        if (displayedRows !== rowCount) {
-            grid.setGridOption("rowData", rows(rowCount));
-            displayedRows = rowCount;
-        }
+        cellRendererSelector: ({ data }) => data && !data.values ? {
+            component: () => {
+                const marker = document.createElement("span");
+                marker.textContent = "*";
+                marker.setAttribute("role", "img");
+                marker.setAttribute("aria-label", t("table.newRow"));
+                return marker;
+            },
+        } : undefined,
     };
 
-    const flushEdits = (): void => { grid?.stopEditing(); };
-
-    const remove = (kind: "row" | "column", index: number): void => {
-        if (!csv || !host.active() || !host.ready()) return;
-        flushEdits();
-        if (kind === "row") {
-            if (index >= csv.rows.length) return;
-            csv.rows.splice(index, 1);
-        } else {
-            if (!csv.header || index >= columnCount) return;
-            if (columnCount === 1) {
-                csv.header = undefined;
-                csv.rows = [];
-            } else {
-                csv.header.splice(index, 1);
-                if (!csv.header.length) csv.header.push("");
-                for (const row of csv.rows) {
-                    row.splice(index, 1);
-                    if (!row.length) row.push("");
-                }
-            }
-        }
-        columnCount = gridColumnCount(csv);
+    const saveRowOrder = (activeGrid: GridApi<GridRow>): void => {
+        if (!csv || grid !== activeGrid) return;
+        const previous = csv.rows;
+        const rows: string[][] = [];
+        activeGrid.forEachNodeAfterFilterAndSort(({ data }) => {
+            if (data?.values) rows.push(data.values);
+        });
+        if (rows.length !== previous.length || rows.every((row, index) => row === previous[index])) return;
+        csv.rows = rows;
         dirty = true;
         modified();
-        updateDeleteTargets();
         search.contentChanged();
     };
 
@@ -210,15 +158,11 @@ export function ViewTable(): JSX.Element {
         grid?.destroy();
         grid = null;
         refreshQueued = false;
-        displayedColumns = 0;
-        displayedRows = 0;
         csv = null;
-        selectedCell = null;
-        updateDeleteTargets();
         source = null;
         dirty = false;
+        nextRowId = 0;
         search.clear();
-        search.contentChanged();
         printRef?.replaceChildren();
     };
 
@@ -238,58 +182,34 @@ export function ViewTable(): JSX.Element {
             }
             const version = generation;
             const {
-                CellStyleModule, ClientSideRowModelModule, LargeTextEditorModule, RenderApiModule,
-                ScrollApiModule, TextEditorModule, createGrid, themeQuartz,
+                CellStyleModule, ClientSideRowModelApiModule, ClientSideRowModelModule, RenderApiModule,
+                RowApiModule, RowDragModule, ScrollApiModule, TextEditorModule, createGrid, themeQuartz,
             } = await import("ag-grid-community");
             if (version !== generation) return;
 
             modified = onModified;
             columnCount = gridColumnCount(csv);
-            displayedColumns = columnCount;
-            displayedRows = csv.rows.length + 1;
             grid = createGrid<GridRow>(gridRef, {
-                theme: themeQuartz.withParams({
-                    accentColor: "var(--color-primary)",
-                    backgroundColor: "var(--color-surface)",
-                    borderColor: "var(--color-border-subtle)",
-                    foregroundColor: "var(--color-text)",
-                    headerBackgroundColor: "var(--color-surface-subtle)",
-                    headerFontWeight: 700,
-                    fontFamily: "var(--font-interface)",
-                    columnBorder: true,
-                    wrapperBorder: { width: 1, style: "solid", color: "var(--color-border)" },
-                    wrapperBorderRadius: "var(--radius-medium)",
-                }),
-                headerHeight: tableRowHeight,
-                rowHeight: tableRowHeight,
+                theme: themeQuartz,
                 defaultColDef: {
-                    editable: true,
                     cellDataType: false,
-                    cellEditor: "agTextCellEditor",
-                    cellEditorSelector: ({ value }) => typeof value === "string" && /[\r\n]/.test(value)
-                        ? { component: "agLargeTextCellEditor", popup: true, params: { maxLength: Math.max(value.length, 524288) } }
-                        : undefined,
                     sortable: false,
                     resizable: false,
                     suppressMovable: true,
-                    width: 152,
                 },
-                columnDefs: columns(),
-                rowData: rows(displayedRows),
-                getRowId: ({ data }) => String(data.index),
-                singleClickEdit: true,
+                columnDefs: [rowNumberColumn, ...Array.from({ length: columnCount }, (_, index) => createColumn(index))],
+                rowData: [...csv.rows.map(createRow), createRow()],
+                getRowId: ({ data }) => data.id,
                 stopEditingWhenCellsLoseFocus: true,
-                onCellFocused: ({ rowIndex, column }) => {
-                    if (rowIndex === null || column === null) return;
-                    const id = typeof column === "string" ? column : column.getColId();
-                    if (id === rowNumberColumnId) return;
-                    selectedCell = { row: rowIndex, column: Number(id) };
-                    updateDeleteTargets();
-                },
+                rowDragManaged: true,
+                suppressMoveWhenRowDragging: true,
+                isRowValidDropPosition: ({ target }) => target?.data?.values ? true : { position: "above" },
+                onRowDragEnter: flushEdits,
+                onRowDragEnd: ({ api }) => queueMicrotask(() => saveRowOrder(api)),
             }, {
                 modules: [
-                    CellStyleModule, ClientSideRowModelModule, LargeTextEditorModule,
-                    RenderApiModule, ScrollApiModule, TextEditorModule,
+                    CellStyleModule, ClientSideRowModelModule, ClientSideRowModelApiModule, RenderApiModule,
+                    RowApiModule, RowDragModule, ScrollApiModule, TextEditorModule,
                 ],
             });
             gridRef.querySelector('[role="grid"]')?.setAttribute("aria-label", t("folder.table"));
@@ -300,8 +220,7 @@ export function ViewTable(): JSX.Element {
             const table = document.createElement("table");
             const header = table.createTHead().insertRow();
             const body = table.createTBody();
-            const width = columnCount;
-            for (let index = 0; index < width; index += 1) {
+            for (let index = 0; index < columnCount; index += 1) {
                 const cell = document.createElement("th");
                 cell.scope = "col";
                 cell.textContent = columnLabel(index);
@@ -309,7 +228,7 @@ export function ViewTable(): JSX.Element {
             }
             for (const row of csv?.rows ?? []) {
                 const line = body.insertRow();
-                for (let index = 0; index < width; index += 1) {
+                for (let index = 0; index < columnCount; index += 1) {
                     line.insertCell().textContent = row[index] ?? "";
                 }
             }
@@ -322,7 +241,6 @@ export function ViewTable(): JSX.Element {
     const openSearch = (): void => {
         flushEdits();
         setSidebarVisible(true);
-        setSidebarTab("search");
         requestAnimationFrame(() => {
             if (host.active() && host.ready()) focusSearch?.();
         });
@@ -333,10 +251,6 @@ export function ViewTable(): JSX.Element {
         onCleanup(() => {
             if (searchFile() === openSearch) setSearchFile(null);
         });
-    });
-    createEffect(() => {
-        t("table.newRow");
-        grid?.refreshCells({ columns: [rowNumberColumnId], force: true });
     });
     onCleanup(() => {
         destroy();
@@ -350,40 +264,10 @@ export function ViewTable(): JSX.Element {
             style={{ display: host.active() ? undefined : "none" }}
             inert={!host.active() || !host.ready()}
         >
-            <div ref={gridRef} class={styles.grid} />
+            <div ref={gridRef} class={`${styles.grid} ag-theme-mode`} data-ag-theme-mode={theme()} />
             <div ref={printRef} class={styles.print} data-print-content />
             <AppSidebar active={host.active()} disabled={!host.ready()}>
-                <SidebarTab selectedKey={sidebarTab()} onSelectedKeyChange={(key) => key && setSidebarTab(key)}>
-                    <SidebarTabSection key="edit" label={t("table.editing")}>
-                        <section class="sidebarSection">
-                            <button
-                                type="button"
-                                class="stdButton toolbar sidebarAction"
-                                data-testid="delete-table-row"
-                                disabled={!host.ready() || rowTarget() === null}
-                                onClick={() => {
-                                    const row = rowTarget();
-                                    if (row !== null) remove("row", row);
-                                }}
-                            >
-                                <Trash2 aria-hidden="true" />
-                                <span class="sidebarActionLabel">{deleteRowLabel()}</span>
-                            </button>
-                            <button
-                                type="button"
-                                class="stdButton toolbar sidebarAction"
-                                data-testid="delete-table-column"
-                                disabled={!host.ready() || columnTarget() === null}
-                                onClick={() => {
-                                    const column = columnTarget();
-                                    if (column !== null) remove("column", column.index);
-                                }}
-                            >
-                                <Trash2 aria-hidden="true" />
-                                <span class="sidebarActionLabel">{deleteColumnLabel()}</span>
-                            </button>
-                        </section>
-                    </SidebarTabSection>
+                <SidebarTab defaultKey="search">
                     <SidebarTabSection key="search" label={t("search.title")}>
                         <SearchPanel controller={search} registerFocus={(handler) => { focusSearch = handler; }} />
                     </SidebarTabSection>

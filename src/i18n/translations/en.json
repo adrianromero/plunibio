@@ -7,12 +7,7 @@
         "saving": "Saving {{ filename }}..."
     },
     "table": {
-        "newRow": "New row",
-        "editing": "Editing",
-        "deleteRow": "Delete row",
-        "deleteRowNumber": "Delete row {{ row }}",
-        "deleteColumn": "Delete column",
-        "deleteColumnNamed": "Delete column “{{ name }}”"
+        "newRow": "New row"
     },
     "toolbar": {
         "print": "Print…",

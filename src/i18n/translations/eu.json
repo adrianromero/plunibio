@@ -7,12 +7,7 @@
         "saving": "{{ filename }} gordetzen..."
     },
     "table": {
-        "newRow": "Errenkada berria",
-        "editing": "Edizioa",
-        "deleteRow": "Ezabatu errenkada",
-        "deleteRowNumber": "Ezabatu {{ row }}. errenkada",
-        "deleteColumn": "Ezabatu zutabea",
-        "deleteColumnNamed": "Ezabatu «{{ name }}» zutabea"
+        "newRow": "Errenkada berria"
     },
     "toolbar": {
         "print": "Inprimatu…",
