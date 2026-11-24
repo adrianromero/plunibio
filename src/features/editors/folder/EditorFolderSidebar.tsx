@@ -66,8 +66,8 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
 
     return (
         <AppSidebar disabled={props.disabled}>
-            <SidebarTab defaultKey="actions">
-                <SidebarTabSection key="actions" label={t("folder.actions")}>
+            <SidebarTab defaultKey="create">
+                <SidebarTabSection key="create" label={t("folder.create")}>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.createFolder")}</h2>
                         <button
@@ -104,6 +104,8 @@ export function EditorFolderSidebar(props: EditorFolderSidebarProps): JSX.Elemen
                             )}
                         </For>
                     </section>
+                </SidebarTabSection>
+                <SidebarTabSection key="sort" label={t("folder.sort")}>
                     <section class="sidebarSection">
                         <h2 class="sidebarSectionTitle">{t("folder.sortBy")}</h2>
                         <For each={attributes}>

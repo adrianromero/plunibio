@@ -140,12 +140,19 @@ describe("EditorFolder", () => {
         dispose = render(() => <EditorFolder />, root);
         const names = () => Array.from(root.querySelectorAll<HTMLElement>("[data-path]"))
             .map((entry) => entry.dataset.path?.replace("docs/", ""));
+        const tab = (key: "create" | "sort") =>
+            root.querySelector<HTMLButtonElement>(`[role="tab"][data-tab-key="${key}"]`)!;
         const sortButton = (attribute: string) => {
             const button = root.querySelector<HTMLButtonElement>(`[data-sort-attribute="${attribute}"]`);
             if (!button) throw new Error("Missing sort button");
             return button;
         };
         await vi.waitFor(() => expect(names()).toEqual(["folder-a", "folder-b", "a.md", "b.md"]));
+        expect(tab("create").getAttribute("aria-selected")).toBe("true");
+        expect(root.querySelector("[data-sort-attribute]")).toBeNull();
+        tab("sort").click();
+        expect(tab("sort").getAttribute("aria-selected")).toBe("true");
+        expect(root.querySelector("[data-create-kind]")).toBeNull();
         expect(sortButton("name").getAttribute("data-sort-direction")).toBe("asc");
         sortButton("name").click();
         expect(names()).toEqual(["folder-b", "folder-a", "b.md", "a.md"]);
@@ -165,6 +172,7 @@ describe("EditorFolder", () => {
         [folderSort, setFolderSort] = createSignal<FolderSort>(loadFolderSort());
         dispose = render(() => <EditorFolder />, root);
         await vi.waitFor(() => expect(names()).toEqual(["folder-a", "folder-b", "a.md", "b.md"]));
+        tab("sort").click();
         expect(sortButton("size").getAttribute("data-sort-direction")).toBe("desc");
     });
 

@@ -28,6 +28,13 @@
             "state": "visible"
         },
         {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='sort']"
+            }
+        },
+        {
             "action": "wait",
             "target": {
                 "using": "css",
@@ -67,6 +74,13 @@
         },
         {
             "action": "refresh"
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='sort']"
+            }
         },
         {
             "action": "wait",
@@ -396,6 +410,13 @@
             "target": {
                 "using": "css",
                 "value": "[data-testid='breadcrumb-segment'][data-path='audit-created']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='create']"
             }
         },
         {

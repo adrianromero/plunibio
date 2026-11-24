@@ -54,7 +54,8 @@
         "chartGroup": "{{ letter }} taldea"
     },
     "folder": {
-        "actions": "Ekintzak",
+        "create": "Sortu",
+        "sort": "Ordenatu",
         "sortBy": "Ordenatu honen arabera",
         "sortName": "Izena",
         "sortSize": "Tamaina",

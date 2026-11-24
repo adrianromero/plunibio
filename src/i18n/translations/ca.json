@@ -54,7 +54,8 @@
         "chartGroup": "Grup {{ letter }}"
     },
     "folder": {
-        "actions": "Accions",
+        "create": "Crear",
+        "sort": "Ordenar",
         "sortBy": "Ordenar per",
         "sortName": "Nom",
         "sortSize": "Mida",

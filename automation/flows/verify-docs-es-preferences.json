@@ -327,6 +327,13 @@
             "action": "click",
             "target": {
                 "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='sort']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
                 "value": "[data-sort-attribute='modified']"
             }
         },
@@ -386,6 +393,13 @@
             "state": "existing"
         },
         {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='sort']"
+            }
+        },
+        {
             "action": "wait",
             "target": {
                 "using": "css",
@@ -398,6 +412,13 @@
             "target": {
                 "using": "css",
                 "value": "[data-testid='folder-entry'][data-path='code']"
+            }
+        },
+        {
+            "action": "click",
+            "target": {
+                "using": "css",
+                "value": "[data-testid='sidebar-tab'][data-tab-key='sort']"
             }
         },
         {
