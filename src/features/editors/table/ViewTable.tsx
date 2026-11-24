@@ -8,8 +8,10 @@ import { createEffect, createMemo, createSignal, on, onCleanup, Show, type JSX }
 import { useAppContext } from "@/app/AppContext";
 import { textFileStorage } from "@/app/FileEditorController";
 import AppSidebar from "@/app/sidebar/AppSidebar";
+import type { ReadFileResult } from "@/backend/rusttypes";
 import SearchPanel from "@/features/search/SearchPanel";
 import { useI18N } from "@/i18n/Localization";
+import { translateAppError } from "@/shared/errors/AppError";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
 import { useEditorTextView } from "../text/EditorTextViewContext";
@@ -180,19 +182,21 @@ export function ViewTable(): JSX.Element {
                 return;
             }
             const metadataPath = metadataFilename(filename, format);
-            let columns: TableColumn[] | null = null;
+            let metadata: ReadFileResult;
             try {
-                const metadata = await textFileStorage.read(basepath(), metadataPath);
-                if (version !== generation) return;
-                if (!metadata.isNew) {
-                    columns = parseTableColumns(metadata.content);
-                    if (!columns) {
-                        host.reportError(t("errors.invalidTableMetadata", { filename: metadataPath }));
-                        return;
-                    }
+                metadata = await textFileStorage.read(basepath(), metadataPath);
+            } catch (error: unknown) {
+                if (version === generation) {
+                    host.reportError(translateAppError(
+                        error, t, t("backendErrors.read_file_failed", { path: metadataPath })
+                    ));
                 }
-            } catch {
-                if (version === generation) host.reportError(t("errors.invalidTableMetadata", { filename: metadataPath }));
+                return;
+            }
+            if (version !== generation) return;
+            const columns = metadata.isNew ? null : parseTableColumns(metadata.content);
+            if (!metadata.isNew && !columns) {
+                host.reportError(t("errors.invalidTableMetadata", { filename: metadataPath }));
                 return;
             }
             const loaded = format.load(content, columns);

@@ -34,11 +34,13 @@ import invalidJsonl from "./fixtures/invalid.table.jsonl?raw";
 import emptyColumns from "./fixtures/empty-columns.meta.csv.json?raw";
 import duplicateColumns from "./fixtures/duplicate-columns.meta.json.json?raw";
 
-let files: Record<string, string> = {};
+type TestFiles = Record<string, string | { code: string; path: string }>;
+let files: TestFiles = {};
 vi.mock("@tauri-apps/api/core", () => ({
     invoke: vi.fn(async (command: string, args: { filename: string }) => {
         if (command === "read_file") {
             const content = files[args.filename];
+            if (typeof content === "object") throw content;
             return { content: content ?? "", isNew: content === undefined };
         }
         return undefined;
@@ -58,7 +60,7 @@ function Probe() {
     return null;
 }
 
-async function mount(content: string, filename = "data.csv", companions: Record<string, string> = {}): Promise<void> {
+async function mount(content: string, filename = "data.csv", companions: TestFiles = {}): Promise<void> {
     files = { ...companions, [filename]: content };
     vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(800);
     vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(400);
@@ -670,7 +672,15 @@ it.each([
     ["invalid.table.jsonl", invalidJsonl, {}, "Line 2"],
     ["invalid.table.jsonl", '{"a":1}\n[]\n', {}, "Line 2"],
     ["no-columns.table.json", noColumns, {}, "no columns"],
-    ["empty-columns.csv", emptyCsv, { "empty-columns.meta.csv.json": emptyColumns }, "empty-columns.meta.csv.json"],
+    [
+        "empty-columns.csv", emptyCsv, { "empty-columns.meta.csv.json": emptyColumns },
+        "Could not read valid table metadata from empty-columns.meta.csv.json.",
+    ],
+    [
+        "unreadable.csv", emptyCsv,
+        { "unreadable.meta.csv.json": { code: "permission_denied", path: "unreadable.meta.csv.json" } },
+        "You do not have permission to access unreadable.meta.csv.json.",
+    ],
     ["duplicate-columns.table.json", emptyJson, { "duplicate-columns.meta.json.json": duplicateColumns }, "duplicate-columns.meta.json.json"],
     ["bad-metadata.table.jsonl", emptyJsonl, { "bad-metadata.meta.jsonl.json": "{columns: []}" }, "bad-metadata.meta.jsonl.json"],
 ] as const)("shows a load error for %s and keeps the source available", async (filename, content, metadata, error) => {
