@@ -332,6 +332,21 @@ fn create_entry_rejects_paths_instead_of_names() {
 }
 
 #[test]
+fn entry_name_validation_respects_platform_path_components() {
+    let name = "C:notes.md";
+    let result = super::validate_entry_name(name);
+
+    #[cfg(windows)]
+    assert_eq!(
+        serde_json::to_value(result.unwrap_err()).unwrap()["code"],
+        "invalid_path"
+    );
+
+    #[cfg(not(windows))]
+    result.unwrap();
+}
+
+#[test]
 fn missing_file_is_unsaved_until_written() {
     tauri::async_runtime::block_on(async {
         let unique = SystemTime::now()

@@ -166,11 +166,15 @@ fn modified_at_millis(metadata: &std::fs::Metadata) -> Option<u64> {
         .ok()
 }
 
+fn is_single_normal_component(path: &Path) -> bool {
+    let mut components = path.components();
+    matches!(components.next(), Some(Component::Normal(_))) && components.next().is_none()
+}
+
 fn validate_entry_name(name: &str) -> Result<(), AppError> {
     if name.trim().is_empty()
-        || matches!(name, "." | "..")
-        || name.contains(['/', '\\'])
-        || name.contains('\0')
+        || name.contains(['/', '\\', '\0'])
+        || !is_single_normal_component(Path::new(name))
     {
         return Err(AppError::invalid_path(
             name,
@@ -971,8 +975,7 @@ fn linked_file_name(preferred_name: &str, attempt: u32) -> Result<String, AppErr
     }
 
     let preferred_path = Path::new(preferred_name);
-    let mut components = preferred_path.components();
-    if !matches!(components.next(), Some(Component::Normal(_))) || components.next().is_some() {
+    if !is_single_normal_component(preferred_path) {
         return Err(AppError::invalid_path(
             preferred_name,
             "linked file name must be a single file name",
