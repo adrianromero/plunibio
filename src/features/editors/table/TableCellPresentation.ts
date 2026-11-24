@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { ColDef, ICellEditorParams, ICellRendererParams, INumberCellEditorParams } from "ag-grid-community";
+import type {
+    ColDef, ICellEditorParams, ICellRendererParams, IDateStringCellEditorParams, INumberCellEditorParams,
+} from "ag-grid-community";
 import type { Translator } from "@/i18n/Localization";
 import { tableCellTypes, type CellValue, type ColumnType } from "./TableCellTypes";
 import type { TableCell, TableColumn, TableRow } from "./TableDocument";
@@ -22,6 +24,7 @@ type ColumnOptions = {
 };
 
 type CellPresentation = {
+    defaultWidth: number;
     column(options: ColumnOptions & { read: (data?: GridRow) => TableCell | undefined }): GridColumn;
     printClass?: string;
     displayEmptyAsText?: boolean;
@@ -29,6 +32,7 @@ type CellPresentation = {
 
 export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
     string: {
+        defaultWidth: 240,
         column({ read, supportsMultilineText }) {
             const multiline = (data?: GridRow): boolean => {
                 const value = read(data)?.value;
@@ -47,10 +51,12 @@ export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
         },
     },
     boolean: {
-        column: () => ({ cellDataType: "boolean" }),
+        defaultWidth: 100,
+        column: () => ({ cellDataType: "boolean", cellClass: styles.booleanCell }),
         displayEmptyAsText: true,
     },
     number: {
+        defaultWidth: 140,
         column({ decimalSeparator, t }) {
             const getValidationErrors: INumberCellEditorParams<GridRow>["getValidationErrors"] = ({ value, internalErrors }) =>
                 typeof value === "number" && Number.isFinite(value) ? internalErrors : [t("table.expected.number")];
@@ -63,6 +69,18 @@ export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
             };
         },
         printClass: styles.numeric,
+    },
+    date: {
+        defaultWidth: 140,
+        column({ t }) {
+            const getValidationErrors: IDateStringCellEditorParams<GridRow>["getValidationErrors"] = ({ value, internalErrors }) =>
+                tableCellTypes.date.read(value) === undefined ? [t("table.expected.date")] : internalErrors;
+            return {
+                cellDataType: "dateString",
+                cellEditorParams: { getValidationErrors },
+                valueParser: ({ newValue }) => tableCellTypes.date.read(newValue),
+            };
+        },
     },
 };
 
@@ -87,6 +105,7 @@ export function createTableGridColumn(definition: TableColumn, index: number, op
     return {
         colId: String(index),
         headerName: definition.label,
+        initialWidth: definition.width ?? presentation.defaultWidth,
         editable: ({ data }) => !!data,
         valueGetter: ({ data }) => read(data)?.value,
         ...presentation.column({ ...options, read }),

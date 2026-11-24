@@ -4,7 +4,8 @@
  */
 
 import { expect, it } from "vitest";
-import { metadataFilename, tableFormatForFilename } from "../TableFormats";
+import { tableCellTypes } from "../TableCellTypes";
+import { metadataFilename, parseTableColumns, tableFormatForFilename } from "../TableFormats";
 
 it.each([
     ["data.csv", "name,hidden\nAna,1\nLeo,2", "name,hidden\nLeo,2\nAna,1"],
@@ -34,4 +35,15 @@ it.each([
     const format = tableFormatForFilename(filename);
     if (!format) throw new Error(`Missing table format for ${filename}`);
     expect(metadataFilename(filename, format)).toBe(expected);
+});
+
+it.each(["0", "-10", '"180"', "null", "1e309"])("rejects a metadata width of %s", (width) => {
+    expect(parseTableColumns(`{"columns":[{"id":"a","label":"A","type":"string","width":${width}}]}`)).toBeNull();
+});
+
+it("accepts only real calendar dates in YYYY-MM-DD format", () => {
+    expect(tableCellTypes.date.parse("2024-02-29")).toBe("2024-02-29");
+    for (const text of ["", "2023-02-29", "2024-04-31", "2024-2-9", "2024-02-29\n", "2024-02-29T00:00:00", "0000-01-01"]) {
+        expect(tableCellTypes.date.parse(text), text).toBeUndefined();
+    }
 });

@@ -12,7 +12,8 @@
         "expected": {
             "string": "S’esperava text.",
             "number": "S’esperava un número.",
-            "boolean": "S’esperava un valor booleà."
+            "boolean": "S’esperava un valor booleà.",
+            "date": "S’esperava una data amb format AAAA-MM-DD."
         },
         "replacementRejected": "Cel·les omeses perquè el reemplaçament no coincideix amb el tipus de la columna: {{ count }}."
     },

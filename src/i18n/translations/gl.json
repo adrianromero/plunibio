@@ -12,7 +12,8 @@
         "expected": {
             "string": "Agardábase texto.",
             "number": "Agardábase un número.",
-            "boolean": "Agardábase un valor booleano."
+            "boolean": "Agardábase un valor booleano.",
+            "date": "Agardábase unha data co formato AAAA-MM-DD."
         },
         "replacementRejected": "Celas omitidas porque a substitución non coincide co tipo da columna: {{ count }}."
     },

@@ -206,7 +206,7 @@ export function ViewTable(): JSX.Element {
             }
             const {
                 CellStyleModule, CheckboxEditorModule, ClientSideRowModelApiModule, ClientSideRowModelModule,
-                LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                DateEditorModule, LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
                 ScrollApiModule, TextEditorModule, TooltipModule, createGrid, themeQuartz,
             } = await import("ag-grid-community");
             if (version !== generation) return;
@@ -237,7 +237,7 @@ export function ViewTable(): JSX.Element {
             }, {
                 modules: [
                     CellStyleModule, CheckboxEditorModule, ClientSideRowModelModule, ClientSideRowModelApiModule,
-                    LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                    DateEditorModule, LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
                     ScrollApiModule, TextEditorModule, TooltipModule,
                 ],
             });

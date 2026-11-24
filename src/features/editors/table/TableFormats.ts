@@ -5,6 +5,7 @@
 
 import { csvTableFormat } from "./CsvTableFormat";
 import { jsonLinesTableFormat, jsonTableFormat } from "./JsonTableFormats";
+import { isColumnType } from "./TableCellTypes";
 import type { TableColumn } from "./TableDocument";
 import type { TableFormat } from "./TableFormat";
 import { isJsonObject, parseJson } from "./TableJson";
@@ -28,11 +29,11 @@ export function parseTableColumns(source: string): TableColumn[] | null {
     const ids = new Set<string>();
     for (const column of metadata.columns as unknown[]) {
         if (!isJsonObject(column)) return null;
-        const { id, label, type } = column;
-        if (typeof id !== "string" || ids.has(id) || typeof label !== "string" ||
-            (type !== "string" && type !== "number" && type !== "boolean")) return null;
+        const { id, label, type, width } = column;
+        if (typeof id !== "string" || ids.has(id) || typeof label !== "string" || !isColumnType(type)) return null;
+        if (width !== undefined && (typeof width !== "number" || !Number.isFinite(width) || width <= 0)) return null;
         ids.add(id);
-        columns.push({ id, label, type });
+        columns.push({ id, label, type, ...(width === undefined ? {} : { width }) });
     }
     return columns;
 }

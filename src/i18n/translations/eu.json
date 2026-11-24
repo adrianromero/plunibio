@@ -12,7 +12,8 @@
         "expected": {
             "string": "Testua espero zen.",
             "number": "Zenbaki bat espero zen.",
-            "boolean": "Balio boolear bat espero zen."
+            "boolean": "Balio boolear bat espero zen.",
+            "date": "AAAA-MM-DD formatuko data bat espero zen."
         },
         "replacementRejected": "Ordezko balioa zutabearen motarekin bat ez datorrelako saltatutako gelaxkak: {{ count }}."
     },

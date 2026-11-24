@@ -432,6 +432,78 @@ it("uses localized decimals for searching, replacing and printing without changi
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: "amount\n2.5\n1.2e-7" }));
 });
 
+it.each([
+    ["values.csv", emptyCsv, "values.meta.csv.json"],
+    ["values.table.json", emptyJson, "values.meta.json.json"],
+    ["values.table.jsonl", emptyJsonl, "values.meta.jsonl.json"],
+] as const)("applies optional metadata column widths to %s", async (filename, content, metadataPath) => {
+    const columns = [
+        { id: "a", label: "A", type: "string", width: 135 },
+        { id: "b", label: "B", type: "number", width: 260 },
+        { id: "c", label: "C", type: "boolean" },
+    ];
+    await mount(content, filename, { [metadataPath]: JSON.stringify({ columns }) });
+    const headers = root.querySelectorAll<HTMLElement>('[role="columnheader"]:not([col-id="row-number"])');
+    expect(Array.from(headers, (header) => header.style.width)).toEqual(["135px", "260px", "100px"]);
+});
+
+it("sets default column widths according to the inferred types", async () => {
+    await mount("Name,Amount,Ready\nAna,1.5,true");
+    const headers = root.querySelectorAll<HTMLElement>('[role="columnheader"]:not([col-id="row-number"])');
+    expect(Array.from(headers, (header) => header.style.width)).toEqual(["240px", "140px", "100px"]);
+});
+
+it.each([
+    ["dates.csv", "dates.meta.csv.json", (dates: string[]) => ["due,note", ...dates.map((date) => `${date},keep`)].join("\n")],
+    ["dates.table.json", "dates.meta.json.json", (dates: string[]) => JSON.stringify(dates.map((due) => ({ due, note: "keep" })), null, 2)],
+    ["dates.table.jsonl", "dates.meta.jsonl.json", (dates: string[]) => dates.map((due) => JSON.stringify({ due, note: "keep" })).join("\n")],
+] as const)("edits ISO dates with the native editor in %s", async (filename, metadataPath, serialize) => {
+    const content = serialize(["2024-02-29", "2023-02-29"]);
+    const metadata = JSON.stringify({ columns: [{ id: "due", label: "Due", type: "date" }] });
+    await mount(content, filename, { [metadataPath]: metadata });
+    expect(cell(0, 0).textContent).toBe("2024-02-29");
+    await vi.waitFor(() => expect(cell(1, 0).textContent).toBe("2023-02-29"));
+    expect(cell(1, 0).getAttribute("aria-description")).toBe("Expected a date in YYYY-MM-DD format.");
+
+    const valid = await openCellEditor(0, 0);
+    expect(valid.type).toBe("date");
+    expect(valid.value).toBe("2024-02-29");
+    valid.value = "";
+    valid.dispatchEvent(new Event("input", { bubbles: true }));
+    await finishEdit(valid, "Enter");
+    expect(cell(0, 0).textContent).toBe("2024-02-29");
+
+    const invalid = await openCellEditor(1, 0);
+    expect(invalid.type).toBe("date");
+    expect(invalid.value).toBe("");
+    invalid.value = "2024-02-29";
+    invalid.dispatchEvent(new Event("input", { bubbles: true }));
+    await finishEdit(invalid, "Escape");
+    expect(context.editor.fileModified()).toBe(false);
+
+    await finishEdit(await enterText(0, 0, "2026-11-24"), "outside click");
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        filename,
+        content: serialize(["2026-11-24", "2023-02-29"]),
+    }));
+});
+
+it("requires a valid date before inserting a new row", async () => {
+    const metadata = JSON.stringify({ columns: [{ id: "due", label: "Due", type: "date" }] });
+    await mount(emptyJson, "dates.table.json", { "dates.meta.json.json": metadata });
+    await finishEdit(await openCellEditor(0, 0), "Enter");
+    expect(context.editor.fileModified()).toBe(false);
+    expect(rowIndicator(0)?.textContent).toBe("*");
+
+    await finishEdit(await enterText(0, 0, "2024-02-29"), "Enter");
+    await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: JSON.stringify([{ due: "2024-02-29" }], null, 2),
+    }));
+});
+
 it("adds a metadata-only CSV column after unmapped and extra fields without moving them", async () => {
     await mount(csvWithMetadata, "folder/with-metadata.CSV", { "folder/with-metadata.meta.csv.json": csvMetadata });
     expect(dataHeaders()).toEqual(["Count", "Name", "Ready"]);
@@ -452,7 +524,8 @@ it("adds a metadata-only CSV column after unmapped and extra fields without movi
 
 it("toggles valid booleans by clicking or pressing Space and keeps invalid values visible", async () => {
     await mount('[{"flag":true},{"flag":false},{"flag":"false"},{}]', "data.table.json");
-    const first = cell(0, 0).querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(cell(0, 0).classList.contains(styles.booleanCell)).toBe(true);
+    const first = cell(0, 0).querySelector<HTMLInputElement>('.ag-checkbox-cell input[type="checkbox"]');
     expect(first?.checked).toBe(true);
     first?.click();
 
@@ -618,6 +691,7 @@ it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
         const indeterminate = await openCellEditor(1, 2);
         expect(indeterminate.type).toBe("checkbox");
         expect(indeterminate.indeterminate).toBe(true);
+        expect(indeterminate.closest(".ag-checkbox-edit")?.closest(`.${styles.booleanCell}`)).toBe(cell(1, 2));
         await finishEdit(indeterminate, exit);
         expect(cell(1, 2).getAttribute("aria-description")).toBe("Expected a boolean.");
         expect(context.editor.fileModified()).toBe(false);

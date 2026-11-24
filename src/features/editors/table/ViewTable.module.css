@@ -26,6 +26,13 @@
     text-overflow: ellipsis;
 }
 
+.grid .booleanCell :global(.ag-checkbox-cell),
+.grid .booleanCell :global(.ag-checkbox-edit) {
+    width: 100%;
+    justify-content: center;
+    padding-inline: 0;
+}
+
 .grid :global(.ag-cell).cellIssue {
     background: var(--color-error-background);
     box-shadow: inset 3px 0 var(--color-error-border);
