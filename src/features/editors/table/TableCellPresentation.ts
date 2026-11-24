@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { ColDef, ICellRendererParams, INumberCellEditorParams } from "ag-grid-community";
+import type { ColDef, ICellEditorParams, ICellRendererParams, INumberCellEditorParams } from "ag-grid-community";
 import type { Translator } from "@/i18n/Localization";
 import { tableCellTypes, type CellValue, type ColumnType } from "./TableCellTypes";
 import type { TableCell, TableColumn, TableRow } from "./TableDocument";
@@ -30,12 +30,18 @@ type CellPresentation = {
 export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
     string: {
         column({ read, supportsMultilineText }) {
-            const multiline = (data?: GridRow): boolean => /[\r\n]/.test(read(data)?.rawText ?? "");
+            const multiline = (data?: GridRow): boolean => {
+                const value = read(data)?.value;
+                return typeof value === "string" && /[\r\n]/.test(value);
+            };
             return {
                 cellDataType: "text",
                 editable: ({ data }) => !!data && (supportsMultilineText || !multiline(data)),
+                // Let the editor confirm text even when the grid has no valid string value for the cell.
+                cellEditorParams: ({ data, value }: ICellEditorParams<GridRow, CellValue>) => ({
+                    value: value ?? read(data)?.rawText ?? "",
+                }),
                 cellEditorSelector: ({ data }) => multiline(data) ? { component: "agLargeTextCellEditor" } : undefined,
-                valueGetter: ({ data }) => read(data)?.rawText ?? "",
                 valueParser: ({ newValue }) => typeof newValue === "string" ? tableCellTypes.string.parse(newValue) : newValue,
             };
         },

@@ -4,6 +4,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
+import { getGridApi } from "ag-grid-community";
 import { render } from "solid-js/web";
 import { afterEach, expect, it, vi } from "vitest";
 import { useAppContext, type AppContextValues } from "@/app/AppContext";
@@ -83,13 +84,18 @@ function cell(row: number, column: number): HTMLElement {
     return element;
 }
 
-async function enterText(row: number, column: number, value: string): Promise<HTMLInputElement> {
+async function openCellEditor(row: number, column: number): Promise<HTMLInputElement> {
     await selectCell(row, column);
-    const input = await vi.waitFor(() => {
-        const input = cell(row, column).querySelector<HTMLInputElement>("input");
-        expect(input).not.toBeNull();
-        return input!;
+    return vi.waitFor(() => {
+        const target = cell(row, column);
+        const input = target.classList.contains("ag-cell-inline-editing") && target.querySelector<HTMLInputElement>("input");
+        if (!input) throw new Error(`Editor for cell ${row}, ${column} is missing`);
+        return input;
     });
+}
+
+async function enterText(row: number, column: number, value: string): Promise<HTMLInputElement> {
+    const input = await openCellEditor(row, column);
     input.value = value;
     input.dispatchEvent(new Event("input", { bubbles: true }));
     return input;
@@ -97,6 +103,30 @@ async function enterText(row: number, column: number, value: string): Promise<HT
 
 function pressEnter(input: HTMLInputElement): void {
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+}
+
+type EditExit = "Enter" | "Tab" | "outside click" | "Escape";
+
+async function finishEdit(input: HTMLInputElement, exit: EditExit): Promise<void> {
+    const cell = input.closest('[role="gridcell"]');
+    const column = cell?.getAttribute("col-id");
+    const row = cell?.closest("[row-index]")?.getAttribute("row-index");
+    input.focus();
+    if (exit === "outside click") {
+        const outside = document.createElement("button");
+        root.append(outside);
+        outside.focus();
+        outside.click();
+        outside.remove();
+    } else {
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: exit, bubbles: true, cancelable: true }));
+    }
+    await vi.waitFor(() => expect(input.isConnected, `${exit} closes the editor in cell ${row}, ${column}`).toBe(false));
+    if (exit === "Tab") {
+        // Tab can start a separate edit in the next cell.
+        const nextEditor = root.querySelector<HTMLInputElement>(".ag-cell-inline-editing input");
+        if (nextEditor) await finishEdit(nextEditor, "Escape");
+    }
 }
 
 function rowIndicator(row: number): HTMLElement | null {
@@ -118,6 +148,8 @@ async function selectCell(row: number, column: number): Promise<void> {
     const target = await vi.waitFor(() => cell(row, column));
     target.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, detail: 1 }));
     target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, detail: 1 }));
+    const grid = root.querySelector<HTMLElement>(".ag-theme-mode")!;
+    getGridApi(grid)?.setFocusedCell(row, String(column));
     target.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, detail: 2 }));
 }
 
@@ -456,10 +488,7 @@ it.each([
     expect(cell(0, 0).getAttribute("aria-description")).toBe("Expected text.");
     expect(cell(2, 0).getAttribute("aria-description")).toBe("Value missing.");
     pressEnter(await enterText(1, 0, "value"));
-    await selectCell(2, 0);
-    const untouched = cell(2, 0).querySelector<HTMLInputElement>("input");
-    expect(untouched).not.toBeNull();
-    pressEnter(untouched!);
+    await finishEdit(await openCellEditor(2, 0), "Escape");
     pressEnter(await enterText(2, 1, "4e-5"));
     await enterText(3, 0, "New");
     await context.editor.toggleSourceMode()?.();
@@ -499,13 +528,130 @@ it("rejects empty numeric edits and reports replacements that fail type validati
     expect(cell(0, 1).textContent).toBe("10");
 });
 
-it("accepts an empty string when editing a cell declared as text", async () => {
-    await mount('[{"a":"value"}]', "data.table.json");
-    await enterText(0, 0, "");
+it.each([["value", "value"], [123.4, "123.4"]] as const)("can clear a text editor prefilled with %s", async (original, text) => {
+    await mount(JSON.stringify([{ a: original }]), "data.table.json", { "data.meta.json.json": jsonMetadata });
+    const input = await openCellEditor(0, 0);
+    expect(input.value).toBe(text);
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
     await context.editor.saveFile()?.();
     const write = vi.mocked(invoke).mock.calls.find(([command]) => command === "write_file");
     expect(JSON.parse((write?.[1] as { content: string }).content)).toEqual([{ a: "" }]);
     expect(cell(0, 0).getAttribute("aria-description")).toBeNull();
+});
+
+it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
+    "uses the native text editor for incompatible values and closes with %s",
+    async (exit) => {
+        await mount(tableJson, "with-metadata.table.json", { "with-metadata.meta.json.json": jsonMetadata });
+        const input = await openCellEditor(0, 0);
+        expect(input.type).toBe("text");
+        expect(input.value).toBe("true");
+        if (exit === "Escape") {
+            input.value = "discard this";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+        await finishEdit(input, exit);
+        expect(context.editor.fileModified()).toBe(exit !== "Escape");
+        await context.editor.saveFile()?.();
+
+        const expected = JSON.parse(tableJson) as Record<string, unknown>[];
+        if (exit !== "Escape") expected[0].a = "true";
+        const write = vi.mocked(invoke).mock.calls.find(([command]) => command === "write_file");
+        expect(JSON.parse((write?.[1] as { content: string }).content)).toEqual(expected);
+        expect(cell(0, 0).getAttribute("aria-description")).toBe(exit === "Escape" ? "Expected text." : null);
+    }
+);
+
+it.each([
+    ["empty.csv", emptyCsv, "Enter", "A,B,C\n,,"],
+    ["empty.table.json", emptyJson, "Tab", JSON.stringify([{ A: "" }], null, 2)],
+    ["empty.table.jsonl", emptyJsonl, "outside click", '{"A":""}'],
+] as const)("inserts an explicitly empty string on the new row of %s", async (filename, content, exit, expected) => {
+    await mount(content, filename);
+    const input = await openCellEditor(0, 0);
+    expect(input.value).toBe("");
+    await finishEdit(input, "Escape");
+    expect(context.editor.fileModified()).toBe(false);
+    expect(rowIndicator(0)?.textContent).toBe("*");
+
+    await finishEdit(await openCellEditor(0, 0), exit);
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ filename, content: expected }));
+    await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
+    expect(rowIndicator(0)?.textContent).toBe("1");
+    expect(cell(0, 0).getAttribute("aria-description")).toBeNull();
+});
+
+it("saves an untouched empty text input immediately when the field was missing", async () => {
+    await mount(noColumns, "no-columns.table.json", { "no-columns.meta.json.json": jsonMetadata });
+    expect((await openCellEditor(0, 0)).value).toBe("");
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: JSON.stringify([{ a: "" }], null, 2),
+    }));
+});
+
+it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
+    "keeps or applies numeric and boolean values from native editors on %s",
+    async (exit) => {
+        await mount(tableJson, "with-metadata.table.json", { "with-metadata.meta.json.json": jsonMetadata });
+        const emptyNumber = await openCellEditor(1, 1);
+        expect(emptyNumber.type).toBe("number");
+        expect(emptyNumber.value).toBe("");
+        await vi.waitFor(() => expect(cell(1, 1).classList.contains("ag-cell-editing-error")).toBe(true));
+        await finishEdit(emptyNumber, exit);
+        expect(cell(1, 1).getAttribute("aria-description")).toBe("Value missing.");
+
+        const indeterminate = await openCellEditor(1, 2);
+        expect(indeterminate.type).toBe("checkbox");
+        expect(indeterminate.indeterminate).toBe(true);
+        await finishEdit(indeterminate, exit);
+        expect(cell(1, 2).getAttribute("aria-description")).toBe("Expected a boolean.");
+        expect(context.editor.fileModified()).toBe(false);
+
+        await finishEdit(await enterText(1, 1, "2.5"), exit);
+        const checkbox = await openCellEditor(1, 2);
+        checkbox.click();
+        checkbox.click();
+        expect(checkbox.checked).toBe(false);
+        expect(checkbox.indeterminate).toBe(false);
+        await finishEdit(checkbox, exit);
+        expect(context.editor.fileModified()).toBe(exit !== "Escape");
+        await context.editor.saveFile()?.();
+
+        const expected = JSON.parse(tableJson) as Record<string, unknown>[];
+        if (exit !== "Escape") {
+            expected[1].b = 2.5;
+            expected[1].c = false;
+        }
+        const write = vi.mocked(invoke).mock.calls.find(([command]) => command === "write_file");
+        expect(JSON.parse((write?.[1] as { content: string }).content)).toEqual(expected);
+    }
+);
+
+it("creates new rows only when a numeric or boolean edit is confirmed with a value", async () => {
+    await mount(emptyJson, "empty.table.json", { "empty.meta.json.json": jsonMetadata });
+    await finishEdit(await openCellEditor(0, 1), "Enter");
+    await finishEdit(await openCellEditor(0, 2), "outside click");
+    await finishEdit(await enterText(0, 1, "8"), "Escape");
+    const pendingBoolean = await openCellEditor(0, 2);
+    pendingBoolean.click();
+    await finishEdit(pendingBoolean, "Escape");
+    expect(context.editor.fileModified()).toBe(false);
+    expect(rowIndicator(0)?.textContent).toBe("*");
+
+    await finishEdit(await enterText(0, 1, "8"), "Tab");
+    await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
+    const checkbox = await openCellEditor(1, 2);
+    expect(checkbox.indeterminate).toBe(true);
+    checkbox.click();
+    await finishEdit(checkbox, "outside click");
+    await vi.waitFor(() => expect(rowIndicator(2)?.textContent).toBe("*"));
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: JSON.stringify([{ b: 8 }, { c: true }], null, 2),
+    }));
 });
 
 it("opens a table of empty objects when explicit columns are available", async () => {
