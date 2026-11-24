@@ -13,7 +13,6 @@ export function EditorTable(): JSX.Element {
     const { main: { filename } } = useAppContext();
     return <EditorTextView
         printable
-        preserveSourceText
         view={ViewTable}
         extensions={editorTextExtensionsForFilename(filename().toLowerCase()) ?? []}
     />;

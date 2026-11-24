@@ -291,7 +291,17 @@ it("prints all rows with column headings and restores source mode", async () => 
     expect(print).toHaveBeenCalledOnce();
     expect(context.editor.sourceMode()).toBe(true);
     await context.editor.saveFile()?.();
-    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content }));
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ content: ["ID,Value", ...rows].join("\n") }));
+});
+
+it("normalizes CSV line endings when returning from source mode", async () => {
+    await mount('Name,Note\r\nAna,"first line\r\nsecond line"\r\n');
+    await context.editor.toggleSourceMode()?.();
+    await context.editor.toggleSourceMode()?.();
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: 'Name,Note\nAna,"first line\nsecond line"\n',
+    }));
 });
 
 it("searches and replaces text in the grid through the shared sidebar", async () => {

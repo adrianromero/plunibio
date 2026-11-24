@@ -36,7 +36,6 @@ export type EditorTextViewProps = {
     extensions?: readonly LanguageSupport[];
     view?: Component | null;
     printable?: boolean;
-    preserveSourceText?: boolean;
 };
 
 export function EditorTextView(props: EditorTextViewProps): JSX.Element {
@@ -45,7 +44,6 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     let editorRef!: HTMLDivElement;
     let sourceScrollRef!: HTMLDivElement;
     let editorView: EditorView | null = null;
-    let originalSource = "";
     let view: FileEditorAdapter | null = null;
     let search: CodeMirrorSearchController | null = null;
     let focusSearch: (() => void) | null = null;
@@ -94,7 +92,6 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
     };
     const replaceSource = (content: string): void => {
         destroySource();
-        originalSource = content;
         const version = generation;
         editorView = new EditorView({
             doc: content,
@@ -117,14 +114,7 @@ export function EditorTextView(props: EditorTextViewProps): JSX.Element {
         sourceScrollRef.scrollTop = 0;
         sourceScrollRef.scrollLeft = 0;
     };
-    const getSource = (): string | null => {
-        if (!editorView) return null;
-        const content = editorView.state.doc.toString();
-        if (!props.preserveSourceText) return content;
-        if (content === originalSource.replace(/\r\n?/g, "\n")) return originalSource;
-        const ending = originalSource.match(/\r\n|\r|\n/)?.[0] ?? "\n";
-        return ending === "\n" ? content : content.replace(/\n/g, ending);
-    };
+    const getSource = (): string | null => editorView?.state.doc.toString() ?? null;
     const replaceView = async (content: string): Promise<void> => {
         if (!view) return;
         const version = generation;
