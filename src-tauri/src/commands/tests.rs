@@ -191,6 +191,23 @@ fn deleting_a_directory_symlink_does_not_delete_its_target() {
 }
 
 #[test]
+fn removes_new_file_when_initial_write_fails() {
+    tauri::async_runtime::block_on(async {
+        let base = unique_temp_dir("failed-initial-write");
+        std::fs::create_dir(&base).unwrap();
+        let path = base.join("new.md");
+        std::fs::File::create_new(&path).unwrap();
+        let read_only_file = tokio::fs::File::open(&path).await.unwrap();
+
+        let result = super::write_new_file(read_only_file, &path, b"initial content").await;
+
+        assert!(result.is_err());
+        assert!(!path.try_exists().unwrap());
+        std::fs::remove_dir(base).unwrap();
+    });
+}
+
+#[test]
 fn creates_empty_files_and_directories_without_overwriting() {
     tauri::async_runtime::block_on(async {
         let unique = SystemTime::now()

@@ -6,7 +6,7 @@ use crate::paths::{
     canonical_basepath, normalize_link_filename, resolve_existing_path, resolve_write_path,
     validate_relative_filename,
 };
-use std::io::Cursor;
+use std::io::{self, Cursor};
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::UNIX_EPOCH;
@@ -14,6 +14,7 @@ use tauri::image::JsImage;
 use tauri::Manager;
 use tauri::Webview;
 use tauri_plugin_opener::OpenerExt;
+use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tracing::{debug, error, info, trace, warn};
 
@@ -754,6 +755,22 @@ pub(crate) async fn create_directory(
     created_entry(&base, &path, name, PathKind::Directory, metadata.as_ref())
 }
 
+async fn write_new_file(mut file: File, path: &Path, content: &[u8]) -> io::Result<File> {
+    let result = async {
+        file.write_all(content).await?;
+        file.flush().await
+    }
+    .await;
+    if let Err(error) = result {
+        drop(file);
+        if let Err(cleanup_error) = tokio::fs::remove_file(path).await {
+            warn!(path = %path.display(), error = %cleanup_error, "Unable to remove partially written file");
+        }
+        return Err(error);
+    }
+    Ok(file)
+}
+
 #[tauri::command]
 pub(crate) async fn create_file(
     basepath: String,
@@ -764,7 +781,7 @@ pub(crate) async fn create_file(
     validate_entry_name(&name)?;
     let (base, parent) = resolve_existing_path(&basepath, &filename).await?;
     let path = parent.join(&name);
-    let mut file = tokio::fs::OpenOptions::new()
+    let file = tokio::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(&path)
@@ -772,23 +789,14 @@ pub(crate) async fn create_file(
         .map_err(|error| {
             create_error("create_file", &name, error, AppErrorCode::CreateFileFailed)
         })?;
-    if let Some(content) = content {
-        let write_result = async {
-            file.write_all(content.as_bytes()).await?;
-            file.flush().await
-        }
-        .await;
-        if let Err(error) = write_result {
-            drop(file);
-            let _ = tokio::fs::remove_file(&path).await;
-            return Err(create_error(
-                "create_file",
-                &name,
-                error,
-                AppErrorCode::CreateFileFailed,
-            ));
-        }
-    }
+    let file = match content {
+        Some(content) => write_new_file(file, &path, content.as_bytes())
+            .await
+            .map_err(|error| {
+                create_error("create_file", &name, error, AppErrorCode::CreateFileFailed)
+            })?,
+        None => file,
+    };
     let metadata = file.metadata().await.ok();
     created_entry(&base, &path, name, PathKind::File, metadata.as_ref())
 }
@@ -1122,7 +1130,7 @@ pub(crate) async fn save_linked_image(
             .into_owned();
         let path = resolve_write_path(&basepath, &linked_filename).await?;
 
-        let mut file = match tokio::fs::OpenOptions::new()
+        let file = match tokio::fs::OpenOptions::new()
             .write(true)
             .create_new(true)
             .open(&path)
@@ -1140,21 +1148,16 @@ pub(crate) async fn save_linked_image(
             }
         };
 
-        let write_result = async {
-            file.write_all(&content).await?;
-            file.flush().await
-        }
-        .await;
-        if let Err(error) = write_result {
-            drop(file);
-            let _ = tokio::fs::remove_file(&path).await;
-            return Err(AppError::io(
-                "write_linked_image",
-                &linked_filename,
-                error,
-                AppErrorCode::WriteFileFailed,
-            ));
-        }
+        write_new_file(file, &path, &content)
+            .await
+            .map_err(|error| {
+                AppError::io(
+                    "write_linked_image",
+                    &linked_filename,
+                    error,
+                    AppErrorCode::WriteFileFailed,
+                )
+            })?;
 
         info!(
             source = %filename,
