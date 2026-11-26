@@ -299,7 +299,7 @@ export function ViewTable(): JSX.Element {
             style={{ display: host.active() ? undefined : "none" }}
             inert={!host.active() || !host.ready()}
         >
-            <div ref={gridRef} class={`${styles.grid} ag-theme-mode`} data-ag-theme-mode={theme()} />
+            <div ref={gridRef} class={`${styles.grid} ag-theme-mode plunibio-grid`} data-ag-theme-mode={theme()} />
             <div ref={printRef} class={styles.print} data-print-content />
             <AppSidebar active={host.active()} disabled={!host.ready()}>
                 <SidebarTab defaultKey="search">

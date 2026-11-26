@@ -13,6 +13,7 @@ import { applyTheme, loadTheme } from "./preferences/ThemePreferences";
 import { applyTypography, loadTypography } from "./preferences/TypographyPreferences";
 import { configureFrontendLog } from "./shared/logging/frontendLog";
 import "./styles/theme.css";
+import "./styles/ag-grid-theme.css";
 
 // Import base styles first
 import "@milkdown/crepe/theme/common/style.css";

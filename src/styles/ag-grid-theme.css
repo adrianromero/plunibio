@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2026 Adrián Romero
+ * SPDX-License-Identifier: MIT
+ */
+
+.plunibio-grid {
+    --ag-background-color: var(--color-view-background);
+    --ag-header-background-color: var(--color-surface-subtle);
+    --ag-foreground-color: var(--color-text);
+    --ag-border-color: var(--color-border);
+    --ag-accent-color: var(--color-primary);
+    --ag-font-family: var(--font-interface);
+
+    --ag-row-vertical-padding-scale: 0.75;
+    --ag-header-vertical-padding-scale: 0.75;
+    --ag-cell-horizontal-padding-scale: 0.75;
+    --ag-wrapper-border: none;
+    --ag-wrapper-border-radius: 0;
+    --ag-row-border: 1px solid var(--color-border-subtle);
+    --ag-column-border: 1px solid var(--color-border-subtle);
+
+    --ag-row-hover-color: var(--color-primary-soft);
+    --ag-range-selection-border-color: var(--color-focus);
+    --ag-cell-editing-border: 1px solid var(--color-focus);
+    --ag-input-focus-border: 1px solid var(--color-focus);
+    --ag-input-focus-background-color: var(--color-surface);
+    --ag-invalid-color: var(--color-error);
+
+    --ag-checkbox-unchecked-background-color: var(--color-surface);
+    --ag-checkbox-unchecked-border-color: var(--color-border-secondary);
+    --ag-checkbox-checked-shape-color: var(--color-on-primary);
+
+    --ag-picker-button-background-color: var(--color-surface);
+    --ag-picker-button-focus-background-color: var(--color-surface);
+    --ag-picker-list-background-color: var(--color-surface);
+    --ag-dropdown-shadow: var(--shadow-dialog);
+
+    --ag-tooltip-background-color: var(--color-surface);
+    --ag-tooltip-error-background-color: var(--color-error-background);
+    --ag-tooltip-error-text-color: var(--color-error-text);
+    --ag-tooltip-error-border: 1px solid var(--color-error-border);
+    --ag-drag-handle-color: var(--color-text-muted);
+}
+
+.plunibio-grid :where(.ag-select-list, .ag-popup-editor .ag-large-text) {
+    border-radius: var(--radius-medium);
+}
+
+.plunibio-grid :where(.ag-popup-editor .ag-large-text) {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+}
