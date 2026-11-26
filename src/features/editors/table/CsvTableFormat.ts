@@ -5,10 +5,10 @@
 
 import { parseCsv, serializeCsv } from "./CsvDocument";
 import { tableCellTypes } from "./TableCellTypes";
-import { createTableDocument, defaultTableColumns, type TableColumn } from "./TableDocument";
+import { createTableDocument, defaultTableColumns } from "./TableDocument";
 import type { TableFormat } from "./TableFormat";
 
-function csvType(value: string | undefined): TableColumn["type"] {
+function csvType(value: string | undefined): "string" | "number" | "boolean" {
     if (value === undefined) return "string";
     if (tableCellTypes.boolean.parse(value) !== undefined) return "boolean";
     return tableCellTypes.number.parse(value) !== undefined ? "number" : "string";
@@ -36,12 +36,13 @@ export const csvTableFormat: TableFormat = {
         return {
             document: createTableDocument(columns, csv.rows, {
                 supportsMultilineText: false,
-                read(record, { id, type }) {
+                read(record, column) {
+                    const { id, type } = column;
                     const index = indices.get(id);
                     const text = index === undefined ? undefined : record[index];
                     return {
                         rawText: text ?? "",
-                        value: text === undefined ? undefined : tableCellTypes[type].parse(text),
+                        value: text === undefined ? undefined : tableCellTypes[type].parse(text, column),
                         missing: text === undefined,
                     };
                 },

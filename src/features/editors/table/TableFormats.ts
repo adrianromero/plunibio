@@ -33,7 +33,16 @@ export function parseTableColumns(source: string): TableColumn[] | null {
         if (typeof id !== "string" || ids.has(id) || typeof label !== "string" || !isColumnType(type)) return null;
         if (width !== undefined && (typeof width !== "number" || !Number.isFinite(width) || width <= 0)) return null;
         ids.add(id);
-        columns.push({ id, label, type, ...(width === undefined ? {} : { width }) });
+        const definition = { id, label, ...(width === undefined ? {} : { width }) };
+        if (type === "enum") {
+            const { values } = column;
+            if (!Array.isArray(values) || !values.length ||
+                !values.every((value: unknown): value is string => typeof value === "string") ||
+                new Set(values).size !== values.length) return null;
+            columns.push({ ...definition, type, values });
+        } else {
+            columns.push({ ...definition, type });
+        }
     }
     return columns;
 }

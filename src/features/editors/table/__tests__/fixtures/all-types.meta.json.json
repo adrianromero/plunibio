@@ -1,0 +1,11 @@
+{
+  "columns": [
+    { "id": "nombre", "label": "Nombre", "type": "string" },
+    { "id": "importe", "label": "Importe", "type": "number" },
+    { "id": "activo", "label": "Activo", "type": "boolean" },
+    { "id": "fecha", "label": "Fecha", "type": "date" },
+    { "id": "cita", "label": "Cita", "type": "datetime" },
+    { "id": "notas", "label": "Notas", "type": "longtext" },
+    { "id": "estado", "label": "Estado", "type": "enum", "values": ["pendiente", "en curso", "cerrado"] }
+  ]
+}

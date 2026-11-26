@@ -109,7 +109,7 @@ function pressEnter(input: HTMLInputElement): void {
 
 type EditExit = "Enter" | "Tab" | "outside click" | "Escape";
 
-async function finishEdit(input: HTMLInputElement, exit: EditExit): Promise<void> {
+async function finishEdit(input: HTMLElement, exit: EditExit): Promise<void> {
     const cell = input.closest('[role="gridcell"]');
     const column = cell?.getAttribute("col-id");
     const row = cell?.closest("[row-index]")?.getAttribute("row-index");
@@ -117,6 +117,7 @@ async function finishEdit(input: HTMLInputElement, exit: EditExit): Promise<void
     if (exit === "outside click") {
         const outside = document.createElement("button");
         root.append(outside);
+        outside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
         outside.focus();
         outside.click();
         outside.remove();
@@ -126,7 +127,7 @@ async function finishEdit(input: HTMLInputElement, exit: EditExit): Promise<void
     await vi.waitFor(() => expect(input.isConnected, `${exit} closes the editor in cell ${row}, ${column}`).toBe(false));
     if (exit === "Tab") {
         // Tab can start a separate edit in the next cell.
-        const nextEditor = root.querySelector<HTMLInputElement>(".ag-cell-inline-editing input");
+        const nextEditor = root.querySelector<HTMLElement>('.ag-cell-inline-editing :is(input, [role="combobox"])');
         if (nextEditor) await finishEdit(nextEditor, "Escape");
     }
 }
@@ -400,6 +401,10 @@ it.each([
     setLocale("es");
     await vi.waitFor(() => expect(cell(0, 0).textContent).toBe("1,3"));
     expect(cell(1, 0).textContent).toBe("0,00004");
+    const numberEditor = await openCellEditor(0, 0);
+    expect(numberEditor.type).toBe("text");
+    expect(numberEditor.value).toBe("1,3");
+    await finishEdit(numberEditor, "Escape");
     expect(context.editor.fileModified()).toBe(false);
     await context.editor.saveFile()?.();
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({ filename, content }));
@@ -457,31 +462,33 @@ it.each([
     ["dates.csv", "dates.meta.csv.json", (dates: string[]) => ["due,note", ...dates.map((date) => `${date},keep`)].join("\n")],
     ["dates.table.json", "dates.meta.json.json", (dates: string[]) => JSON.stringify(dates.map((due) => ({ due, note: "keep" })), null, 2)],
     ["dates.table.jsonl", "dates.meta.jsonl.json", (dates: string[]) => dates.map((due) => JSON.stringify({ due, note: "keep" })).join("\n")],
-] as const)("edits ISO dates with the native editor in %s", async (filename, metadataPath, serialize) => {
+] as const)("edits localized dates as text and saves ISO dates in %s", async (filename, metadataPath, serialize) => {
     const content = serialize(["2024-02-29", "2023-02-29"]);
     const metadata = JSON.stringify({ columns: [{ id: "due", label: "Due", type: "date" }] });
     await mount(content, filename, { [metadataPath]: metadata });
-    expect(cell(0, 0).textContent).toBe("2024-02-29");
+    expect(cell(0, 0).textContent).toBe("02/29/2024");
     await vi.waitFor(() => expect(cell(1, 0).textContent).toBe("2023-02-29"));
     expect(cell(1, 0).getAttribute("aria-description")).toBe("Expected a date in YYYY-MM-DD format.");
+    setLocale("es");
+    await vi.waitFor(() => expect(cell(0, 0).textContent).toBe("29/02/2024"));
 
     const valid = await openCellEditor(0, 0);
-    expect(valid.type).toBe("date");
-    expect(valid.value).toBe("2024-02-29");
+    expect(valid.type).toBe("text");
+    expect(valid.value).toBe("29/02/2024");
     valid.value = "";
     valid.dispatchEvent(new Event("input", { bubbles: true }));
     await finishEdit(valid, "Enter");
-    expect(cell(0, 0).textContent).toBe("2024-02-29");
+    expect(cell(0, 0).textContent).toBe("29/02/2024");
 
     const invalid = await openCellEditor(1, 0);
-    expect(invalid.type).toBe("date");
-    expect(invalid.value).toBe("");
-    invalid.value = "2024-02-29";
+    expect(invalid.type).toBe("text");
+    expect(invalid.value).toBe("2023-02-29");
+    invalid.value = "29/02/2024";
     invalid.dispatchEvent(new Event("input", { bubbles: true }));
     await finishEdit(invalid, "Escape");
     expect(context.editor.fileModified()).toBe(false);
 
-    await finishEdit(await enterText(0, 0, "2026-11-24"), "outside click");
+    await finishEdit(await enterText(0, 0, "24/11/2026"), "outside click");
     await context.editor.saveFile()?.();
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
         filename,
@@ -494,7 +501,7 @@ it("requires a valid date before inserting a new row", async () => {
     await mount(emptyJson, "dates.table.json", { "dates.meta.json.json": metadata });
     await finishEdit(await openCellEditor(0, 0), "Enter");
     expect(context.editor.fileModified()).toBe(false);
-    expect(rowIndicator(0)?.textContent).toBe("*");
+    await vi.waitFor(() => expect(rowIndicator(0)?.textContent).toBe("*"));
 
     await finishEdit(await enterText(0, 0, "2024-02-29"), "Enter");
     await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
@@ -502,6 +509,150 @@ it("requires a valid date before inserting a new row", async () => {
     expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
         content: JSON.stringify([{ due: "2024-02-29" }], null, 2),
     }));
+});
+
+const statusMetadata = JSON.stringify({
+    columns: [{ id: "status", label: "Status", type: "enum", values: ["Open", "Closed"] }],
+});
+
+it.each([
+    ["edits.csv", "edits.meta.csv.json", "Enter",
+        (cita: string, notas: string) => 'cita,notas\n' + cita + ',"' + notas + '"'],
+    ["edits.table.json", "edits.meta.json.json", "Tab",
+        (cita: string, notas: string) => JSON.stringify([{ cita, notas }], null, 2)],
+    ["edits.table.jsonl", "edits.meta.jsonl.json", "outside click",
+        (cita: string, notas: string) => JSON.stringify({ cita, notas })],
+] as const)("edits localized datetime and longtext in %s", async (filename, metadataPath, exit, serialize) => {
+    const metadata = JSON.stringify({ columns: [
+        { id: "cita", label: "Cita", type: "datetime" },
+        { id: "notas", label: "Notas", type: "longtext" },
+    ] });
+    const start = "2026-11-24T09:30:15";
+    const changed = "2026-11-25T10:45:30";
+    await mount(serialize(start, "Una línea"), filename, { [metadataPath]: metadata });
+    expect(cell(0, 0).textContent).toBe("11/24/2026 09:30:15 AM");
+    setLocale("es");
+    await vi.waitFor(() => expect(cell(0, 0).textContent).toBe("24/11/2026 09:30:15"));
+
+    const dateTime = await openCellEditor(0, 0);
+    expect(dateTime.type).toBe("text");
+    expect(dateTime.value).toBe("24/11/2026 09:30:15");
+    dateTime.value = "";
+    dateTime.dispatchEvent(new Event("input", { bubbles: true }));
+    await finishEdit(dateTime, "Enter");
+    expect(context.editor.fileModified()).toBe(false);
+
+    await finishEdit(await enterText(0, 0, "25/11/2026 10:45:30"), "Tab");
+    expect(cell(0, 0).textContent).toBe("25/11/2026 10:45:30");
+
+    const openLongText = async () => {
+        const existing = root.querySelector<HTMLTextAreaElement>(".ag-popup-editor textarea");
+        if (existing) return existing;
+        await selectCell(0, 1);
+        return vi.waitFor(() => {
+            const textarea = root.querySelector<HTMLTextAreaElement>(".ag-popup-editor textarea");
+            if (!textarea) throw new Error("Long text editor is missing");
+            return textarea;
+        });
+    };
+    const cancelled = await openLongText();
+    expect(cancelled.value).toBe("Una línea");
+    cancelled.value = "Cancelado";
+    cancelled.dispatchEvent(new Event("input", { bubbles: true }));
+    await finishEdit(cancelled, "Escape");
+    expect(cell(0, 1).textContent).toBe("Una línea");
+
+    const textarea = await openLongText();
+    const notes = "Texto largo ".repeat(20).trim() + "\nSegunda línea";
+    expect(textarea.maxLength).toBeGreaterThan(notes.length);
+    textarea.value = notes;
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    await finishEdit(textarea, exit);
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        filename, content: serialize(changed, notes),
+    }));
+});
+
+it("confirms an empty longtext value on a new row", async () => {
+    const metadata = JSON.stringify({ columns: [{ id: "notas", label: "Notas", type: "longtext" }] });
+    await mount(emptyJson, "notes.table.json", { "notes.meta.json.json": metadata });
+    await selectCell(0, 0);
+    const textarea = await vi.waitFor(() => {
+        const editor = root.querySelector<HTMLTextAreaElement>(".ag-popup-editor textarea");
+        if (!editor) throw new Error("Long text editor is missing");
+        return editor;
+    });
+    expect(textarea.value).toBe("");
+    await finishEdit(textarea, "Enter");
+    await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: JSON.stringify([{ notas: "" }], null, 2),
+    }));
+});
+
+async function openEnumEditor(row: number): Promise<HTMLElement> {
+    await selectCell(row, 0);
+    return vi.waitFor(() => {
+        const editor = cell(row, 0).querySelector<HTMLElement>('[role="combobox"]');
+        if (!editor) throw new Error(`Enum editor for row ${row} is missing`);
+        return editor;
+    });
+}
+
+async function chooseEnumOption(editor: HTMLElement, label: string): Promise<void> {
+    editor.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
+    const list = document.getElementById(editor.getAttribute("aria-controls") ?? "");
+    const options = Array.from(list?.querySelectorAll<HTMLElement>('[role="option"]') ?? []);
+    expect(options.map((item) => item.textContent?.trim())).toEqual(["Choose an option", "Open", "Closed"]);
+    options.find((item) => item.textContent?.trim() === label)?.dispatchEvent(
+        new MouseEvent("mousedown", { bubbles: true, cancelable: true })
+    );
+    await vi.waitFor(() => expect(editor.isConnected).toBe(false));
+}
+
+it.each([
+    ["status.csv", "status.meta.csv.json", (values: string[]) => ["status,note", ...values.map((value) => `${value},keep`)].join("\n")],
+    ["status.table.json", "status.meta.json.json", (values: string[]) => JSON.stringify(values.map((status) => ({ status, note: "keep" })), null, 2)],
+    ["status.table.jsonl", "status.meta.jsonl.json", (values: string[]) => values.map((status) => JSON.stringify({ status, note: "keep" })).join("\n")],
+] as const)("edits only declared enum values with the native dropdown in %s", async (filename, metadataPath, serialize) => {
+    await mount(serialize(["Closed", "unknown", "keep invalid"]), filename, { [metadataPath]: statusMetadata });
+    expect(cell(0, 0).textContent).toBe("Closed");
+    await vi.waitFor(() => expect(cell(1, 0).textContent).toBe("unknown"));
+    expect(cell(1, 0).getAttribute("aria-description")).toBe("Expected one of the listed options.");
+    await finishEdit(await openEnumEditor(1), "Tab");
+    await finishEdit(await openEnumEditor(1), "outside click");
+    await finishEdit(await openEnumEditor(1), "Escape");
+    expect(context.editor.fileModified()).toBe(false);
+
+    await chooseEnumOption(await openEnumEditor(1), "Open");
+    expect(cell(1, 0).getAttribute("aria-description")).toBeNull();
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        filename, content: serialize(["Closed", "Open", "keep invalid"]),
+    }));
+});
+
+it("creates a new row only after choosing an enum option", async () => {
+    await mount(emptyJson, "status.table.json", { "status.meta.json.json": statusMetadata });
+    await finishEdit(await openEnumEditor(0), "outside click");
+    expect(context.editor.fileModified()).toBe(false);
+    await vi.waitFor(() => expect(rowIndicator(0)?.textContent).toBe("*"));
+
+    await chooseEnumOption(await openEnumEditor(0), "Closed");
+    await vi.waitFor(() => expect(rowIndicator(1)?.textContent).toBe("*"));
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        content: JSON.stringify([{ status: "Closed" }], null, 2),
+    }));
+});
+
+it.each([[undefined], [[]], [["Open", "Open"]], [["Open", 1]]])("rejects invalid enum metadata (%j)", async (values) => {
+    const metadata = JSON.stringify({ columns: [{ id: "status", label: "Status", type: "enum", values }] });
+    await mount(emptyJson, "status.table.json", { "status.meta.json.json": metadata });
+    expect(root.textContent).toContain("Could not read valid table metadata from status.meta.json.json.");
+    expect(root.querySelector('[role="grid"]')).toBeNull();
 });
 
 it("adds a metadata-only CSV column after unmapped and extra fields without moving them", async () => {
@@ -678,11 +829,11 @@ it("saves an untouched empty text input immediately when the field was missing",
 });
 
 it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
-    "keeps or applies numeric and boolean values from native editors on %s",
+    "keeps or applies numeric and boolean values on %s",
     async (exit) => {
         await mount(tableJson, "with-metadata.table.json", { "with-metadata.meta.json.json": jsonMetadata });
         const emptyNumber = await openCellEditor(1, 1);
-        expect(emptyNumber.type).toBe("number");
+        expect(emptyNumber.type).toBe("text");
         expect(emptyNumber.value).toBe("");
         await vi.waitFor(() => expect(cell(1, 1).classList.contains("ag-cell-editing-error")).toBe(true));
         await finishEdit(emptyNumber, exit);
@@ -696,7 +847,8 @@ it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
         expect(cell(1, 2).getAttribute("aria-description")).toBe("Expected a boolean.");
         expect(context.editor.fileModified()).toBe(false);
 
-        await finishEdit(await enterText(1, 1, "2.5"), exit);
+        setLocale("es");
+        await finishEdit(await enterText(1, 1, "2,5"), exit);
         const checkbox = await openCellEditor(1, 2);
         checkbox.click();
         checkbox.click();
@@ -715,6 +867,23 @@ it.each(["Enter", "Tab", "outside click", "Escape"] as const)(
         expect(JSON.parse((write?.[1] as { content: string }).content)).toEqual(expected);
     }
 );
+
+it("converts a numeric string only when confirmed in the text editor", async () => {
+    const filename = "with-metadata.table.json";
+    await mount('[{"b":"2,5"}]', filename, { "with-metadata.meta.json.json": jsonMetadata });
+    setLocale("es");
+
+    const cancelled = await openCellEditor(0, 1);
+    expect(cancelled.value).toBe("2,5");
+    await finishEdit(cancelled, "Escape");
+    expect(context.editor.fileModified()).toBe(false);
+
+    await finishEdit(await openCellEditor(0, 1), "Enter");
+    await context.editor.saveFile()?.();
+    expect(invoke).toHaveBeenCalledWith("write_file", expect.objectContaining({
+        filename, content: JSON.stringify([{ b: 2.5 }], null, 2),
+    }));
+});
 
 it("creates new rows only when a numeric or boolean edit is confirmed with a value", async () => {
     await mount(emptyJson, "empty.table.json", { "empty.meta.json.json": jsonMetadata });

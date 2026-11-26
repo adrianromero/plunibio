@@ -4,10 +4,10 @@
  */
 
 import type {
-    ColDef, ICellEditorParams, ICellRendererParams, IDateStringCellEditorParams, INumberCellEditorParams,
+    ColDef, ICellEditorParams, ICellRendererParams, ITextCellEditorParams,
 } from "ag-grid-community";
 import type { Translator } from "@/i18n/Localization";
-import { tableCellTypes, type CellValue, type ColumnType } from "./TableCellTypes";
+import { tableCellTypes, type CellValue, type ColumnType, type TableFormatting } from "./TableCellTypes";
 import type { TableCell, TableColumn, TableRow } from "./TableDocument";
 import type { TableSearchController } from "./TableSearchController";
 import styles from "./ViewTable.module.css";
@@ -17,18 +17,68 @@ export type GridRow = { id: string; values?: TableRow };
 type GridColumn = ColDef<GridRow, CellValue>;
 type ColumnOptions = {
     t: Translator;
-    decimalSeparator: () => string;
+    formatting: () => TableFormatting;
     supportsMultilineText: boolean;
     setCell: (row: GridRow, column: TableColumn, value: CellValue) => boolean;
     search: Pick<TableSearchController, "contentChanged" | "isMatch" | "isCurrent">;
 };
 
+type ColumnPresentationOptions = ColumnOptions & {
+    definition: TableColumn;
+    read: (data?: GridRow) => TableCell | undefined;
+};
+
 type CellPresentation = {
     defaultWidth: number;
-    column(options: ColumnOptions & { read: (data?: GridRow) => TableCell | undefined }): GridColumn;
+    column(options: ColumnPresentationOptions): GridColumn;
     printClass?: string;
     displayEmptyAsText?: boolean;
 };
+
+function textColumn(read: (data?: GridRow) => TableCell | undefined, editorParams: { maxLength?: number } = {}): GridColumn {
+    return {
+        cellDataType: "text",
+        // Seed an editable string even when the underlying value is missing or invalid.
+        cellEditorParams: ({ data, value }: ICellEditorParams<GridRow, CellValue>) => ({
+            ...editorParams,
+            value: value ?? read(data)?.rawText ?? "",
+        }),
+        // Keep the empty string as a valid value instead of the grid's default null.
+        valueParser: ({ newValue }) => newValue,
+    };
+}
+
+function formattedTextColumn(
+    type: "number" | "date" | "datetime",
+    cellDataType: "number" | "dateString" | "dateTimeString",
+    example: CellValue,
+    { t, formatting, read }: ColumnPresentationOptions,
+): GridColumn {
+    const adapter = tableCellTypes[type];
+    const format = (value: CellValue): string => adapter.format(value, formatting());
+    const parse = (text: string): CellValue | undefined => adapter.parse(text, { formatting: formatting() });
+    const cellEditorParams = ({ data, value }: ICellEditorParams<GridRow, CellValue>): Pick<
+        ITextCellEditorParams<GridRow, CellValue>, "useFormatter" | "value" | "formatValue" | "getValidationErrors"
+    > => {
+        const rawText = read(data)?.rawText ?? "";
+        return {
+            useFormatter: true,
+            // Run a valid source string through the same validation even when confirmed untouched.
+            value: value ?? parse(rawText),
+            formatValue: () => value == null ? rawText : format(value),
+            getValidationErrors: ({ value, internalErrors }) =>
+                adapter.read(value) === undefined || (typeof value === "number" && !Number.isFinite(value))
+                    ? [t("table.expectedFormat", { example: format(example) })] : internalErrors,
+        };
+    };
+    return {
+        cellDataType,
+        cellEditor: "agTextCellEditor",
+        cellEditorParams,
+        valueParser: ({ newValue }) => typeof newValue === "string" ? parse(newValue) : adapter.read(newValue),
+        valueFormatter: ({ value }) => value == null ? "" : format(value),
+    };
+}
 
 export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
     string: {
@@ -39,16 +89,20 @@ export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
                 return typeof value === "string" && /[\r\n]/.test(value);
             };
             return {
-                cellDataType: "text",
+                ...textColumn(read),
                 editable: ({ data }) => !!data && (supportsMultilineText || !multiline(data)),
-                // Let the editor confirm text even when the grid has no valid string value for the cell.
-                cellEditorParams: ({ data, value }: ICellEditorParams<GridRow, CellValue>) => ({
-                    value: value ?? read(data)?.rawText ?? "",
-                }),
                 cellEditorSelector: ({ data }) => multiline(data) ? { component: "agLargeTextCellEditor" } : undefined,
-                valueParser: ({ newValue }) => typeof newValue === "string" ? tableCellTypes.string.parse(newValue) : newValue,
             };
         },
+    },
+    longtext: {
+        defaultWidth: 320,
+        column: ({ read }) => ({
+            // Use the maximum HTML textarea length in place of the grid's 200-character default.
+            ...textColumn(read, { maxLength: 2_147_483_647 }),
+            cellEditor: "agLargeTextCellEditor",
+            cellEditorPopup: true,
+        }),
     },
     boolean: {
         defaultWidth: 100,
@@ -57,28 +111,33 @@ export const tableCellPresentation: Record<ColumnType, CellPresentation> = {
     },
     number: {
         defaultWidth: 140,
-        column({ decimalSeparator, t }) {
-            const getValidationErrors: INumberCellEditorParams<GridRow>["getValidationErrors"] = ({ value, internalErrors }) =>
-                typeof value === "number" && Number.isFinite(value) ? internalErrors : [t("table.expected.number")];
-            return {
-                cellDataType: "number",
-                cellClass: "ag-right-aligned-cell",
-                cellEditorParams: { getValidationErrors },
-                valueParser: ({ newValue }) => typeof newValue === "string" ? tableCellTypes.number.parse(newValue) : newValue,
-                valueFormatter: ({ value }) => value == null ? "" : tableCellTypes.number.format(value, decimalSeparator()),
-            };
-        },
+        column: (options) => ({
+            ...formattedTextColumn("number", "number", 1.25, options),
+            cellClass: "ag-right-aligned-cell",
+        }),
         printClass: styles.numeric,
     },
     date: {
         defaultWidth: 140,
-        column({ t }) {
-            const getValidationErrors: IDateStringCellEditorParams<GridRow>["getValidationErrors"] = ({ value, internalErrors }) =>
-                tableCellTypes.date.read(value) === undefined ? [t("table.expected.date")] : internalErrors;
+        column: (options) => formattedTextColumn("date", "dateString", "2026-12-10", options),
+    },
+    datetime: {
+        defaultWidth: 220,
+        column: (options) => formattedTextColumn("datetime", "dateTimeString", "2026-12-10T16:45:30", options),
+    },
+    enum: {
+        defaultWidth: 180,
+        column({ definition, t }) {
+            const values = definition.values ?? [];
             return {
-                cellDataType: "dateString",
-                cellEditorParams: { getValidationErrors },
-                valueParser: ({ newValue }) => tableCellTypes.date.read(newValue),
+                cellDataType: "text",
+                cellEditor: "agSelectCellEditor",
+                // The native editor displays its first option when the cell has no selection.
+                cellEditorParams: ({ value }: ICellEditorParams<GridRow, CellValue>) => ({
+                    values: value == null ? [null, ...values] : [...values],
+                }),
+                valueFormatter: ({ value }) => value === null ? t("table.selectOption") : String(value ?? ""),
+                valueParser: ({ newValue }) => tableCellTypes.enum.read(newValue, definition),
             };
         },
     },
@@ -91,7 +150,8 @@ export function createTableGridColumn(definition: TableColumn, index: number, op
     const cellIssue = (cell?: TableCell): string | undefined => {
         if (!cell) return undefined;
         if (cell.missing) return t("table.missingValue");
-        return cell.value === undefined ? t(`table.expected.${definition.type}`) : undefined;
+        const type = definition.type === "longtext" ? "string" : definition.type;
+        return cell.value === undefined ? t(`table.expected.${type}`) : undefined;
     };
     const renderFallback = ({ data }: ICellRendererParams<GridRow, CellValue>): HTMLElement => {
         const cell = read(data);
@@ -108,7 +168,7 @@ export function createTableGridColumn(definition: TableColumn, index: number, op
         initialWidth: definition.width ?? presentation.defaultWidth,
         editable: ({ data }) => !!data,
         valueGetter: ({ data }) => read(data)?.value,
-        ...presentation.column({ ...options, read }),
+        ...presentation.column({ ...options, definition, read }),
         cellRendererSelector: ({ data, eGridCell }) => {
             const cell = read(data);
             const issue = cellIssue(cell);
@@ -118,7 +178,8 @@ export function createTableGridColumn(definition: TableColumn, index: number, op
             return undefined;
         },
         valueSetter: ({ data, newValue }) => {
-            if (!data || newValue == null || !setCell(data, definition, newValue)) return false;
+            const value = tableCellTypes[definition.type].read(newValue, definition);
+            if (!data || value === undefined || !setCell(data, definition, value)) return false;
             search.contentChanged();
             return true;
         },

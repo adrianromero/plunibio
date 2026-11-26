@@ -6,6 +6,14 @@
 export const APP_LOCALES = ["en", "es", "ca", "gl", "eu"] as const;
 export type AppLocale = (typeof APP_LOCALES)[number];
 
+export const formattingLocales = {
+    en: "en-US",
+    es: "es-ES",
+    ca: "ca-ES",
+    gl: "gl-ES",
+    eu: "eu-ES",
+} as const satisfies Record<AppLocale, string>;
+
 const LOCALE_KEY = "plunibio.locale";
 
 type LocalePreferenceReader = Pick<Storage, "getItem">;

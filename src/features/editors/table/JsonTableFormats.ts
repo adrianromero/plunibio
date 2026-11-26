@@ -8,7 +8,7 @@ import { createTableDocument, defaultTableColumns, type TableColumn } from "./Ta
 import type { TableFormat, TableLoadResult } from "./TableFormat";
 import { isJsonObject, parseJson, type JsonObject } from "./TableJson";
 
-function jsonType(value: unknown): TableColumn["type"] {
+function jsonType(value: unknown): "string" | "number" | "boolean" {
     const type = typeof value;
     return type === "number" || type === "boolean" ? type : "string";
 }
@@ -32,14 +32,15 @@ function loadJsonRows(
     return {
         document: createTableDocument<JsonObject>(columns, rows, {
             supportsMultilineText: true,
-            read(record, { id, type }) {
+            read(record, column) {
+                const { id, type } = column;
                 if (!Object.prototype.hasOwnProperty.call(record, id)) {
                     return { rawText: "", value: undefined, missing: true };
                 }
                 const raw = record[id];
                 return {
                     rawText: typeof raw === "object" ? JSON.stringify(raw) : String(raw),
-                    value: tableCellTypes[type].read(raw),
+                    value: tableCellTypes[type].read(raw, column),
                     missing: false,
                 };
             },

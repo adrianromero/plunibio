@@ -9,11 +9,15 @@
     "table": {
         "newRow": "New row",
         "missingValue": "Value missing.",
+        "selectOption": "Choose an option",
+        "expectedFormat": "Enter a value like {{ example }}.",
         "expected": {
             "string": "Expected text.",
             "number": "Expected a number.",
             "boolean": "Expected a boolean.",
-            "date": "Expected a date in YYYY-MM-DD format."
+            "date": "Expected a date in YYYY-MM-DD format.",
+            "datetime": "Expected a date and time in YYYY-MM-DDTHH:mm:ss format.",
+            "enum": "Expected one of the listed options."
         },
         "replacementRejected": "Cells skipped because the replacement did not match the column type: {{ count }}."
     },

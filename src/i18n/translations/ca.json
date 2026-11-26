@@ -9,11 +9,15 @@
     "table": {
         "newRow": "Fila nova",
         "missingValue": "Falta el valor.",
+        "selectOption": "Tria una opció",
+        "expectedFormat": "Introdueix un valor com ara {{ example }}.",
         "expected": {
             "string": "S’esperava text.",
             "number": "S’esperava un número.",
             "boolean": "S’esperava un valor booleà.",
-            "date": "S’esperava una data amb format AAAA-MM-DD."
+            "date": "S’esperava una data amb format AAAA-MM-DD.",
+            "datetime": "S’esperava una data i una hora amb el format AAAA-MM-DDTHH:mm:ss.",
+            "enum": "S’esperava una de les opcions de la llista."
         },
         "replacementRejected": "Cel·les omeses perquè el reemplaçament no coincideix amb el tipus de la columna: {{ count }}."
     },

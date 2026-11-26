@@ -9,11 +9,15 @@
     "table": {
         "newRow": "Errenkada berria",
         "missingValue": "Balioa falta da.",
+        "selectOption": "Aukeratu aukera bat",
+        "expectedFormat": "Sartu {{ example }} bezalako balio bat.",
         "expected": {
             "string": "Testua espero zen.",
             "number": "Zenbaki bat espero zen.",
             "boolean": "Balio boolear bat espero zen.",
-            "date": "AAAA-MM-DD formatuko data bat espero zen."
+            "date": "AAAA-MM-DD formatuko data bat espero zen.",
+            "datetime": "AAAA-MM-DDTHH:mm:ss formatuko data eta ordua espero ziren.",
+            "enum": "Zerrendako aukeretako bat espero zen."
         },
         "replacementRejected": "Ordezko balioa zutabearen motarekin bat ez datorrelako saltatutako gelaxkak: {{ count }}."
     },

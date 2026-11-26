@@ -5,7 +5,10 @@
 
 import type { CellValue, ColumnType } from "./TableCellTypes";
 
-export type TableColumn = { id: string; label: string; type: ColumnType; width?: number };
+export type TableColumn = { id: string; label: string; width?: number } & (
+    | { type: "enum"; values: readonly string[] }
+    | { type: Exclude<ColumnType, "enum">; values?: never }
+);
 
 export function defaultTableColumns(): TableColumn[] {
     return ["A", "B", "C"].map((id) => ({ id, label: id, type: "string" }));

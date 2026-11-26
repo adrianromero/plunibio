@@ -1,0 +1,20 @@
+[
+  {
+    "nombre": "Revisión de contenidos",
+    "importe": 125.5,
+    "activo": true,
+    "fecha": "2026-11-24",
+    "cita": "2026-11-24T09:30:00",
+    "notas": "Revisar los cambios de la última versión.\nEnviar el resultado al equipo.",
+    "estado": "en curso"
+  },
+  {
+    "nombre": "Entrega final",
+    "importe": 0,
+    "activo": false,
+    "fecha": "2026-12-02",
+    "cita": "2026-12-02T16:45:30",
+    "notas": "",
+    "estado": "pendiente"
+  }
+]

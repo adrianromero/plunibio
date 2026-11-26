@@ -9,11 +9,15 @@
     "table": {
         "newRow": "Fila nueva",
         "missingValue": "Falta el valor.",
+        "selectOption": "Elige una opción",
+        "expectedFormat": "Introduce un valor como {{ example }}.",
         "expected": {
             "string": "Se esperaba texto.",
             "number": "Se esperaba un número.",
             "boolean": "Se esperaba un valor booleano.",
-            "date": "Se esperaba una fecha con formato AAAA-MM-DD."
+            "date": "Se esperaba una fecha con formato AAAA-MM-DD.",
+            "datetime": "Se esperaba una fecha y hora con formato AAAA-MM-DDTHH:mm:ss.",
+            "enum": "Se esperaba una de las opciones de la lista."
         },
         "replacementRejected": "Celdas omitidas porque el reemplazo no coincide con el tipo de la columna: {{ count }}."
     },

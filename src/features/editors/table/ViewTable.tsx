@@ -11,11 +11,12 @@ import AppSidebar from "@/app/sidebar/AppSidebar";
 import type { ReadFileResult } from "@/backend/rusttypes";
 import SearchPanel from "@/features/search/SearchPanel";
 import { useI18N } from "@/i18n/Localization";
+import { formattingLocales } from "@/preferences/LocalePreferences";
 import { translateAppError } from "@/shared/errors/AppError";
 import SidebarTab from "@/shared/ui/sidebar/SidebarTab";
 import SidebarTabSection from "@/shared/ui/sidebar/SidebarTabSection";
 import { useEditorTextView } from "../text/EditorTextViewContext";
-import { tableCellTypes, type CellValue } from "./TableCellTypes";
+import { createTableFormatting, tableCellTypes, type CellValue } from "./TableCellTypes";
 import { createTableGridColumn, tableCellPresentation, type GridRow } from "./TableCellPresentation";
 import type { TableColumn, TableDocument, TableRow } from "./TableDocument";
 import { metadataFilename, parseTableColumns, tableFormatForFilename } from "./TableFormats";
@@ -29,8 +30,7 @@ export function ViewTable(): JSX.Element {
     const { t, locale } = useI18N();
     const { main: { basepath }, editor: { theme, searchFile, setSearchFile, setSidebarVisible } } = useAppContext();
     const [rejectedReplacements, setRejectedReplacements] = createSignal(0);
-    const decimalSeparator = createMemo(() => new Intl.NumberFormat(locale()).formatToParts(1.1)
-        .find(({ type }) => type === "decimal")?.value ?? ".");
+    const formatting = createMemo(() => createTableFormatting(formattingLocales[locale()]));
     let gridRef!: HTMLDivElement;
     let printRef!: HTMLDivElement;
     let grid: GridApi<GridRow> | null = null;
@@ -46,7 +46,7 @@ export function ViewTable(): JSX.Element {
     const createRow = (values?: TableRow): GridRow => ({ id: String(nextRowId++), values });
     const displayCell = (row: TableRow, column: TableColumn): string => {
         const cell = row.read(column);
-        return cell.value === undefined ? cell.rawText : tableCellTypes[column.type].format(cell.value, decimalSeparator());
+        return cell.value === undefined ? cell.rawText : tableCellTypes[column.type].format(cell.value, formatting());
     };
     const flushEdits = (): void => { grid?.stopEditing(); };
     const focusGrid = (): void => {
@@ -83,7 +83,10 @@ export function ViewTable(): JSX.Element {
                 const definition = model?.columns[column];
                 const data = grid?.getDisplayedRowAtIndex(row)?.data;
                 if (!definition || !data?.values) continue;
-                const parsed = tableCellTypes[definition.type].parse(value, decimalSeparator());
+                const parsed = tableCellTypes[definition.type].parse(value, {
+                    values: definition.values,
+                    formatting: formatting(),
+                });
                 if (parsed === undefined) rejected += 1;
                 else setCell(data, definition, parsed);
             }
@@ -105,7 +108,7 @@ export function ViewTable(): JSX.Element {
             });
         }
     );
-    createEffect(on(decimalSeparator, () => search.contentChanged(), { defer: true }));
+    createEffect(on(formatting, () => search.contentChanged(), { defer: true }));
 
     const displayRows = (table: TableDocument): string[][] => table.rows.map((row) =>
         table.columns.map((column) => displayCell(row, column))
@@ -206,8 +209,8 @@ export function ViewTable(): JSX.Element {
             }
             const {
                 CellStyleModule, CheckboxEditorModule, ClientSideRowModelApiModule, ClientSideRowModelModule,
-                DateEditorModule, LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
-                ScrollApiModule, TextEditorModule, TooltipModule, createGrid, themeQuartz,
+                LargeTextEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                ScrollApiModule, SelectEditorModule, TextEditorModule, TooltipModule, createGrid, themeQuartz,
             } = await import("ag-grid-community");
             if (version !== generation) return;
 
@@ -223,7 +226,7 @@ export function ViewTable(): JSX.Element {
                 columnDefs: [
                     rowNumberColumn,
                     ...table.columns.map((column, index) => createTableGridColumn(column, index, {
-                        t, decimalSeparator, supportsMultilineText: table.supportsMultilineText, setCell, search,
+                        t, formatting, supportsMultilineText: table.supportsMultilineText, setCell, search,
                     })),
                 ],
                 rowData: [...table.rows.map(createRow), createRow()],
@@ -237,8 +240,8 @@ export function ViewTable(): JSX.Element {
             }, {
                 modules: [
                     CellStyleModule, CheckboxEditorModule, ClientSideRowModelModule, ClientSideRowModelApiModule,
-                    DateEditorModule, LargeTextEditorModule, NumberEditorModule, RenderApiModule, RowApiModule, RowDragModule,
-                    ScrollApiModule, TextEditorModule, TooltipModule,
+                    LargeTextEditorModule, RenderApiModule, RowApiModule, RowDragModule,
+                    ScrollApiModule, SelectEditorModule, TextEditorModule, TooltipModule,
                 ],
             });
             gridRef.querySelector('[role="grid"]')?.setAttribute("aria-label", t("folder.table"));
