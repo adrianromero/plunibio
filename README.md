@@ -2,7 +2,7 @@
 
 ![1.00](./plunibio-readme.png)
 
-A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Crepe.
+A lightweight desktop Markdown editor built with Tauri, SolidJS, and Milkdown Crepe.
 
 > 🔵 Plunibio is under active development. Features and interfaces may change before the first stable release.
 
@@ -22,7 +22,7 @@ A lightweight desktop Markdown editor built with Tauri, SolidJS, and Mikldown Cr
 
 - Global loading feedback for asynchronous operations.
 
-- English and Spanish user interfaces selected from the system locale.
+- English, Spanish, Catalan, Galician and Basque interfaces, with a saved language preference and system-locale fallback.
 
 - Base-directory boundary checks in the Rust backend.
 
@@ -146,16 +146,32 @@ During feature development, bug fixes, refactoring, and other coding tasks, **do
 
 These updates are reserved for a dedicated documentation task when preparing a new release, once features are frozen, and still require an explicit request. Reading the directories is allowed; checks that would write to them must use temporary copies. Preserve any changes already present in the working tree.
 
-The main source directories are:
+### Application architecture
 
-```text
-src/                    SolidJS application and styles
-src/i18n/               English and Spanish translations
-src-tauri/src/          Rust application and Tauri commands
-src-tauri/capabilities/ Tauri security capabilities
-```
+At startup, the frontend applies the saved theme and typography, requests the initial workspace and filename from Rust, and mounts the Solid application. `App` provides localization and application context, asks Rust for the selected path's kind, and passes the selection to `RootContent`. Directories open the folder browser. Files go through the filename dispatcher. [Startup](src/index.tsx) · [App](src/app/App.tsx) · [Content selection](src/features/editors/ContentForPath.ts) · [RootContent](src/app/RootContent.tsx)
 
-Useful validation commands:
+| When changing | Where the behavior belongs |
+| --- | --- |
+| Navigation, editor commands or global feedback | `useAppContext()` exposes three groups. `main` owns the workspace, filename transitions and dialogs. `editor` exposes editor actions, modified state and display preferences. `spinner` provides loading feedback. Use `main.loadFilename` for ordinary navigation so the current editor's unload handler runs. [AppContext](src/app/AppContext.tsx) |
+| A keyboard shortcut | The application provider defines the key, modifiers and accessor for the currently available handler. The dispatcher matches events, checks blocked interactions and handles capture or bubble phase. Connect the shortcut and the toolbar to the same action so availability follows the active editor. [AppShortcuts](src/app/AppShortcuts.tsx) · [Toolbar](src/features/toolbar/Toolbar.tsx) |
+| Translated UI or errors | In a component, call `const { t } = useI18N()` and use `t("errors.unsupportedPathType", { filename })` for a parameterized message. Pass the typed `Translator` to helpers that need it. English defines the key shape. Keep the same keys and placeholder names across the five dictionaries. Rust error codes are translated at the UI boundary. [Localization](src/i18n/Localization.tsx) · [Dictionaries](src/i18n/translations/) · [Error translation](src/shared/errors/AppError.ts) |
+| Controls, styling or persisted UI preferences | Reuse the shared controls, menus, sidebar and dialogs. Keep component layout in adjacent `*.module.css`, use theme variables for colors, and put library-wide overrides in the Milkdown or AG Grid stylesheet. Preference modules own loading, saving and applying settings such as theme and typography. [Shared UI](src/shared/ui/) · [Styles](src/styles/) · [Preferences](src/preferences/) |
+| Cross-feature behavior | Look for path display, error presentation and logging in `src/shared/`. Search and printing have their own feature modules. For search, implement the existing controller contract when a new view needs a different search engine. [Shared helpers](src/shared/) · [SearchController](src/features/search/SearchController.ts) · [Printing](src/features/printing/) |
+| Native file access | Tauri registers commands in `lib.rs`. Existing file operations live in `commands.rs`, with workspace path handling in `paths.rs`. Follow the request and response through the Rust implementation and its TypeScript consumer when changing an IPC contract. [Registration](src-tauri/src/lib.rs) · [Commands](src-tauri/src/commands.rs) · [Paths](src-tauri/src/paths.rs) · [Frontend types](src/backend/rusttypes.ts) · [Capabilities](src-tauri/capabilities/) |
+
+### Extending an editor
+
+1. **Choose the entry point.** Put format-specific code beside the closest editor under `src/features/editors/`. The dispatcher checks compound filenames such as `.echarts.json`, table formats and known extensions before falling back to an external opener. For another text language, start with the language mapping. [Filename dispatch](src/features/editors/EditorForFilename.ts) · [CodeLanguages](src/features/editors/text/CodeLanguages.ts)
+2. **Choose the view.** `EditorText` passes filename-specific CodeMirror extensions to `EditorTextView` with `view={null}`. `EditorMarkdown` uses the same shell with Markdown extensions and a rich `ViewMarkdown` powered by Crepe. An alternate view uses `useEditorTextView()` to register its adapter and report readiness-related errors or empty states. [EditorText](src/features/editors/text/EditorText.tsx) · [EditorMarkdown](src/features/editors/markdown/EditorMarkdown.tsx) · [View contract](src/features/editors/text/EditorTextViewContext.tsx)
+3. **Use the shared file lifecycle.** The shell connects its adapter to `createFileEditorController`. The controller loads, saves and reloads through text or binary storage. The adapter supplies `getContent`, `replaceContent` and `destroy`, with optional hooks for buffered edits, focus and printing. Keep format parsing and serialization in the feature. Exercise opening, editing, switching modes where supported, saving and reopening the result. [EditorTextView](src/features/editors/text/EditorTextView.tsx) · [File controller and adapter](src/app/FileEditorController.ts)
+
+### Storybook and desktop automation
+
+Run `npm run storybook` to interact with component states, or `npm run build-storybook` to build the catalog. Stories live beside their feature in `__stories__/`. The preview provides localization, light and dark themes, and accessibility tooling. Wrap stories that consume application context in `StoryAppProvider` and keep them aligned with changes to props, handlers and visible states. [Preview configuration](.storybook/preview.tsx) · [StoryAppProvider](src/app/__stories__/support/StoryAppProvider.tsx)
+
+For end-to-end behavior, build the instrumented desktop app with `npm run automation:build`. For example, `npm run automation:run -- automation/flows/smoke-markdown-source.json` exercises Markdown editing on a temporary copy of the sample workspace. JSON flows also drive PDF checks and capture real desktop screenshots for the manual and website. Prefer accessible targets and check each flow's inputs and output directory. [Runner, selectors and capture workflows](automation/README.md) · [Markdown smoke flow](automation/flows/smoke-markdown-source.json)
+
+### Local validation
 
 ```bash
 npm run check
@@ -222,10 +238,9 @@ The macOS packages currently use an ad-hoc signature and the Windows packages ar
 
 ## Website maintenance
 
-When explicitly asked to update the bilingual website, start with
-[website/README.md](website/README.md). It includes the editorial contract, update-plan
-and chapter templates, automated screenshot procedures, and publication checks for Home,
-Features, Installation, Docs, and About. Follow the [documentation and examples policy](#documentation-and-examples-policy): these updates are deferred until release preparation with frozen features.
+For an authorized release documentation update, start from the recorded baseline, compare it with the target version and plan the affected Spanish and English pages together. The editorial guide defines terminology, chapter structure, warnings, evidence and completion criteria. The maintenance guide ties each chapter to its screenshot flows, image descriptions and publication checks. [Website maintenance](website/README.md) · [Editorial guide](website/maintenance/editorial.md) · [Documentation baseline](website/maintenance/current-baseline.md)
+
+The Atlas de Lumina and documentation lab workspaces provide examples for walkthroughs, QA and screenshots. Use temporary copies for checks that edit their contents. Updates to these workspaces and the site follow the [documentation and examples policy](#documentation-and-examples-policy). [Example workspace guidelines](examples/README.md)
 
 ## Contributing
 
